@@ -44,50 +44,61 @@ def fetch(group, size, page, order = 'reservedAt:desc'):
 		# throw
 
 
-def ls_group(group, size=10, page=1):
-	for item in fetch(group, size, page)['list']:
-		author = item['category']['name']
-		title = item['values']['title']
-		url = os.path.join(blog_url(group), item['contentId'])
-		print(author, title, url)
+def list_group(group, size=10, page=1):
+	for i in fetch(group, size, page)['list']:
+		show(i, group)
 
 
-def ls_member(name, size=10, group=None):
+def list_member(name, group=None, size=10, page=1):
 	if not group in member.belongs_to(name):
 		group = member.belongs_to(name)[0]
 
-	page = 0
 	listed = 0
-
 	while listed<size:
-		page += 1
-		response = fetch(group, size*3, page)
+		items = list(filter(
+			lambda i: i['category']['name'] == member.full_name(name),
+			fetch(group, size*3, page)['list']))
 
-		for item in response['list']:
-			author = item['category']['name']
-			if author == member.full_name(name):
-				title = item['values']['title']
-				url = blog_url(group) + '/' + item['contentId']
-				print(author, title, url)
-				listed += 1
+		for i in items:
+			show(i, group)
+		listed += len(items)
+		page += 1
+
+	return page
+
+
+def show(item, group):
+	author = item['category']['name']
+	title = item['values']['title']
+	url = os.path.join(blog_url(group), item['contentId'])
+	published = item['openingAt']
+	created = item['createdAt']
+
+	print(author, title, url)
 
 
 def ls():
 	parser = argparse.ArgumentParser()
 
+	# arguments for fetching
 	parser.add_argument('name', type=str,
 		help='group or member name')
+
 	parser.add_argument('-s', '--size', type=int, default=10,
 		help='number of articles in [1, 99]')
+
 	parser.add_argument('-p', '--page', type=int, default=1,
 		help='page number')
+
 	parser.add_argument('--group', type=str,
 		help='specify group when name is a member')
 
-	args = parser.parse_args()
 
-	if member.is_group(args.name):
-		ls_group(args.name, args.size, args.page)
+	argv = parser.parse_args()
 
-	elif member.is_member(args.name):
-		ls_member(args.name, args.size, args.group)
+
+	if member.is_group(argv.name):
+		list_group(argv.name, argv.size, argv.page)
+
+	elif member.is_member(argv.name):
+		list_member(argv.name, group=argv.group, size=argv.size)
