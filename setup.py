@@ -8,7 +8,7 @@ setup(
 	packages=find_packages(),
 	entry_points={
 		'console_scripts': [
-			'gl2f-blogs = gl2f.blogs:ls'
+			'gl2blogs = gl2f.blogs:ls'
 		]
 	}
 )
