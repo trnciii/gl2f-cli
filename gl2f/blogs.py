@@ -1,5 +1,6 @@
 import requests
 import sys, argparse
+from . import member
 
 
 def request_url(group):
@@ -50,19 +51,36 @@ def ls_group(group, size=10, page=1):
 		print(author, title, url)
 
 
+def ls_member(name, size=10):
+	group = member.belongs_to(name)[0]
+	page = 0
+	listed = 0
+
+	while listed<size:
+		page += 1
+		response = fetch(group, size*3, page)
+
+		for item in response['list']:
+			author = item['category']['name']
+			if author == member.full_name(name):
+				title = item['values']['title']
+				url = blog_url(group) + '/' + item['contentId']
+				print(author, title, url)
+				listed += 1
+
+
+
 def ls(argv = sys.argv):
 	parser = argparse.ArgumentParser()
 
-	parser.add_argument('group', type=str, help='group name')
-	parser.add_argument('-s', '--size', default=10, help='number of articles')
-	parser.add_argument('-p', '--page', default=1, help='page')
+	parser.add_argument('name', type=str, help='group or member name')
+	parser.add_argument('-s', '--size', type=int, default=10, help='number of articles in [1, 99]')
+	parser.add_argument('-p', '--page', type=int, default=1, help='page')
 
 	args = parser.parse_args()
 
+	if member.is_group(args.name):
+		ls_group(args.name, args.size, args.page)
 
-	ls_group(args.group, args.size, args.page)
-
-
-
-if __name__ == '__main__':
-	ls()
+	elif member.is_member(args.name):
+		ls_member(args.name, args.size)
