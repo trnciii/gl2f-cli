@@ -44,14 +44,34 @@ def fetch(group, size, page, order = 'reservedAt:desc'):
 		# throw
 
 
-def list_group(group, size=10, page=1):
-	for i in fetch(group, size, page)['list']:
-		show(i, group)
+class Formatter:
+	def __init__(self):
+		self.url_parent = None
+
+	def set_group(self, group):
+		self.url_parent = blog_url(group)
+
+	def format(self, item, end='\n'):
+		author = item['category']['name']
+		title = item['values']['title']
+		url = os.path.join(self.url_parent, item['contentId'])
+		published = item['openingAt']
+		created = item['createdAt']
+
+		return ' '.join([author, title, url])
 
 
-def list_member(name, group=None, size=10, page=1):
+def list_group(group, size=10, page=1, formatter=Formatter()):
+	formatter.set_group(group)
+	items = fetch(group, size, page)['list']
+	print(*[formatter.format(i) for i in items], sep='\n')
+
+
+def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 	if not group in member.belongs_to(name):
 		group = member.belongs_to(name)[0]
+
+	formatter.set_group(group)
 
 	listed = 0
 	while listed<size:
@@ -59,25 +79,15 @@ def list_member(name, group=None, size=10, page=1):
 			lambda i: i['category']['name'] == member.full_name(name),
 			fetch(group, size*3, page)['list']))
 
-		for i in items:
-			show(i, group)
+		print(*[formatter.format(i) for i in items], sep='\n')
+
 		listed += len(items)
 		page += 1
 
 	return page
 
 
-def show(item, group):
-	author = item['category']['name']
-	title = item['values']['title']
-	url = os.path.join(blog_url(group), item['contentId'])
-	published = item['openingAt']
-	created = item['createdAt']
-
-	print(author, title, url)
-
-
-def ls():
+def parse_args():
 	parser = argparse.ArgumentParser()
 
 	# arguments for fetching
@@ -93,12 +103,15 @@ def ls():
 	parser.add_argument('--group', type=str,
 		help='specify group when name is a member')
 
+	return parser.parse_args()
 
-	argv = parser.parse_args()
 
+def ls():
+	argv = parse_args()
+	pr = Formatter()
 
 	if member.is_group(argv.name):
-		list_group(argv.name, argv.size, argv.page)
+		list_group(argv.name, argv.size, argv.page, formatter=pr)
 
 	elif member.is_member(argv.name):
-		list_member(argv.name, group=argv.group, size=argv.size)
+		list_member(argv.name, group=argv.group, size=argv.size, formatter=pr)
