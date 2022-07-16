@@ -52,8 +52,10 @@ def ls_group(group, size=10, page=1):
 		print(author, title, url)
 
 
-def ls_member(name, size=10):
-	group = member.belongs_to(name)[0]
+def ls_member(name, size=10, group=None):
+	if not group in member.belongs_to(name):
+		group = member.belongs_to(name)[0]
+
 	page = 0
 	listed = 0
 
@@ -70,13 +72,17 @@ def ls_member(name, size=10):
 				listed += 1
 
 
-
-def ls(argv = sys.argv):
+def ls():
 	parser = argparse.ArgumentParser()
 
-	parser.add_argument('name', type=str, help='group or member name')
-	parser.add_argument('-s', '--size', type=int, default=10, help='number of articles in [1, 99]')
-	parser.add_argument('-p', '--page', type=int, default=1, help='page')
+	parser.add_argument('name', type=str,
+		help='group or member name')
+	parser.add_argument('-s', '--size', type=int, default=10,
+		help='number of articles in [1, 99]')
+	parser.add_argument('-p', '--page', type=int, default=1,
+		help='page number')
+	parser.add_argument('--group', type=str,
+		help='specify group when name is a member')
 
 	args = parser.parse_args()
 
@@ -84,4 +90,4 @@ def ls(argv = sys.argv):
 		ls_group(args.name, args.size, args.page)
 
 	elif member.is_member(args.name):
-		ls_member(args.name, args.size)
+		ls_member(args.name, args.size, args.group)
