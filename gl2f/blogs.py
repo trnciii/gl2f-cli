@@ -1,4 +1,5 @@
 import requests
+import os
 import sys, argparse
 from . import member
 
@@ -16,7 +17,7 @@ def blog_url(group):
 	url = {
 		'girls2': 'https://girls2-fc.jp/page/blogs',
 		'lovely2': 'https://girls2-fc.jp/page/lovely2blogs',
-		'lucky2': 'https://girls2-fc.jp/page/lucky2blogs/',
+		'lucky2': 'https://girls2-fc.jp/page/lucky2blogs',
 	}
 	return url[group]
 
@@ -47,7 +48,7 @@ def ls_group(group, size=10, page=1):
 	for item in fetch(group, size, page)['list']:
 		author = item['category']['name']
 		title = item['values']['title']
-		url = blog_url(group) + '/' + item['contentId']
+		url = os.path.join(blog_url(group), item['contentId'])
 		print(author, title, url)
 
 
