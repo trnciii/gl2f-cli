@@ -56,7 +56,7 @@ class Formatter:
 
 	def format(self, item, end='\n'):
 		dic = {
-			'author': item['category']['name'],
+			'author': util.justzen(item['category']['name'], member.name_width()),
 			'title': item['values']['title'],
 			'url': os.path.join(self.url_parent, item['contentId']),
 			'date-p': util.to_datetime(item['openingAt']).strftime(self.fdstring),

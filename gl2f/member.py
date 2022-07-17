@@ -43,6 +43,10 @@ def full_name(name):
 	return table[name]['fullname']
 
 
+def name_width():
+	return max(len(i['fullname']) for i in table.values())
+
+
 if __name__ == '__main__':
 	assert is_group('yuzuha') == False
 	assert is_group('girls2') == True
