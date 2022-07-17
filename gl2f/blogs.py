@@ -38,7 +38,6 @@ def fetch(group, size, page, order = 'reservedAt:desc'):
 
 	if response.ok:
 		return response.json()
-
 	else:
 		print('fetch failed')
 		# throw
@@ -46,7 +45,7 @@ def fetch(group, size, page, order = 'reservedAt:desc'):
 
 def ls_group(group, size=10, page=1):
 	for item in fetch(group, size, page)['list']:
-		author = item['category']['name']
+		author = member.full_name(member.id_to_name(item['categoryId']))
 		title = item['values']['title']
 		url = os.path.join(blog_url(group), item['contentId'])
 		print(author, title, url)
