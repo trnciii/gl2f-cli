@@ -92,6 +92,16 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 	return page
 
 
+def list_today(formatter=Formatter()):
+	for group in ['girls2', 'lucky2']:
+		formatter.set_group(group)
+		items = filter(
+			lambda i: util.is_today(i['openingAt']),
+			fetch(group, size=10, page=1)['list'])
+
+		print(*[formatter.format(i) for i in items], sep='\n')
+
+
 def parse_args():
 	parser = argparse.ArgumentParser()
 
@@ -139,3 +149,6 @@ def ls():
 
 	elif member.is_member(argv.name):
 		list_member(argv.name, group=argv.group, size=argv.size, formatter=pr)
+
+	elif argv.name == 'today':
+		list_today(formatter=pr)
