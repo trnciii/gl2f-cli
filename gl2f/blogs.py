@@ -1,8 +1,7 @@
 import requests
 import os
 import sys, argparse
-from . import member
-from .util import to_datetime
+from . import member, util
 
 
 def request_url(group):
@@ -60,11 +59,12 @@ class Formatter:
 			'author': item['category']['name'],
 			'title': item['values']['title'],
 			'url': os.path.join(self.url_parent, item['contentId']),
-			'date-p': to_datetime(item['openingAt']).strftime(self.fdstring),
-			'date-c': to_datetime(item['createdAt']).strftime(self.fdstring),
+			'date-p': util.to_datetime(item['openingAt']).strftime(self.fdstring),
+			'date-c': util.to_datetime(item['createdAt']).strftime(self.fdstring),
+			'\\n': '\n',
 		}
 
-		return self.sep.join([dic[key] for key in self.fstring.split('|')])
+		return self.sep.join(dic[key] for key in self.fstring.split('|'))
 
 
 def list_group(group, size=10, page=1, formatter=Formatter()):
@@ -112,7 +112,7 @@ def parse_args():
 
 	# formatting
 	parser.add_argument('--format', '-F', type=str, default='author|title|url',
-		help='formatting. list {author, date-p(published), date-c(created), title, url} with | separator. default="author|data-p|title|url"')
+		help='formatting. list {author, date-p(published), date-c(created), title, url, \\n} with | separator. default="author|data-p|title|url"')
 
 	parser.add_argument('--date-format', '-Fd', type=str, default='%m/%d',
 		help='date formatting.')
@@ -120,8 +120,16 @@ def parse_args():
 	parser.add_argument('--sep', type=str, default=' ',
 		help='separator string.')
 
+	parser.add_argument('--break-urls', action='store_true',
+		help='break before url')
 
-	return parser.parse_args()
+
+	args = parser.parse_args()
+
+	if args.break_urls:
+		args.format = args.format.replace('url', '\\n|url')
+
+	return args
 
 def ls():
 	argv = parse_args()
