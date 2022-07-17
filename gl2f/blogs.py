@@ -127,7 +127,7 @@ def parse_args():
 	parser.add_argument('name', type=str,
 		help='group or member name')
 
-	parser.add_argument('-s', '--size', type=int, default=10,
+	parser.add_argument('-n', '--number', type=int, default=10,
 		help='number of articles in [1, 99]')
 
 	parser.add_argument('-p', '--page', type=int, default=1,
@@ -138,10 +138,10 @@ def parse_args():
 
 
 	# formatting
-	parser.add_argument('--format', '-F', type=str, default='author|title|url',
-		help='formatting. list {author, date-p(published), date-c(created), title, url, \\n} with | separator. default="author|data-p|title|url"')
+	parser.add_argument('--format', '-f', type=str, default='author|title|url',
+		help='formatting. list {author, date-p(published), date-c(created), title, url, text, \\n} with "|" separator. default="author|title|url"')
 
-	parser.add_argument('--date-format', '-Fd', type=str, default='%m/%d',
+	parser.add_argument('--date-format', '-df', type=str, default='%m/%d',
 		help='date formatting.')
 
 	parser.add_argument('--sep', type=str, default=' ',
@@ -153,11 +153,17 @@ def parse_args():
 	parser.add_argument('--preview', action='store_true',
 		help='show blog text')
 
+	parser.add_argument('--date', '-d', action='store_true',
+		help='show publish date on the left')
+
 
 	args = parser.parse_args()
 
 	if args.break_urls:
 		args.format = args.format.replace('url', '\\n|url')
+
+	if args.date:
+		args.format = 'date-p|' + args.format
 
 	if args.preview:
 		args.format += '|\\n|text|\\n'
@@ -169,10 +175,10 @@ def ls():
 	pr = Formatter(f=argv.format, fd=argv.date_format, sep=argv.sep)
 
 	if member.is_group(argv.name):
-		list_group(argv.name, argv.size, argv.page, formatter=pr)
+		list_group(argv.name, argv.number, argv.page, formatter=pr)
 
 	elif member.is_member(argv.name):
-		list_member(argv.name, group=argv.group, size=argv.size, formatter=pr)
+		list_member(argv.name, group=argv.group, size=argv.number, formatter=pr)
 
 	elif argv.name == 'today':
 		list_today(formatter=pr)
