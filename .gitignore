@@ -2,3 +2,4 @@
 build/
 *.egg-info
 *.json
+gl2f/auth

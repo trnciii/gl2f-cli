@@ -102,6 +102,12 @@ table = {
 		'fullname': '佐藤妃希',
 		'categoryId': '661168410020807520'
 	},
+
+	'lovely2staff': {
+		'group' : [],
+		'fullname': "スタッフ",
+		'categoryId': "436714547944883137",
+	}
 }
 
 

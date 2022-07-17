@@ -1,5 +1,6 @@
 import requests
 import os
+import json
 import sys, argparse
 from . import member, util
 
@@ -22,7 +23,16 @@ def blog_url(group):
 	return url[group]
 
 
-def fetch(group, size, page, order = 'reservedAt:desc'):
+def load_xauth():
+	authfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'auth')
+	if os.path.exists(authfile):
+		with open(authfile) as f:
+			return f.readline()
+	else:
+		return ''
+
+
+def fetch(group, size, page, order = 'reservedAt:desc', xauth=''):
 	response = requests.get(
 		request_url(group),
 		params={
@@ -34,6 +44,7 @@ def fetch(group, size, page, order = 'reservedAt:desc'):
 		headers={
 	    'origin': 'https://girls2-fc.jp',
 	    'x-from': blog_url(group),
+			'x-authorization': xauth,
 		})
 
 	if response.ok:
@@ -67,12 +78,15 @@ class Formatter:
 
 
 def list_group(group, size=10, page=1, formatter=Formatter()):
+	xauth=load_xauth()
 	formatter.set_group(group)
-	items = fetch(group, size, page)['list']
+	items = fetch(group, size, page, xauth=xauth)['list']
 	print(*[formatter.format(i) for i in items], sep='\n')
 
 
 def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
+	xauth=load_xauth()
+
 	if not group in member.belongs_to(name):
 		group = member.belongs_to(name)[0]
 
@@ -82,7 +96,7 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 	while listed<size:
 		items = list(filter(
 			lambda i: i['category']['name'] == member.full_name(name),
-			fetch(group, size*3, page)['list']))
+			fetch(group, size*3, page, xauth=xauth)['list']))
 
 		print(*[formatter.format(i) for i in items], sep='\n')
 
@@ -93,11 +107,13 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 
 
 def list_today(formatter=Formatter()):
+	xauth=load_xauth()
+
 	for group in ['girls2', 'lucky2']:
 		formatter.set_group(group)
 		items = filter(
 			lambda i: util.is_today(i['openingAt']),
-			fetch(group, size=10, page=1)['list'])
+			fetch(group, size=10, page=1, xauth=xauth)['list'])
 
 		print(*[formatter.format(i) for i in items], sep='\n')
 
