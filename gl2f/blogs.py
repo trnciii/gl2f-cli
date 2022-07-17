@@ -71,10 +71,12 @@ class Formatter:
 			'url': os.path.join(self.url_parent, item['contentId']),
 			'date-p': util.to_datetime(item['openingAt']).strftime(self.fdstring),
 			'date-c': util.to_datetime(item['createdAt']).strftime(self.fdstring),
+			'text': '\n'.join(util.paragraphs(item['values']['body'])),
 			'\\n': '\n',
 		}
 
-		return self.sep.join(dic[key] for key in self.fstring.split('|'))
+		return self.sep.join(dic[key] for key in self.fstring.split('|'))\
+			.replace(f'{self.sep}\n{self.sep}', '\n')
 
 
 def list_group(group, size=10, page=1, formatter=Formatter()):
@@ -148,11 +150,17 @@ def parse_args():
 	parser.add_argument('--break-urls', action='store_true',
 		help='break before url')
 
+	parser.add_argument('--preview', action='store_true',
+		help='show blog text')
+
 
 	args = parser.parse_args()
 
 	if args.break_urls:
 		args.format = args.format.replace('url', '\\n|url')
+
+	if args.preview:
+		args.format += '|\\n|text|\\n'
 
 	return args
 
