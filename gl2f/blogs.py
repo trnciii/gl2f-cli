@@ -2,6 +2,7 @@ import requests
 import os
 import sys, argparse
 from . import member
+from .util import to_datetime
 
 
 def request_url(group):
@@ -45,20 +46,25 @@ def fetch(group, size, page, order = 'reservedAt:desc'):
 
 
 class Formatter:
-	def __init__(self):
+	def __init__(self, f='author|title|url', fd='%m/%d', sep=' '):
 		self.url_parent = None
+		self.fstring = f
+		self.fdstring = fd
+		self.sep = sep
 
 	def set_group(self, group):
 		self.url_parent = blog_url(group)
 
 	def format(self, item, end='\n'):
-		author = item['category']['name']
-		title = item['values']['title']
-		url = os.path.join(self.url_parent, item['contentId'])
-		published = item['openingAt']
-		created = item['createdAt']
+		dic = {
+			'author': item['category']['name'],
+			'title': item['values']['title'],
+			'url': os.path.join(self.url_parent, item['contentId']),
+			'date-p': to_datetime(item['openingAt']).strftime(self.fdstring),
+			'date-c': to_datetime(item['createdAt']).strftime(self.fdstring),
+		}
 
-		return ' '.join([author, title, url])
+		return self.sep.join([dic[key] for key in self.fstring.split('|')])
 
 
 def list_group(group, size=10, page=1, formatter=Formatter()):
@@ -90,7 +96,7 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 def parse_args():
 	parser = argparse.ArgumentParser()
 
-	# arguments for fetching
+	# listing
 	parser.add_argument('name', type=str,
 		help='group or member name')
 
@@ -101,14 +107,25 @@ def parse_args():
 		help='page number')
 
 	parser.add_argument('--group', type=str,
-		help='specify group when name is a member')
+		help='specify group when name is a member.')
+
+
+	# formatting
+	parser.add_argument('--format', '-F', type=str, default='author|title|url',
+		help='formatting. list {author, date-p(published), date-c(created), title, url} with | separator. default="author|data-p|title|url"')
+
+	parser.add_argument('--date-format', '-Fd', type=str, default='%m/%d',
+		help='date formatting.')
+
+	parser.add_argument('--sep', type=str, default=' ',
+		help='separator string.')
+
 
 	return parser.parse_args()
 
-
 def ls():
 	argv = parse_args()
-	pr = Formatter()
+	pr = Formatter(f=argv.format, fd=argv.date_format, sep=argv.sep)
 
 	if member.is_group(argv.name):
 		list_group(argv.name, argv.size, argv.page, formatter=pr)
