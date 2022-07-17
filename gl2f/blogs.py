@@ -27,7 +27,7 @@ def load_xauth():
 	authfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'auth')
 	if os.path.exists(authfile):
 		with open(authfile) as f:
-			return f.readline()
+			return f.readline().rstrip('\n')
 	else:
 		return ''
 
