@@ -24,6 +24,8 @@ def blog_url(group):
 
 
 def fetch(group, size, page, order = 'reservedAt:desc', xauth=''):
+	auth.verify()
+
 	response = requests.get(
 		request_url(group),
 		params={
