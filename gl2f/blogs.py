@@ -71,7 +71,7 @@ class Formatter:
 			'url': os.path.join(self.url_parent, item['contentId']),
 			'date-p': util.to_datetime(item['openingAt']).strftime(self.fdstring),
 			'date-c': util.to_datetime(item['createdAt']).strftime(self.fdstring),
-			'text': '\n'.join(util.paragraphs(item['values']['body'])),
+			'text': '\n' + '\n'.join(util.paragraphs(item['values']['body'])) + '\n',
 			'\\n': '\n',
 		}
 
@@ -166,7 +166,7 @@ def parse_args():
 		args.format = 'date-p|' + args.format
 
 	if args.preview:
-		args.format += '|\\n|text|\\n'
+		args.format += '|text'
 
 	return args
 
