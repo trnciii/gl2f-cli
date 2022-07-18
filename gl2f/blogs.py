@@ -119,7 +119,8 @@ class Formatter:
 def list_group(group, size=10, page=1, formatter=Formatter()):
 	formatter.set_group(group)
 	items = fetch(group, size, page, xauth=auth.load())['list']
-	print(*[formatter.format(i) for i in items], sep='\n')
+	for i in items:
+		print(formatter.format(i))
 
 
 def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
@@ -137,7 +138,8 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 			lambda i: member.from_id(i['categoryId'])[0] == name,
 			fetch(group, 99, page, xauth=auth.load())['list']))
 
-		print(*[formatter.format(i) for i in items], sep='\n')
+		for i in items:
+			print(formatter.format(i))
 
 		listed += len(items)
 		page += 1
@@ -152,7 +154,8 @@ def list_today(formatter=Formatter()):
 			lambda i: util.is_today(i['openingAt']),
 			fetch(group, size=10, page=1, xauth=auth.load())['list'])
 
-		print(*[formatter.format(i) for i in items], sep='\n')
+		for i in items:
+			print(formatter.format(i))
 
 
 def parse_args():
