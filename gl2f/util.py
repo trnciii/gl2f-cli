@@ -3,8 +3,10 @@ import re
 
 
 def paragraphs(body):
-	lines = [re.sub('<[^>]*>', '', line) for line in body.split('<br>')]
-	return filter(lambda x: x!='', lines)
+	return filter(
+		lambda x: x!='',
+		(re.sub('<[^>]*>', '', para) for para in body.split('<br>'))
+	)
 
 
 def to_datetime(t):
