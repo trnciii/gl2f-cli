@@ -63,10 +63,26 @@ class Formatter:
 
 	def set_group(self, group):
 		self.url_parent = blog_url(group)
+		self.group = group
+
+
+	def author(self, item):
+		k, v = member.from_id(item['categoryId'])
+		fullname = v['fullname']
+		colf, colb = v['color'][self.group].values()
+		mods = [
+			'[1',
+			util.term_rgb(*colf),
+			util.term_rgb(*colb, 'b')
+		]
+		return util.justzen(
+			util.term_mod(fullname, mods),
+			member.name_width()
+		)
 
 	def format(self, item, end='\n'):
 		dic = {
-			'author': util.justzen(member.full_name(member.id_to_name(item['categoryId'])), member.name_width()),
+			'author': self.author(item),
 			'title': item['values']['title'],
 			'url': os.path.join(self.url_parent, item['contentId']),
 			'date-p': util.to_datetime(item['openingAt']).strftime(self.fdstring),
