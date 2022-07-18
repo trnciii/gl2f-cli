@@ -32,20 +32,22 @@ def remove():
 def verify():
 	import requests
 
+	au = load()
+
 	response = requests.get(
 		'https://api.fensi.plus/v1/auth/token/verify',
 		cookies={},
 		headers={
 	    'origin': 'https://girls2-fc.jp',
-	    'x-authorization': load(),
+	    'x-authorization': au,
 	    'x-from': 'https://girls2-fc.jp/page/blogs',
 	    'x-root-origin': 'https://girls2-fc.jp',
 		}).json()
 
-	if auth != response['token']:
+	if au != response['token']:
 		print('token seems to be updated!!')
 		print('current')
-		print(auth)
+		print(au)
 		print()
 		print('new')
 		print(response['token'])
