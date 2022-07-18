@@ -131,7 +131,7 @@ def get():
 		},
 
 		'lovely2staff': {
-			'group' : [],
+			'group' : ['lovely2'],
 			'fullname': "スタッフ",
 			'color':{'lovely2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
 			'categoryId': "436714547944883137",
