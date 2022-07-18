@@ -71,18 +71,36 @@ class Formatter:
 			member.name_width()
 		)
 
+	def title(self, item):
+		return term.mod(item['values']['title'], [term.bold()])
+
+	def url(self, item):
+		return term.mod(os.path.join(self.url_parent, item['contentId']), [term.dim()])
+
+	def date_p(self, item):
+		return util.to_datetime(item['openingAt']).strftime(self.fdstring)
+
+	def date_c(self, item):
+		return util.to_datetime(item['createdAt']).strftime(self.fdstring)
+
+	def text(self, item):
+		return '\n{}\n'.format( '\n'.join(util.paragraphs(item['values']['body'])) )
+
+	def breakline(self, item):
+		return '\n'
+
 	def format(self, item, end='\n'):
 		dic = {
-			'author': self.author(item),
-			'title': term.mod(item['values']['title'], [term.bold()]),
-			'url': term.mod(os.path.join(self.url_parent, item['contentId']), [term.dim()]),
-			'date-p': util.to_datetime(item['openingAt']).strftime(self.fdstring),
-			'date-c': util.to_datetime(item['createdAt']).strftime(self.fdstring),
-			'text': '\n' + '\n'.join(util.paragraphs(item['values']['body'])) + '\n',
-			'\\n': '\n',
+			'author': self.author,
+			'title': self.title,
+			'url': self.url,
+			'date-p': self.date_p,
+			'date-c': self.date_c,
+			'text': self.text,
+			'\\n': self.breakline,
 		}
 
-		return self.sep.join(dic[key] for key in self.fstring.split('|'))\
+		return self.sep.join(dic[key](item) for key in self.fstring.split('|'))\
 			.replace(f'{self.sep}\n{self.sep}', '\n')
 
 
