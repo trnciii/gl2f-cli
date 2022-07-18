@@ -2,7 +2,7 @@ import requests
 import os
 import json
 import sys, argparse
-from . import member, util
+from . import member, util, terminal as term
 
 
 def request_url(group):
@@ -71,12 +71,12 @@ class Formatter:
 		fullname = v['fullname']
 		colf, colb = v['color'][self.group].values()
 		mods = [
-			'[1',
-			util.term_rgb(*colf),
-			util.term_rgb(*colb, 'b')
+			term.bold(),
+			term.rgb(*colf),
+			term.rgb(*colb, 'b')
 		]
-		return util.justzen(
-			util.term_mod(fullname, mods),
+		return term.justzen(
+			term.mod(fullname, mods),
 			member.name_width()
 		)
 
