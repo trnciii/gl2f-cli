@@ -52,9 +52,16 @@ class Formatter:
 		self.fdstring = fd
 		self.sep = sep
 
+		self.index = 0
+		self.digits = 2
+
 	def set_group(self, group):
 		self.url_parent = blog_url(group)
 		self.group = group
+
+	def reset_index(self, i=0, digits=2):
+		self.index = i
+		self.digits = digits
 
 
 	def author(self, item):
@@ -89,6 +96,10 @@ class Formatter:
 	def breakline(self, item):
 		return '\n'
 
+	def inc_index(self, item):
+		self.index += 1
+		return f'{self.index:{self.digits}}'
+
 	def format(self, item, end='\n'):
 		dic = {
 			'author': self.author,
@@ -97,6 +108,7 @@ class Formatter:
 			'date-p': self.date_p,
 			'date-c': self.date_c,
 			'text': self.text,
+			'index': self.inc_index,
 			'\\n': self.breakline,
 		}
 
@@ -179,6 +191,9 @@ def parse_args():
 	parser.add_argument('--date', '-d', action='store_true',
 		help='show publish date on the left')
 
+	parser.add_argument('--enum', action='store_true',
+		help='show index on the left (lefter than date)')
+
 
 	args = parser.parse_args()
 
@@ -188,6 +203,9 @@ def parse_args():
 	if args.date:
 		args.format = 'date-p|' + args.format
 
+	if args.enum:
+		args.format = 'index|' + args.format
+
 	if args.preview:
 		args.format += '|text'
 
@@ -195,13 +213,14 @@ def parse_args():
 
 def ls():
 	argv = parse_args()
-	pr = Formatter(f=argv.format, fd=argv.date_format, sep=argv.sep)
+	fm = Formatter(f=argv.format, fd=argv.date_format, sep=argv.sep)
+	fm.reset_index(digits=len(str(argv.number)))
 
 	if member.is_group(argv.name):
-		list_group(argv.name, argv.number, argv.page, formatter=pr)
+		list_group(argv.name, argv.number, argv.page, formatter=fm)
 
 	elif member.is_member(argv.name):
-		list_member(argv.name, group=argv.group, size=argv.number, formatter=pr)
+		list_member(argv.name, group=argv.group, size=argv.number, formatter=fm)
 
 	elif argv.name == 'today':
-		list_today(formatter=pr)
+		list_today(formatter=fm)
