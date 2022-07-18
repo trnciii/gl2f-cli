@@ -113,7 +113,7 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 	listed = 0
 	while listed<size:
 		items = list(filter(
-			lambda i: i['category']['name'] == member.full_name(name),
+			lambda i: i['category']['name'] == member.from_name(name)['fullname'],
 			fetch(group, size*3, page, xauth=xauth)['list']))
 
 		print(*[formatter.format(i) for i in items], sep='\n')
