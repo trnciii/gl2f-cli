@@ -42,6 +42,11 @@ def verify():
 		}).json()
 
 
+def login():
+	add()
+	return 'success' if verify()['success'] else 'fail'
+
+
 def auth():
 	import argparse
 
@@ -50,7 +55,8 @@ def auth():
 		'remove': remove,
 		'verify': verify,
 		'file': file,
-		'load': load
+		'load': load,
+		'login': login,
 	}
 
 	parser = argparse.ArgumentParser()
