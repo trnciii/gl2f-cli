@@ -74,8 +74,8 @@ class Formatter:
 	def format(self, item, end='\n'):
 		dic = {
 			'author': self.author(item),
-			'title': item['values']['title'],
-			'url': os.path.join(self.url_parent, item['contentId']),
+			'title': term.mod(item['values']['title'], [term.bold()]),
+			'url': term.mod(os.path.join(self.url_parent, item['contentId']), [term.dim()]),
 			'date-p': util.to_datetime(item['openingAt']).strftime(self.fdstring),
 			'date-c': util.to_datetime(item['createdAt']).strftime(self.fdstring),
 			'text': '\n' + '\n'.join(util.paragraphs(item['values']['body'])) + '\n',
