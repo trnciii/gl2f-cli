@@ -124,24 +124,24 @@ def list_group(group, size=10, page=1, formatter=Formatter()):
 
 
 def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
-	print('more articles may return than specified.')
-	member_data = member.from_name(name)
+	group_list = member.from_name(name)['group']
 
-	if not group in member_data['group']:
-		group = member_data['group'][0]
+	if not group in group_list:
+		group = group_list[0]
 
 	formatter.set_group(group)
 
 	listed = 0
 	while listed<size:
-		items = list(filter(
+		items = filter(
 			lambda i: member.from_id(i['categoryId'])[0] == name,
-			fetch(group, 99, page, xauth=auth.load())['list']))
+			fetch(group, 99, page, xauth=auth.load())['list'])
 
 		for i in items:
 			print(formatter.format(i))
+			listed += 1
+			if listed>=size: return page
 
-		listed += len(items)
 		page += 1
 
 	return page
