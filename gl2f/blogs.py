@@ -104,16 +104,17 @@ def list_group(group, size=10, page=1, formatter=Formatter()):
 
 def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 	xauth=load_xauth()
+	member_data = member.from_name(name)
 
-	if not group in member.belongs_to(name):
-		group = member.belongs_to(name)[0]
+	if not group in member_data['group']:
+		group = member_data['group'][0]
 
 	formatter.set_group(group)
 
 	listed = 0
 	while listed<size:
 		items = list(filter(
-			lambda i: i['category']['name'] == member.from_name(name)['fullname'],
+			lambda i: i['category']['name'] == member_data['fullname'],
 			fetch(group, size*3, page, xauth=xauth)['list']))
 
 		print(*[formatter.format(i) for i in items], sep='\n')

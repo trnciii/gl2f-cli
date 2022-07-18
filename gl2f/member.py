@@ -145,11 +145,12 @@ def keys():
 def from_name(name):
 	return get()[name]
 
-def from_id(contentId):
-	for k, v in get().items():
-		if v['categoryId'] == contentId:
-			return k, v
-	print('not found')
+def from_id(categoryId):
+	ret = next(filter(
+		lambda item: item[1]['categoryId'] == categoryId,
+		get().items()
+	))
+	return ret
 
 
 def is_group(group):
@@ -158,12 +159,6 @@ def is_group(group):
 def is_member(member):
 	return member in get().keys()
 
-
-def belongs_to(member, group=None):
-	if group:
-		return group in from_name(member)['group']
-	else:
-		return from_name(member)['group']
 
 def name_width():
 	return max(len(i['fullname']) for i in get().values())
