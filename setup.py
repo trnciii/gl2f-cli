@@ -11,7 +11,8 @@ setup(
 	],
 	entry_points={
 		'console_scripts': [
-			'gl2blogs = gl2f.blogs:ls'
+			'gl2blogs = gl2f.blogs:ls',
+			'gl2f-auth = gl2f.auth:auth'
 		]
 	}
 )

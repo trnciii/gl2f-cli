@@ -1,8 +1,8 @@
 import requests
 import os
 import json
-import sys, argparse
-from . import member, util, terminal as term
+import argparse
+from . import member, util, terminal as term, auth
 
 
 def request_url(group):
@@ -21,15 +21,6 @@ def blog_url(group):
 		'lucky2': 'https://girls2-fc.jp/page/lucky2blogs',
 	}
 	return url[group]
-
-
-def load_xauth():
-	authfile = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'auth')
-	if os.path.exists(authfile):
-		with open(authfile) as f:
-			return f.readline().rstrip('\n')
-	else:
-		return ''
 
 
 def fetch(group, size, page, order = 'reservedAt:desc', xauth=''):
@@ -96,14 +87,12 @@ class Formatter:
 
 
 def list_group(group, size=10, page=1, formatter=Formatter()):
-	xauth=load_xauth()
 	formatter.set_group(group)
-	items = fetch(group, size, page, xauth=xauth)['list']
+	items = fetch(group, size, page, xauth=auth.load())['list']
 	print(*[formatter.format(i) for i in items], sep='\n')
 
 
 def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
-	xauth=load_xauth()
 	member_data = member.from_name(name)
 
 	if not group in member_data['group']:
@@ -115,7 +104,7 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 	while listed<size:
 		items = list(filter(
 			lambda i: i['category']['name'] == member_data['fullname'],
-			fetch(group, size*3, page, xauth=xauth)['list']))
+			fetch(group, size*3, page, xauth=auth.load())['list']))
 
 		print(*[formatter.format(i) for i in items], sep='\n')
 
@@ -126,13 +115,11 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 
 
 def list_today(formatter=Formatter()):
-	xauth=load_xauth()
-
 	for group in ['girls2', 'lucky2']:
 		formatter.set_group(group)
 		items = filter(
 			lambda i: util.is_today(i['openingAt']),
-			fetch(group, size=10, page=1, xauth=xauth)['list'])
+			fetch(group, size=10, page=1, xauth=auth.load())['list'])
 
 		print(*[formatter.format(i) for i in items], sep='\n')
 
