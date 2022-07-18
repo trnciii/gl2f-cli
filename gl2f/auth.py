@@ -29,16 +29,17 @@ def remove():
 		os.remove(path)
 
 
-def check():
+def verify():
 	import requests
 	return requests.get(
-		'https://api.fensi.plus/v1/users/me',
+		'https://api.fensi.plus/v1/auth/token/verify',
 		cookies={},
 		headers={
 	    'origin': 'https://girls2-fc.jp',
 	    'x-authorization': load(),
 	    'x-from': 'https://girls2-fc.jp/page/blogs',
-	})
+	    'x-root-origin': 'https://girls2-fc.jp',
+		}).json()
 
 
 def auth():
@@ -47,7 +48,7 @@ def auth():
 	commands = {
 		'add': add,
 		'remove': remove,
-		'check': check,
+		'verify': verify,
 		'file': file,
 		'load': load
 	}
