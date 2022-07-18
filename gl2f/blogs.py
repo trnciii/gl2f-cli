@@ -93,6 +93,7 @@ def list_group(group, size=10, page=1, formatter=Formatter()):
 
 
 def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
+	print('more articles may return than specified.')
 	member_data = member.from_name(name)
 
 	if not group in member_data['group']:
@@ -103,8 +104,8 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 	listed = 0
 	while listed<size:
 		items = list(filter(
-			lambda i: i['category']['name'] == member_data['fullname'],
-			fetch(group, size*3, page, xauth=auth.load())['list']))
+			lambda i: member.from_id(i['categoryId'])[0] == name,
+			fetch(group, 99, page, xauth=auth.load())['list']))
 
 		print(*[formatter.format(i) for i in items], sep='\n')
 
