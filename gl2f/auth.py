@@ -46,6 +46,7 @@ def update(au):
 	res = verify(au)
 	if res['success']:
 		if res['token'] != au:
+			print('token updated')
 			add(res['token'])
 		return res['token']
 	else:
