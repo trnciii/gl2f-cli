@@ -51,7 +51,7 @@ def update(au):
 		return res['token']
 	else:
 		print('unauthorized')
-		return False
+		return ''
 
 updated = lambda: update(load())
 
