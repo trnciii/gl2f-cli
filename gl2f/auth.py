@@ -8,7 +8,7 @@ def file():
 	if os.path.exists(path):
 		return path
 	else:
-		print('token not found')
+		print('file not found')
 		return None
 
 def load():
@@ -19,9 +19,9 @@ def load():
 		return ''
 
 
-def add():
+def add(token):
 	with open(filepath(), 'w') as f:
-		f.write(input('enter token:'))
+		f.write(token)
 
 def remove():
 	path = file()
@@ -29,17 +29,40 @@ def remove():
 		os.remove(path)
 
 
-def verify():
+def verify(au):
 	import requests
 	return requests.get(
 		'https://api.fensi.plus/v1/auth/token/verify',
 		cookies={},
 		headers={
 	    'origin': 'https://girls2-fc.jp',
-	    'x-authorization': load(),
+	    'x-authorization': au,
 	    'x-from': 'https://girls2-fc.jp/page/blogs',
 	    'x-root-origin': 'https://girls2-fc.jp',
 		}).json()
+
+
+def update(au):
+	res = verify(au)
+	if res['success']:
+		if res['token'] != au:
+			print('token updated')
+			add(res['token'])
+		return res['token']
+	else:
+		print('unauthorized')
+		return ''
+
+updated = lambda: update(load())
+
+
+def login():
+	token = update(input('enter token:'))
+	if token:
+		add(token)
+		return 'success'
+	else:
+		return 'fail'
 
 
 def auth():
@@ -48,9 +71,10 @@ def auth():
 	commands = {
 		'add': add,
 		'remove': remove,
-		'verify': verify,
+		'verify': lambda: verify(load()),
 		'file': file,
-		'load': load
+		'load': load,
+		'login': login,
 	}
 
 	parser = argparse.ArgumentParser()
