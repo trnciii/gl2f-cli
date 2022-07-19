@@ -23,9 +23,7 @@ def blog_url(group):
 	return url[group]
 
 
-def fetch(group, size, page, order = 'reservedAt:desc', xauth=''):
-	auth.verify()
-
+def fetch(group, size, page, order = 'reservedAt:desc'):
 	response = requests.get(
 		request_url(group),
 		params={
@@ -37,7 +35,7 @@ def fetch(group, size, page, order = 'reservedAt:desc', xauth=''):
 		headers={
 	    'origin': 'https://girls2-fc.jp',
 	    'x-from': blog_url(group),
-			'x-authorization': xauth,
+			'x-authorization': auth.updated(),
 		})
 
 	if response.ok:
@@ -90,7 +88,7 @@ class Formatter:
 
 def list_group(group, size=10, page=1, formatter=Formatter()):
 	formatter.set_group(group)
-	items = fetch(group, size, page, xauth=auth.load())['list']
+	items = fetch(group, size, page)['list']
 	print(*[formatter.format(i) for i in items], sep='\n')
 
 
@@ -106,7 +104,7 @@ def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
 	while listed<size:
 		items = list(filter(
 			lambda i: i['category']['name'] == member_data['fullname'],
-			fetch(group, size*3, page, xauth=auth.load())['list']))
+			fetch(group, size*3, page)['list']))
 
 		print(*[formatter.format(i) for i in items], sep='\n')
 
@@ -121,7 +119,7 @@ def list_today(formatter=Formatter()):
 		formatter.set_group(group)
 		items = filter(
 			lambda i: util.is_today(i['openingAt']),
-			fetch(group, size=10, page=1, xauth=auth.load())['list'])
+			fetch(group, size=10, page=1)['list'])
 
 		print(*[formatter.format(i) for i in items], sep='\n')
 
