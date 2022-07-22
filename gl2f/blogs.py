@@ -177,7 +177,9 @@ def parse_args():
 
 	# formatting
 	parser.add_argument('--format', '-f', type=str, default='author|title|url',
-		help='formatting. list {author, date-p(published), date-c(created), title, url, text, \\n} with "|" separator. default="author|title|url"')
+		help='formatting specified by a list of  {{ {} }} separated by "|". default "author|title|url".'\
+		.format(', '.join(Formatter.format.__code__.co_consts[1]))
+	)
 
 	parser.add_argument('--date-format', '-df', type=str, default='%m/%d',
 		help='date formatting.')
