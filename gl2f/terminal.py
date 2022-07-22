@@ -1,6 +1,9 @@
+import re
+
 def justzen(s, w):
-	if w>len(s):
-		return s + '　'*(w-len(s))
+	len_displayed = len(re.sub(r'\033\[.*?m', '', s))
+	if w>len_displayed:
+		return s + '　'*(w-len_displayed)
 	else:
 		return s
 
@@ -42,3 +45,18 @@ def strikeline():
 
 def mod(s, cc):
 	return ''.join(cc) + s + reset_all()
+
+if __name__ == '__main__':
+	import terminal as term, member
+
+	fullname = '森朱里'
+	colf, colb = [255, 255, 255], [32, 203, 115]
+	mods = [
+		term.bold(),
+		term.rgb(*colf),
+		term.rgb(*colb, 'b')
+	]
+	print(term.justzen(
+		term.mod(fullname, mods),
+		member.name_width()
+	))

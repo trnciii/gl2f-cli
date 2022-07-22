@@ -52,9 +52,16 @@ class Formatter:
 		self.fdstring = fd
 		self.sep = sep
 
+		self.index = 0
+		self.digits = 2
+
 	def set_group(self, group):
 		self.url_parent = blog_url(group)
 		self.group = group
+
+	def reset_index(self, i=0, digits=2):
+		self.index = i
+		self.digits = digits
 
 
 	def author(self, item):
@@ -71,44 +78,70 @@ class Formatter:
 			member.name_width()
 		)
 
+	def title(self, item):
+		return term.mod(item['values']['title'], [term.bold()])
+
+	def url(self, item):
+		return term.mod(os.path.join(self.url_parent, item['contentId']), [term.dim()])
+
+	def date_p(self, item):
+		return util.to_datetime(item['openingAt']).strftime(self.fdstring)
+
+	def date_c(self, item):
+		return util.to_datetime(item['createdAt']).strftime(self.fdstring)
+
+	def text(self, item):
+		return '\n{}\n'.format( '\n'.join(util.paragraphs(item['values']['body'])) )
+
+	def breakline(self, item):
+		return '\n'
+
+	def inc_index(self, item):
+		self.index += 1
+		return f'{self.index:{self.digits}}'
+
 	def format(self, item, end='\n'):
 		dic = {
-			'author': self.author(item),
-			'title': item['values']['title'],
-			'url': os.path.join(self.url_parent, item['contentId']),
-			'date-p': util.to_datetime(item['openingAt']).strftime(self.fdstring),
-			'date-c': util.to_datetime(item['createdAt']).strftime(self.fdstring),
-			'text': '\n' + '\n'.join(util.paragraphs(item['values']['body'])) + '\n',
-			'\\n': '\n',
+			'author': self.author,
+			'title': self.title,
+			'url': self.url,
+			'date-p': self.date_p,
+			'date-c': self.date_c,
+			'text': self.text,
+			'index': self.inc_index,
+			'\\n': self.breakline,
 		}
 
-		return self.sep.join(dic[key] for key in self.fstring.split('|'))\
+		return self.sep.join(dic[key](item) for key in self.fstring.split('|'))\
 			.replace(f'{self.sep}\n{self.sep}', '\n')
 
 
 def list_group(group, size=10, page=1, formatter=Formatter()):
 	formatter.set_group(group)
 	items = fetch(group, size, page)['list']
-	print(*[formatter.format(i) for i in items], sep='\n')
+	for i in items:
+		print(formatter.format(i))
 
 
 def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
-	member_data = member.from_name(name)
+	group_list = member.from_name(name)['group']
 
-	if not group in member_data['group']:
-		group = member_data['group'][0]
+	if not group in group_list:
+		group = group_list[0]
 
 	formatter.set_group(group)
 
 	listed = 0
 	while listed<size:
-		items = list(filter(
-			lambda i: i['category']['name'] == member_data['fullname'],
-			fetch(group, size*3, page)['list']))
+		items = filter(
+			lambda i: member.from_id(i['categoryId'])[0] == name,
+			fetch(group, 99, page)['list'])
 
-		print(*[formatter.format(i) for i in items], sep='\n')
+		for i in items:
+			print(formatter.format(i))
+			listed += 1
+			if listed>=size: return page
 
-		listed += len(items)
 		page += 1
 
 	return page
@@ -121,7 +154,8 @@ def list_today(formatter=Formatter()):
 			lambda i: util.is_today(i['openingAt']),
 			fetch(group, size=10, page=1)['list'])
 
-		print(*[formatter.format(i) for i in items], sep='\n')
+		for i in items:
+			print(formatter.format(i))
 
 
 def parse_args():
@@ -160,6 +194,9 @@ def parse_args():
 	parser.add_argument('--date', '-d', action='store_true',
 		help='show publish date on the left')
 
+	parser.add_argument('--enum', action='store_true',
+		help='show index on the left (lefter than date)')
+
 
 	args = parser.parse_args()
 
@@ -169,6 +206,9 @@ def parse_args():
 	if args.date:
 		args.format = 'date-p|' + args.format
 
+	if args.enum:
+		args.format = 'index|' + args.format
+
 	if args.preview:
 		args.format += '|text'
 
@@ -176,13 +216,14 @@ def parse_args():
 
 def ls():
 	argv = parse_args()
-	pr = Formatter(f=argv.format, fd=argv.date_format, sep=argv.sep)
+	fm = Formatter(f=argv.format, fd=argv.date_format, sep=argv.sep)
+	fm.reset_index(digits=len(str(argv.number)))
 
 	if member.is_group(argv.name):
-		list_group(argv.name, argv.number, argv.page, formatter=pr)
+		list_group(argv.name, argv.number, argv.page, formatter=fm)
 
 	elif member.is_member(argv.name):
-		list_member(argv.name, group=argv.group, size=argv.number, formatter=pr)
+		list_member(argv.name, group=argv.group, size=argv.number, formatter=fm)
 
 	elif argv.name == 'today':
-		list_today(formatter=pr)
+		list_today(formatter=fm)
