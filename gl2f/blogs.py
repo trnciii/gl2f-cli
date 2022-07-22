@@ -35,7 +35,7 @@ def fetch(group, size, page, order = 'reservedAt:desc'):
 		headers={
 	    'origin': 'https://girls2-fc.jp',
 	    'x-from': blog_url(group),
-			'x-authorization': auth.updated(),
+			'x-authorization': auth.update(auth.load()),
 		})
 
 	if response.ok:
