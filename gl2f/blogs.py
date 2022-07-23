@@ -66,9 +66,14 @@ class Formatter:
 
 
 	def author(self, item):
-		_, v = member.from_id(item['categoryId'])
-		fullname = v['fullname']
-		colf, colb = v['color'][self.group].values()
+		try:
+			_, v = member.from_id(item['categoryId'])
+			fullname = v['fullname']
+			colf, colb = v['color'][self.group].values()
+		except StopIteration:
+			fullname = item['category']['name']
+			colf, colb = [255, 255, 255], [157, 157, 157]
+
 		mods = [
 			term.bold(),
 			term.rgb(*colf),
