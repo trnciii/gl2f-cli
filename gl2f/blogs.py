@@ -66,7 +66,7 @@ class Formatter:
 
 
 	def author(self, item):
-		k, v = member.from_id(item['categoryId'])
+		_, v = member.from_id(item['categoryId'])
 		fullname = v['fullname']
 		colf, colb = v['color'][self.group].values()
 		mods = [
@@ -125,8 +125,8 @@ def list_group(group, size=10, page=1, formatter=Formatter()):
 
 
 def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
-	member_data = member.from_name(name)
-	categoryId = member_data['categoryId']
+	member_data = member.get()[name]
+	categoryId = member_data['categoryId']['blog']
 	group_list = member_data['group']
 	if not group in group_list:
 		group = group_list[0]
