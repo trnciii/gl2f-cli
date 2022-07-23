@@ -3,31 +3,31 @@ from . import member
 from .ls import pretty, ls
 
 
-def parse_args():
-	parser = argparse.ArgumentParser()
-
+def add_args(parser):
 	ls.add_args(parser)
 	pretty.add_args(parser)
 
-	args = parser.parse_args()
 
+def ls_blogs(args):
+	lister = ls.Lister('blog')
 	pretty.post_argparse(args)
 
-	return args
+	fm = pretty.Formatter(f=args.format, fd=args.date_format, sep=args.sep)
+	fm.reset_index(digits=len(str(args.number)))
 
+	if member.is_group(args.name):
+		lister.list_group(args.name, args.number, args.page, formatter=fm)
 
-def list():
-	lister = ls.Lister('blog')
+	elif member.is_member(args.name):
+		lister.list_member(args.name, group=args.group, size=args.number, formatter=fm)
 
-	argv = parse_args()
-	fm = pretty.Formatter(f=argv.format, fd=argv.date_format, sep=argv.sep)
-	fm.reset_index(digits=len(str(argv.number)))
-
-	if member.is_group(argv.name):
-		lister.list_group(argv.name, argv.number, argv.page, formatter=fm)
-
-	elif member.is_member(argv.name):
-		lister.list_member(argv.name, group=argv.group, size=argv.number, formatter=fm)
-
-	elif argv.name == 'today':
+	elif args.name == 'today':
 		lister.list_today(formatter=fm)
+
+
+def main():
+	parser = argparse.ArgumentParser()
+	add_args(parser)
+	args = parser.parse_args()
+
+	ls_blogs(args)
