@@ -23,18 +23,19 @@ def blog_url(group):
 	return url[group]
 
 
-def fetch(group, size, page, order = 'reservedAt:desc'):
+def fetch(group, size, page, categoryId=None, order='reservedAt:desc'):
 	response = requests.get(
 		request_url(group),
 		params={
-	    'size': str(size),
-	    'page': str(page),
-	    'order': str(order),
+			'size': str(size),
+			'page': str(page),
+			'order': str(order),
+			'categoryId': categoryId
 		},
 		cookies={},
 		headers={
-	    'origin': 'https://girls2-fc.jp',
-	    'x-from': blog_url(group),
+			'origin': 'https://girls2-fc.jp',
+			'x-from': blog_url(group),
 			'x-authorization': auth.updated(),
 		})
 
@@ -124,27 +125,17 @@ def list_group(group, size=10, page=1, formatter=Formatter()):
 
 
 def list_member(name, group=None, size=10, page=1, formatter=Formatter()):
-	group_list = member.from_name(name)['group']
-
+	member_data = member.from_name(name)
+	categoryId = member_data['categoryId']
+	group_list = member_data['group']
 	if not group in group_list:
 		group = group_list[0]
 
 	formatter.set_group(group)
 
-	listed = 0
-	while listed<size:
-		items = filter(
-			lambda i: member.from_id(i['categoryId'])[0] == name,
-			fetch(group, 99, page)['list'])
-
-		for i in items:
-			print(formatter.format(i))
-			listed += 1
-			if listed>=size: return page
-
-		page += 1
-
-	return page
+	items = fetch(group, size, page, categoryId=categoryId)['list']
+	for i in items:
+		print(formatter.format(i))
 
 
 def list_today(formatter=Formatter()):
