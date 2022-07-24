@@ -6,6 +6,7 @@ def get():
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [0, 190, 243]}},
 			'categoryId': {
 				'blog': '271548290024080549',
+				'radio': '271548290024080549',
 			}
 		},
 		'momoka': {
@@ -14,6 +15,7 @@ def get():
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [31, 82, 209]}},
 			'categoryId': {
 				'blog': '271548304888693925',
+				'radio': '271548304888693925',
 			}
 		},
 		'misaki': {
@@ -22,6 +24,7 @@ def get():
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [247, 117, 0]}},
 			'categoryId': {
 				'blog': '271548319161909900',
+				'radio': '271548319161909900',
 			}
 		},
 		'youka': {
@@ -30,6 +33,7 @@ def get():
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}},
 			'categoryId': {
 				'blog': '271548334819247269',
+				'radio': '271548334819247269',
 			}
 		},
 		'kurea': {
@@ -38,6 +42,7 @@ def get():
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
 			'categoryId': {
 				'blog': '271548349729997452',
+				'radio': '271548349729997452',
 			}
 		},
 		'minami': {
@@ -46,6 +51,7 @@ def get():
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [255, 80, 159]}},
 			'categoryId': {
 				'blog': '271548364363924645',
+				'radio': '271548364363924645',
 			}
 		},
 		'kira': {
@@ -54,6 +60,7 @@ def get():
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [229, 182, 15]}},
 			'categoryId': {
 				'blog': '271548377827639948',
+				'radio': '271548377827639948',
 			}
 		},
 		'toa': {
@@ -62,6 +69,7 @@ def get():
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [32, 203, 115]}},
 			'categoryId': {
 				'blog': '271548392222491813',
+				'radio': '271548392222491813',
 			}
 		},
 		'ran': {
@@ -70,6 +78,7 @@ def get():
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [255, 46, 46]}},
 			'categoryId': {
 				'blog': '271548406038528652',
+				'radio': '271548406038528652',
 			}
 		},
 
@@ -99,6 +108,7 @@ def get():
 			},
 			'categoryId': {
 				'blog': '436713912444912481',
+				'radio': '436713912444912481',
 			}
 		},
 		'yura': {
@@ -110,6 +120,7 @@ def get():
 			},
 			'categoryId': {
 				'blog': '443306956518589243',
+				'radio': '443306956518589243',
 			}
 		},
 
@@ -119,6 +130,7 @@ def get():
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [31, 82, 209]}},
 			'categoryId': {
 				'blog': '540078282813473595',
+				'radio': '562927300052517691',
 			}
 		},
 		'hiro': {
@@ -127,6 +139,7 @@ def get():
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}},
 			'categoryId': {
 				'blog': '540080651374691131',
+				'radio': '540080651374691131',
 			}
 		},
 		'yuwa': {
@@ -135,6 +148,7 @@ def get():
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 80, 159]}},
 			'categoryId': {
 				'blog': '540080829989127105',
+				'radio': '540080829989127105',
 			}
 		},
 		'kanna': {
@@ -143,6 +157,7 @@ def get():
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
 			'categoryId': {
 				'blog': '540081291836523457',
+				'blradioog': '540081291836523457',
 			}
 		},
 		'ririka': {
@@ -151,6 +166,7 @@ def get():
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [229, 182, 15]}},
 			'categoryId': {
 				'blog': '661170107531133993',
+				'radio': '661170107531133993',
 			}
 		},
 		'akari': {
@@ -159,6 +175,7 @@ def get():
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [32, 203, 115]}},
 			'categoryId': {
 				'blog': '661169466536625193',
+				'radio': '661169466536625193',
 			}
 		},
 		'kiki': {
@@ -167,6 +184,7 @@ def get():
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 46, 46]}},
 			'categoryId': {
 				'blog': '661168410020807520',
+				'radio': '661168410020807520',
 			}
 		},
 
