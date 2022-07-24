@@ -8,7 +8,7 @@ def add_args(parser):
 	pretty.add_args(parser)
 
 
-def ls_blogs(args):
+def core(args):
 	lister = ls.Lister('blog')
 	pretty.post_argparse(args)
 
@@ -30,4 +30,4 @@ def main():
 	add_args(parser)
 	args = parser.parse_args()
 
-	ls_blogs(args)
+	core(args)

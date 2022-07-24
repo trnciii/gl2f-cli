@@ -9,11 +9,11 @@ def main():
 
 	parser_blogs = subparsers.add_parser('blogs')
 	blogs.add_args(parser_blogs)
-	parser_blogs.set_defaults(handler=blogs.ls_blogs)
+	parser_blogs.set_defaults(handler=blogs.core)
 
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)
-	parser_auth.set_defaults(handler=auth.auth)
+	parser_auth.set_defaults(handler=auth.core)
 
 
 	args = parser.parse_args()

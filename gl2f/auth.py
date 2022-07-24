@@ -90,7 +90,7 @@ def add_args(parser):
 	parser.add_argument('args', nargs='*')
 
 
-def auth(args):
+def core(args):
 	commands()[args.command](*args.args)
 
 
@@ -101,4 +101,4 @@ def main():
 	add_args(parser)
 	args = parser.parse_args()
 
-	commands()[args.command](*args.args)
+	core(args)
