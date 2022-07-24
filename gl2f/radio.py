@@ -9,7 +9,7 @@ def add_args(parser):
 
 
 def core(args):
-	lister = ls.Lister('radio')
+	lister = ls.Lister('radio', debug=args.dump_response)
 	pretty.post_argparse(args)
 
 	fm = pretty.Formatter(f=args.format, fd=args.date_format, sep=args.sep)

@@ -6,7 +6,7 @@ from . import pretty
 
 
 class Lister:
-	def __init__(self, name):
+	def __init__(self, name, debug=False):
 		if name == 'blog':
 			from . import domain_blogs
 			self.domain = domain_blogs
@@ -18,6 +18,8 @@ class Lister:
 		elif name == 'news':
 			from . import domain_news
 			self.domain = domain_news
+
+		self.debug = debug
 
 
 	def fetch(self, group, size, page, categoryId=None, order='reservedAt:desc'):
@@ -36,11 +38,14 @@ class Lister:
 				'x-authorization': auth.update(auth.load()),
 			})
 
-		if response.ok:
-			return response.json()
-		else:
-			print('fetch failed')
-			# throw
+		if not response.ok:
+			return
+
+		if self.debug:
+			with open('response.json', 'w') as f:
+				json.dump(response.json(), f, indent=2)
+
+		return response.json()
 
 
 	def list_group(self, group, size=10, page=1, formatter=pretty.Formatter()):
@@ -90,3 +95,6 @@ def add_args(parser):
 
 	parser.add_argument('--group', type=str,
 		help='specify group when name is a member.')
+
+	parser.add_argument('--dump-response', action='store_true',
+		help='dump response from server as ./response.json')
