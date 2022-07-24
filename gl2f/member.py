@@ -4,68 +4,90 @@ def get():
 			'group': ['girls2'],
 			'fullname': '小田柚葉',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [0, 190, 243]}},
-			'categoryId': '271548290024080549'
+			'categoryId': {
+				'blog': '271548290024080549',
+			}
 		},
 		'momoka': {
 			'group': ['girls2'],
 			'fullname': '隅谷百花',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [31, 82, 209]}},
-			'categoryId': '271548304888693925'
+			'categoryId': {
+				'blog': '271548304888693925',
+			}
 		},
 		'misaki': {
 			'group': ['girls2'],
 			'fullname': '鶴屋美咲',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [247, 117, 0]}},
-			'categoryId': '271548319161909900'
+			'categoryId': {
+				'blog': '271548319161909900',
+			}
 		},
 		'youka': {
 			'group': ['girls2'],
 			'fullname': '小川桜花',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}},
-			'categoryId': '271548334819247269'
+			'categoryId': {
+				'blog': '271548334819247269',
+			}
 		},
 		'kurea': {
 			'group': ['girls2'],
 			'fullname': '増田來亜',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
-			'categoryId': '271548349729997452'
+			'categoryId': {
+				'blog': '271548349729997452',
+			}
 		},
 		'minami': {
 			'group': ['girls2'],
 			'fullname': '菱田未渚美',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [255, 80, 159]}},
-			'categoryId': '271548364363924645'
+			'categoryId': {
+				'blog': '271548364363924645',
+			}
 		},
 		'kira': {
 			'group': ['girls2'],
 			'fullname': '山口綺羅',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [229, 182, 15]}},
-			'categoryId': '271548377827639948'
+			'categoryId': {
+				'blog': '271548377827639948',
+			}
 		},
 		'toa': {
 			'group': ['girls2'],
 			'fullname': '原田都愛',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [32, 203, 115]}},
-			'categoryId': '271548392222491813'
+			'categoryId': {
+				'blog': '271548392222491813',
+			}
 		},
 		'ran': {
 			'group': ['girls2'],
 			'fullname': '石井蘭',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [255, 46, 46]}},
-			'categoryId': '271548406038528652'
+			'categoryId': {
+				'blog': '271548406038528652',
+			}
 		},
 
 		'miyu': {
 			'group': ['lovely2'],
 			'fullname': '渡辺未優',
 			'color':{'lovely2': {'foreground': [255, 255, 255], 'background': [243, 111, 163]}},
-			'categoryId': '436713148108505915'
+			'categoryId': {
+				'blog': '436713148108505915',
+			}
 		},
 		'yui': {
 			'group': ['lovely2'],
 			'fullname': '山下結衣',
 			'color':{'lovely2': {'foreground': [255, 255, 255], 'background': [95, 189, 225]}},
-			'categoryId': '436714399051285307'
+			'categoryId': {
+				'blog': '436714399051285307',
+			}
 		},
 
 		'rina': {
@@ -75,7 +97,9 @@ def get():
 				'lucky2': {'foreground': [255, 255, 255], 'background': [0, 190, 243]},
 				'lovely2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}
 			},
-			'categoryId': '436713912444912481'
+			'categoryId': {
+				'blog': '436713912444912481',
+			}
 		},
 		'yura': {
 			'group': ['lucky2', 'lovely2'],
@@ -84,70 +108,82 @@ def get():
 				'lucky2': {'foreground': [255, 255, 255], 'background': [31, 82, 209]},
 				'lovely2': {'foreground': [255, 255, 255], 'background': [247, 117, 0]}
 			},
-			'categoryId': '443306956518589243'
+			'categoryId': {
+				'blog': '443306956518589243',
+			}
 		},
 
 		'tsubaki': {
 			'group': ['lucky2'],
 			'fullname': '永山椿',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [31, 82, 209]}},
-			'categoryId': '540078282813473595'
+			'categoryId': {
+				'blog': '540078282813473595',
+			}
 		},
 		'hiro': {
 			'group': ['lucky2'],
 			'fullname': '深澤日彩',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}},
-			'categoryId': '540080651374691131'
+			'categoryId': {
+				'blog': '540080651374691131',
+			}
 		},
 		'yuwa': {
 			'group': ['lucky2'],
 			'fullname': '比嘉優和',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 80, 159]}},
-			'categoryId': '540080829989127105'
+			'categoryId': {
+				'blog': '540080829989127105',
+			}
 		},
 		'kanna': {
 			'group': ['lucky2'],
 			'fullname': '佐藤栞奈',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
-			'categoryId': '540081291836523457'
+			'categoryId': {
+				'blog': '540081291836523457',
+			}
 		},
 		'ririka': {
 			'group': ['lucky2'],
 			'fullname': '上村梨々香',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [229, 182, 15]}},
-			'categoryId': '661170107531133993'
+			'categoryId': {
+				'blog': '661170107531133993',
+			}
 		},
 		'akari': {
 			'group': ['lucky2'],
 			'fullname': '森朱里',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [32, 203, 115]}},
-			'categoryId': '661169466536625193'
+			'categoryId': {
+				'blog': '661169466536625193',
+			}
 		},
 		'kiki': {
 			'group': ['lucky2'],
 			'fullname': '佐藤妃希',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 46, 46]}},
-			'categoryId': '661168410020807520'
+			'categoryId': {
+				'blog': '661168410020807520',
+			}
 		},
 
 		'lovely2staff': {
 			'group' : ['lovely2'],
 			'fullname': "スタッフ",
 			'color':{'lovely2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
-			'categoryId': "436714547944883137",
+			'categoryId': {
+				'blog': "436714547944883137",
+			}
 		}
 	}
 
 
-def keys():
-	return get().keys()
-
-def from_name(name):
-	return get()[name]
-
 def from_id(categoryId):
 	ret = next(filter(
-		lambda item: item[1]['categoryId'] == categoryId,
+		lambda item: categoryId in item[1]['categoryId'].values(),
 		get().items()
 	))
 	return ret
@@ -170,12 +206,3 @@ if __name__ == '__main__':
 
 	assert is_member('miyu') == True
 	assert is_member('lovely2') == False
-
-
-	assert belongs_to('miyu') == ['lovely2']
-	assert belongs_to('rina') == ['lucky2', 'lovely2']
-
-	assert belongs_to('yui', 'lovely2') == True
-	assert belongs_to('yura', 'lovely2') == True
-	assert belongs_to('yura', 'lucky2') == True
-	assert belongs_to('yura', 'girls2') == False

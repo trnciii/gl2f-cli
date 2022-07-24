@@ -19,7 +19,7 @@ def load():
 		return ''
 
 
-def add(token):
+def save(token):
 	with open(filepath(), 'w') as f:
 		f.write(token)
 
@@ -44,46 +44,61 @@ def verify(au):
 
 def update(au):
 	res = verify(au)
-	if res['success']:
-		if res['token'] != au:
-			print('token updated')
-			add(res['token'])
-		return res['token']
-	else:
+	if not res['success']:
 		print('unauthorized')
 		return ''
 
-updated = lambda: update(load())
+	token = res['token']
+	if token != au:
+		save(token)
+	return token
 
 
 def login():
 	token = update(input('enter token:'))
 	if token:
-		add(token)
-		return 'success'
+		print('success')
+		save(token)
 	else:
-		return 'fail'
+		print('fail')
 
 
-def auth():
-	import argparse
+def update_cli():
+	before = load()
+	after = update(before)
 
-	commands = {
-		'add': add,
+	if after == '':
+		pass
+	elif before == after:
+		print('up to date')
+	else:
+		print('token updated')
+
+
+def commands():
+	return {
 		'remove': remove,
-		'verify': lambda: verify(load()),
-		'file': file,
-		'load': load,
+		'file': lambda: print(file()),
+		'load': lambda: print(load()),
 		'login': login,
+		'update': update_cli,
 	}
 
-	parser = argparse.ArgumentParser()
 
-	parser.add_argument('command', type=str, choices=list(commands.keys()))
+def add_args(parser):
+	parser.add_argument('command', type=str, choices=list(commands().keys()))
 	parser.add_argument('args', nargs='*')
 
+
+def core(args):
+	commands()[args.command](*args.args)
+
+
+def main():
+	import argparse
+
+	parser = argparse.ArgumentParser()
+	add_args(parser)
 	args = parser.parse_args()
 
-
-	ret = commands[args.command](*args.args)
-	print(ret)
+	core(args)
