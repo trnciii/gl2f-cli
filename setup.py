@@ -13,7 +13,7 @@ setup(
 		'console_scripts': [
 			'gl2f = gl2f.__main__:main',
 			'gl2f-blogs = gl2f.blogs:main',
-			'gl2f-auth = gl2f.auth:auth'
+			'gl2f-auth = gl2f.auth:main'
 		]
 	}
 )

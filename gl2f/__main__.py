@@ -1,14 +1,20 @@
 import argparse
-from . import blogs
+from . import blogs, auth
 from .ls import ls, pretty
 
 def main():
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers()
 
+
 	parser_blogs = subparsers.add_parser('blogs')
 	blogs.add_args(parser_blogs)
 	parser_blogs.set_defaults(handler=blogs.ls_blogs)
+
+	parser_auth = subparsers.add_parser('auth')
+	auth.add_args(parser_auth)
+	parser_auth.set_defaults(handler=auth.auth)
+
 
 	args = parser.parse_args()
 

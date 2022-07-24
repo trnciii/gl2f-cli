@@ -75,10 +75,8 @@ def update_cli():
 		print('token updated')
 
 
-def auth():
-	import argparse
-
-	commands = {
+def commands():
+	return {
 		'remove': remove,
 		'file': lambda: print(file()),
 		'load': lambda: print(load()),
@@ -86,12 +84,21 @@ def auth():
 		'update': update_cli,
 	}
 
-	parser = argparse.ArgumentParser()
 
-	parser.add_argument('command', type=str, choices=list(commands.keys()))
+def add_args(parser):
+	parser.add_argument('command', type=str, choices=list(commands().keys()))
 	parser.add_argument('args', nargs='*')
 
+
+def auth(args):
+	commands()[args.command](*args.args)
+
+
+def main():
+	import argparse
+
+	parser = argparse.ArgumentParser()
+	add_args(parser)
 	args = parser.parse_args()
 
-
-	commands[args.command](*args.args)
+	commands()[args.command](*args.args)
