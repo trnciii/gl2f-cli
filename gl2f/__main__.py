@@ -1,5 +1,5 @@
 import argparse
-from . import blogs, auth, radio
+from . import blogs, auth, radio, news
 from .ls import ls, pretty
 
 def main():
@@ -18,6 +18,11 @@ def main():
 	parser_radio = subparsers.add_parser('radio')
 	radio.add_args(parser_radio)
 	parser_radio.set_defaults(handler=radio.core)
+
+	parser_news = subparsers.add_parser('news')
+	news.add_args(parser_news)
+	parser_news.set_defaults(handler=news.core)
+
 
 	args = parser.parse_args()
 

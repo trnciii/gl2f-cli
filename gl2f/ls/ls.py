@@ -15,6 +15,10 @@ class Lister:
 			from . import domain_radio
 			self.domain = domain_radio
 
+		elif name == 'news':
+			from . import domain_news
+			self.domain = domain_news
+
 
 	def fetch(self, group, size, page, categoryId=None, order='reservedAt:desc'):
 		response = requests.get(
