@@ -29,7 +29,7 @@ class Lister:
 			headers={
 				'origin': 'https://girls2-fc.jp',
 				'x-from': self.domain.contents_url(group),
-				'x-authorization': auth.updated(),
+				'x-authorization': auth.update(auth.load()),
 			})
 
 		if response.ok:
