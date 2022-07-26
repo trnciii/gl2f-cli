@@ -12,7 +12,7 @@ def core(args):
 	lister = ls.Lister('blog', debug=args.dump_response)
 	pretty.post_argparse(args)
 
-	fm = pretty.Formatter(f=args.format, fd=args.date_format, sep=args.sep)
+	fm = pretty.Formatter(f=args.format, fd=args.date_format, sep=args.sep, preview=args.preview)
 	fm.reset_index(digits=len(str(args.number)))
 
 	if member.is_group(args.name):

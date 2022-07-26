@@ -1,11 +1,12 @@
-from .. import terminal as term, util, member
+from .. import terminal as term, util, member, article
 import os
 
 class Formatter:
-	def __init__(self, f='author|title|url', fd='%m/%d', sep=' '):
+	def __init__(self, f='author|title|url', fd='%m/%d', sep=' ', preview='compact'):
 		self.fstring = f
 		self.fdstring = fd
 		self.sep = sep
+		self.preview = preview
 
 		self.index = 0
 		self.digits = 2
@@ -47,7 +48,7 @@ class Formatter:
 		return util.to_datetime(item['createdAt']).strftime(self.fdstring)
 
 	def text(self, item):
-		return '\n{}\n'.format( '\n'.join(util.paragraphs(item['values']['body'])) )
+		return '\n{}\n'.format(article.to_text(item['values']['body'], self.preview))
 
 	def breakline(self, item):
 		return '\n'
@@ -68,8 +69,7 @@ class Formatter:
 			'\\n': self.breakline,
 		}
 
-		return self.sep.join(dic[key](item) for key in self.fstring.split('|'))\
-			.replace(f'{self.sep}\n{self.sep}', '\n')
+		return self.sep.join(dic[key](item) for key in self.fstring.split('|'))
 
 
 def add_args(parser):
@@ -87,7 +87,7 @@ def add_args(parser):
 	parser.add_argument('--break-urls', action='store_true',
 		help='break before url')
 
-	parser.add_argument('--preview', action='store_true',
+	parser.add_argument('--preview', type=str, nargs='?', const='compact', choices=article.to_text_option,
 		help='show blog text')
 
 	parser.add_argument('--date', '-d', action='store_true',
