@@ -11,7 +11,7 @@ def paragraphs(body):
 	return ptn_paragraph.findall(ptn_empty_paragraph.sub('', body))
 
 
-def compose_full(p):
+def compose_line(p):
 	if ptn_media.match(p):
 		t = '[{}]'.format(ptn_media_type.search(p).group(0))
 		return term.mod(t, [term.bold(), term.dim()])
@@ -19,11 +19,17 @@ def compose_full(p):
 		return ptn_break.sub('', p)
 
 
-def to_text(body, opt):
-	if opt == 'full':
-		return '\n'.join(map(compose_full, paragraphs(body)))
+to_text_option = {'full', 'compact', 'compressed'}
 
+def to_text(body, key):
+	assert key in to_text_option
 
-def face(n):
-	return '\n{0}・_・{0}\n'.format('-'*n)
+	if key == 'full':
+		return '\n'.join(map(compose_line, paragraphs(body)))
 
+	elif key == 'compact':
+		text = '\n'.join(map(compose_line, paragraphs(body)))
+		return re.sub(r'\n+', '\n', text)
+
+	elif key == 'compressed':
+		return ''.join(map(compose_line, paragraphs(body)))
