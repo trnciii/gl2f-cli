@@ -2,7 +2,8 @@ import requests
 import json
 import argparse
 import os
-from .. import member, util, auth
+from ..util import member, is_today
+from .. import auth
 from . import pretty
 
 
@@ -79,7 +80,7 @@ class Lister:
 			formatter.page_url = self.domain.contents_url(group)
 			formatter.group = group
 			items = filter(
-				lambda i: util.is_today(i['openingAt']),
+				lambda i: is_today(i['openingAt']),
 				self.fetch(group, size=10, page=1)['list'])
 
 			for i in items:

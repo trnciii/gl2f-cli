@@ -1,4 +1,4 @@
-from .. import terminal as term, util, member, article
+from ..util import terminal as term, to_datetime, member, article
 import os
 
 class Formatter:
@@ -42,10 +42,10 @@ class Formatter:
 		return term.mod(os.path.join(self.page_url, item['contentId']), [term.dim()])
 
 	def date_p(self, item):
-		return util.to_datetime(item['openingAt']).strftime(self.fdstring)
+		return to_datetime(item['openingAt']).strftime(self.fdstring)
 
 	def date_c(self, item):
-		return util.to_datetime(item['createdAt']).strftime(self.fdstring)
+		return to_datetime(item['createdAt']).strftime(self.fdstring)
 
 	def text(self, item):
 		return '\n{}\n'.format(article.to_text(item['values']['body'], self.preview))

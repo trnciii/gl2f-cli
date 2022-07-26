@@ -1,5 +1,5 @@
 import argparse
-from . import member
+from .util import member
 from .ls import pretty, ls
 
 
