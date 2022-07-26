@@ -1,4 +1,4 @@
-from .. import terminal as term, util, member
+from .. import terminal as term, util, member, article
 import os
 
 class Formatter:
@@ -47,7 +47,7 @@ class Formatter:
 		return util.to_datetime(item['createdAt']).strftime(self.fdstring)
 
 	def text(self, item):
-		return '\n{}\n'.format( '\n'.join(util.paragraphs(item['values']['body'])) )
+		return '\n{}\n'.format(article.to_text(item['values']['body'], 'full'))
 
 	def breakline(self, item):
 		return '\n'
