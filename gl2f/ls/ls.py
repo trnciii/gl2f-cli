@@ -1,6 +1,7 @@
 import requests
 import json
 import argparse
+import os
 from .. import member, util, auth
 from . import pretty
 
@@ -42,7 +43,9 @@ class Lister:
 			return
 
 		if self.debug:
-			with open('response.json', 'w') as f:
+			query = categoryId if categoryId else group
+			path = os.path.join(self.debug, f'{self.domain.name}-{query}.json')
+			with open(path, 'w') as f:
 				json.dump(response.json(), f, indent=2)
 
 		return response.json()
@@ -96,5 +99,5 @@ def add_args(parser):
 	parser.add_argument('--group', type=str,
 		help='specify group when name is a member.')
 
-	parser.add_argument('--dump-response', action='store_true',
+	parser.add_argument('--dump-response', type=str, nargs='?', const='.',
 		help='dump response from server as ./response.json')
