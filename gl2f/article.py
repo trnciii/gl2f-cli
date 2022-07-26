@@ -25,10 +25,10 @@ def to_text(body, key):
 	assert key in to_text_option
 
 	if key == 'full':
-		return '\n'.join(map(compose_line, paragraphs(body)))
+		return '\n'.join(map(compose_line, paragraphs(body))).rstrip('\n')
 
 	elif key == 'compact':
-		text = '\n'.join(map(compose_line, paragraphs(body)))
+		text = '\n'.join(map(compose_line, paragraphs(body))).rstrip('\n')
 		return re.sub(r'\n+', '\n', text)
 
 	elif key == 'compressed':
