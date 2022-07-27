@@ -107,5 +107,5 @@ def post_argparse(args):
 	if args.enum:
 		args.format = 'index|' + args.format
 
-	if args.preview:
+	if args.preview and not 'text' in args.format:
 		args.format += '|text'
