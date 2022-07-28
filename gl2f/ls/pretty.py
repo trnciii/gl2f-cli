@@ -69,12 +69,12 @@ class Formatter:
 			'\\n': self.breakline,
 		}
 
-		return self.sep.join(dic[key](item) for key in self.fstring.split('|'))
+		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
 
 
 def add_args(parser):
-	parser.add_argument('--format', '-f', type=str, default='author|title|url',
-		help='formatting specified by a list of  {{ {} }} separated by "|". default "author|title|url".'\
+	parser.add_argument('--format', '-f', type=str, default='author:title:url',
+		help='formatting specified by a list of  {{ {} }} separated by ":". default "author:title:url".'\
 		.format(', '.join(Formatter.format.__code__.co_consts[1]))
 	)
 
@@ -99,13 +99,15 @@ def add_args(parser):
 
 def post_argparse(args):
 	if args.break_urls:
-		args.format = args.format.replace('url', '\\n|url')
+		args.format = args.format.replace('url', '\\n:url')
 
 	if args.date:
-		args.format = 'date-p|' + args.format
+		args.format = 'date-p:' + args.format
 
 	if args.enum:
-		args.format = 'index|' + args.format
+		args.format = 'index:' + args.format
 
 	if args.preview and not 'text' in args.format:
-		args.format += '|text'
+		args.format += ':text'
+
+	args.format = args.format.rstrip(':').lstrip(':')
