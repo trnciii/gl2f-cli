@@ -16,7 +16,7 @@ def core(args):
 	fm.reset_index(digits=len(str(args.number)))
 
 	if args.name in {'family', 'girls2', 'lucky2'}:
-		lister.list_group(args.name, args.number, args.page, formatter=fm)
+		lister.list_group(args.name, args.number, args.page, args.order, formatter=fm)
 
 
 def main():

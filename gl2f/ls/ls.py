@@ -24,7 +24,7 @@ class Lister:
 		self.debug = debug
 
 
-	def fetch(self, group, size, page, categoryId=None, order='reservedAt:desc'):
+	def fetch(self, group, size, page, order='reservedAt:desc', categoryId=None):
 		response = requests.get(
 			self.domain.request_url(group),
 			params={
@@ -52,15 +52,15 @@ class Lister:
 		return response.json()
 
 
-	def list_group(self, group, size=10, page=1, formatter=pretty.Formatter()):
+	def list_group(self, group, size=10, page=1, order='reservedAt:desc', formatter=pretty.Formatter()):
 		formatter.page_url = self.domain.contents_url(group)
 		formatter.group = group
-		items = self.fetch(group, size, page)['list']
+		items = self.fetch(group, size, page, order)['list']
 		for i in items:
 			print(formatter.format(i))
 
 
-	def list_member(self, name, group=None, size=10, page=1, formatter=pretty.Formatter()):
+	def list_member(self, name, group=None, size=10, page=1, order='reservedAt:desc', formatter=pretty.Formatter()):
 		member_data = member.get()[name]
 		categoryId = member_data['categoryId'][self.domain.name]
 		group_list = member_data['group']
@@ -70,7 +70,7 @@ class Lister:
 		formatter.page_url = self.domain.contents_url(group)
 		formatter.group = group
 
-		items = self.fetch(group, size, page, categoryId=categoryId)['list']
+		items = self.fetch(group, size, page, order, categoryId=categoryId)['list']
 		for i in items:
 			print(formatter.format(i))
 
@@ -96,6 +96,9 @@ def add_args(parser):
 
 	parser.add_argument('-p', '--page', type=int, default=1,
 		help='page number')
+
+	parser.add_argument('--order', type=str, default='reservedAt:desc',
+		help='order. {reservedAt, name} × {asc, desc}. default = reservedAt:desc.')
 
 	parser.add_argument('--group', type=str,
 		help='specify group when name is a member.')
