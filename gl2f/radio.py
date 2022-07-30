@@ -19,7 +19,7 @@ def core(args):
 		lister.list_group(args.name, args.number, args.page, args.order, formatter=fm)
 
 	elif member.is_member(args.name):
-		lister.list_member(args.name, args.group, args.number, order=args.order, formatter=fm)
+		lister.list_member(args.name, args.group, args.number, args.page, order=args.order, formatter=fm)
 
 
 def main():

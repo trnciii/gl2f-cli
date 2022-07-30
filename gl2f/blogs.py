@@ -19,7 +19,7 @@ def core(args):
 		lister.list_group(args.name, args.number, args.page, order=args.order, formatter=fm)
 
 	elif member.is_member(args.name):
-		lister.list_member(args.name, group=args.group, size=args.number, order=args.order, formatter=fm)
+		lister.list_member(args.name, group=args.group, page=args.page, size=args.number, order=args.order, formatter=fm)
 
 	elif args.name == 'today':
 		lister.list_today(formatter=fm)
