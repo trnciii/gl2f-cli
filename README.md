@@ -4,13 +4,14 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 公式サイトではメンバーごとのリストが用意されていなかったり複数の記事を開くのが大変だったり使いづらかったので作りました。
 ブラウザで開くとき以上のやりとりをしていないので大丈夫と思っていますが、このアプリは利用規約に触れる行為を目的とはしていませんので、問題があるかもしれない部分を見つけたら教えてくださると助かります。
 
+![](docs/demo.gif)
+
 
 ## 機能
 
 * ブログ・ラジオ・ニュースのリストを表示する
 	* グループごと、メンバーごとの出力
 	* 引数による出力フォーマットの指定
-	* ラジオの特別編やニュースの分類はまだ
 
 
 ## 必要なもの
@@ -36,9 +37,9 @@ pip install git+https://github.com/trnciii/gl2f-cli
 `gl2f <サブコマンド>` もしくは `gl2f-<サブコマンド>` という形で利用します。
 サブコマンドは `blogs, radio, news` があり、それぞれ
 
-* ブログ（ https://api.fensi.plus/v1/sites/girls2-fc/texts/271474317252887717/contents 等）
-* ラジオ ( https://api.fensi.plus/v1/sites/girls2-fc/texts/lucky2Radio/contents 等)
-* ニュース ( https://api.fensi.plus/v1/sites/girls2-fc/news/familyNews/contents 等)
+* ブログ（ https://girls2-fc.jp/page/blogs 等）
+* ラジオ ( https://girls2-fc.jp/page/lucky2radio 等)
+* ニュース ( https://girls2-fc.jp/page/familyNews 等)
 
 の最新情報をリストします。
 直後にある引数とオプションの説明に加えて、コマンドの例を[末尾](#コマンドの例)にたくさん載せますので参考にしてください。
@@ -102,7 +103,7 @@ gl2f blogs girls2
 
 小田柚葉のブログを表示する
 ```sh
-gi2f blogs yuzuha
+gl2f blogs yuzuha
 ```
 
 今日投稿されたブログを表示する（`today` は `blogs` でのみ使えます）
@@ -150,7 +151,7 @@ lovely2 のニュースを公開日の早いものから10件表示する（コ�
 gl2f news lovely2 --order reservedAt:asc # --date --date-format '%Y/%m/%d'
 ```
 
-原田都愛のブログをタイトル降順に30件表示する
+原田都愛のブログをタイトル降順で30件表示する
 ```sh
 gl2f blogs toa --order name:desc -n 30
 ```
