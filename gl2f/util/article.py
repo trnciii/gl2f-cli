@@ -22,7 +22,9 @@ def compose_line(p):
 to_text_option = {'full', 'compact', 'compressed'}
 
 def to_text(body, key):
-	assert key in to_text_option
+	if key not in to_text_option:
+		key = 'compact'
+
 
 	if key == 'full':
 		return '\n'.join(map(compose_line, paragraphs(body))).rstrip('\n')
