@@ -14,9 +14,9 @@ def paragraphs(body):
 
 
 def compose_line(p):
-	p = ptn_media.sub(term.mod(r'[\1]', [term.bold(), term.dim()]), p)
-	p = ptn_strong.sub(term.mod(r'\1', [term.blink()]), p)
-	p = ptn_link.sub(term.mod(r'\1', [term.dim()]), p)
+	p = ptn_media.sub(term.mod(r'[\1]', [term.dim()]), p)
+	p = ptn_strong.sub(term.mod(r'\1', [term.color('white', 'fl'), term.color('black', 'bl')]), p)
+	p = ptn_link.sub(term.mod(r'\1', [term.color('cyan', 'fl')]), p)
 	p = ptn_span.sub('', p)
 	p = ptn_break.sub('', p)
 	return p

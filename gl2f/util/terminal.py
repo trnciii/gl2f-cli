@@ -13,6 +13,31 @@ def rgb(r, g, b, bg='f'):
 	else:
 		return f'\033[38;2;{r};{g};{b}m'
 
+def color(name, k='f'):
+	table = {
+		'black': 0,
+		'red': 1,
+		'green': 2,
+		'yellow': 3,
+		'blue': 4,
+		'magenta': 5,
+		'cyan': 6,
+		'white': 7
+	}
+
+	kind = {
+		'f': 3,
+		'b': 4,
+		'fl': 9,
+		'bl': 10
+	}
+
+	assert name in table.keys()
+	assert k in kind.keys()
+
+	return f'\033[{kind[k]}{table[name]}m'
+
+
 def reset_all():
 	return '\033[m'
 
