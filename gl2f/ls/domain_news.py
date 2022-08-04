@@ -1,4 +1,4 @@
-name = 'radio'
+name = 'news'
 
 def request_url(group):
 	url = {
