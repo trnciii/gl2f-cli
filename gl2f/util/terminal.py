@@ -9,9 +9,9 @@ def justzen(s, w):
 
 def rgb(r, g, b, bg='f'):
 	if bg in ['b', 'bg', 'background']:
-		return f'\033[48;2;{r};{g};{b}m'
+		return f'48;2;{r};{g};{b}'
 	else:
-		return f'\033[38;2;{r};{g};{b}m'
+		return f'38;2;{r};{g};{b}'
 
 def color(name, k='f'):
 	table = {
@@ -35,41 +35,41 @@ def color(name, k='f'):
 	assert name in table.keys()
 	assert k in kind.keys()
 
-	return f'\033[{kind[k]}{table[name]}m'
+	return str(kind[k]) + str(table[name])
 
 
 def reset_all():
-	return '\033[m'
+	return ''
 
 def reset_color():
-	return '\033[0m'
+	return '0'
 
 def bold():
-	return '\033[1m'
+	return '1'
 
 def dim():
-	return '\033[2m'
+	return '2'
 
 def italic():
-	return '\033[3m'
+	return '3'
 
 def underline():
-	return '\033[4m'
+	return '4'
 
 def blink():
-	return '\033[5m'
+	return '5'
 
 def inv():
-	return '\033[7m'
+	return '7'
 
 def hide():
-	return '\033[8m'
+	return '8'
 
 def strikeline():
-	return '\033[9m'
+	return '9'
 
 def mod(s, cc):
-	return ''.join(cc) + s + reset_all()
+	return '\033[{}m'.format(';'.join(cc)) + s + '\033[{}m'.format(reset_all())
 
 if __name__ == '__main__':
 	import terminal as term, member
