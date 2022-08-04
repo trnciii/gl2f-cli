@@ -34,6 +34,8 @@ pip install git+https://github.com/trnciii/gl2f-cli
 
 ## 使い方
 
+とりあえず[#コマンドの例](#コマンドの例)を実行してみると良いと思います。
+
 `gl2f <サブコマンド>` もしくは `gl2f-<サブコマンド>` という形で利用します。
 サブコマンドは `blogs, radio, news` があり、それぞれ
 
@@ -42,7 +44,7 @@ pip install git+https://github.com/trnciii/gl2f-cli
 * ニュース ( https://girls2-fc.jp/page/familyNews 等)
 
 の最新情報をリストします。
-直後にある引数とオプションの説明に加えて、コマンドの例を[末尾](#コマンドの例)にたくさん載せますので参考にしてください。
+直後にある引数とオプションの説明と[コマンドの例](#コマンドの例)を参考にしてください。
 
 
 ### サブコマンドの引数
@@ -89,7 +91,7 @@ gl2f news family # GL2 family 両方のニュース。 https://girls2-fc.jp/page
 分類のため、以下のタグを用意しています。
 
 * listing リストする情報や整理について
-* appearance リストや記事の表示・成型について
+* appearance リストや記事の表示・整形について
 
 
 ## コマンドの例
