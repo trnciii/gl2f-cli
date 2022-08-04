@@ -1,22 +1,25 @@
 import re
 from . import terminal as term
 
-ptn_paragraph = re.compile(r'(?<=<p>).*?(?=</p>)')
-ptn_empty_paragraph = re.compile(r'<p></p>')
-ptn_media = re.compile(r'<fns-media.*?</fns-media>')
-ptn_media_type = re.compile(r'(?<=type=").*?(?=")')
+ptn_paragraph = re.compile(r'<p>(.*?)</p>')
+ptn_media = re.compile(r'<fns-media.*?type="(.+?)".*?></fns-media>')
 ptn_break = re.compile(r'<br>')
+ptn_link = re.compile(r'<a href="(.+?)".*?>.+?</a>')
+ptn_strong = re.compile(r'<strong>(.*?)</strong>')
+ptn_span = re.compile(r'<span.*?>(.*?)</span>')
+
 
 def paragraphs(body):
-	return ptn_paragraph.findall(ptn_empty_paragraph.sub('', body))
+	return [ptn_paragraph.sub(r'\1', line) for line in ptn_paragraph.findall(body)]
 
 
 def compose_line(p):
-	if ptn_media.match(p):
-		t = '[{}]'.format(ptn_media_type.search(p).group(0))
-		return term.mod(t, [term.bold(), term.dim()])
-	else:
-		return ptn_break.sub('', p)
+	p = ptn_media.sub(term.mod(r'[\1]', [term.bold(), term.dim()]), p)
+	p = ptn_strong.sub(term.mod(r'\1', [term.blink()]), p)
+	p = ptn_link.sub(term.mod(r'\1', [term.dim()]), p)
+	p = ptn_span.sub('', p)
+	p = ptn_break.sub('', p)
+	return p
 
 
 to_text_option = {'full', 'compact', 'compressed'}
