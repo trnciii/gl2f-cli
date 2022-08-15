@@ -12,10 +12,9 @@ setup(
 	entry_points={
 		'console_scripts': [
 			'gl2f = gl2f.__main__:main',
-			'gl2f-blogs = gl2f.blogs:main',
-			'gl2f-radio = gl2f.radio:main',
-			'gl2f-news = gl2f.news:main',
-			'gl2f-auth = gl2f.auth:main'
+			'gl2b = gl2f.blogs:main',
+			'gl2r = gl2f.radio:main',
+			'gl2n = gl2f.news:main',
 		]
 	}
 )
