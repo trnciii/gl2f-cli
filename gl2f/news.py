@@ -15,7 +15,8 @@ def core(args):
 	fm = pretty.Formatter(f=args.format, fd=args.date_format, sep=args.sep, preview=args.preview)
 	fm.reset_index(digits=len(str(args.number)))
 
-	lister.list_group(args.name, args.number, args.page, args.order, formatter=fm)
+	for i in lister.list_group(args.name, args.number, args.page, args.order):
+		fm.print(i)
 
 
 def main():

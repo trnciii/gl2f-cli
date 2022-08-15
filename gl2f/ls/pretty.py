@@ -1,4 +1,5 @@
 from ..util import terminal as term, to_datetime, member, article
+from . import board
 import os
 
 class Formatter:
@@ -20,7 +21,7 @@ class Formatter:
 		try:
 			_, v = member.from_id(item['categoryId'])
 			fullname = v['fullname']
-			colf, colb = v['color'][self.group].values()
+			colf, colb = v['color'][board.to_group(item['boardId'])].values()
 		except StopIteration:
 			fullname = item['category']['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
@@ -39,7 +40,8 @@ class Formatter:
 		return term.mod(item['values']['title'], [term.bold()])
 
 	def url(self, item):
-		return term.mod(os.path.join(self.page_url, item['contentId']), [term.dim()])
+		url = os.path.join(board.from_id(item['boardId']), item['contentId'])
+		return term.mod(url, [term.dim()])
 
 	def date_p(self, item):
 		return to_datetime(item['openingAt']).strftime(self.fdstring)
@@ -70,6 +72,9 @@ class Formatter:
 		}
 
 		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
+
+	def print(self, item, end='\n'):
+		print(self.format(item, end))
 
 
 def add_args(parser):

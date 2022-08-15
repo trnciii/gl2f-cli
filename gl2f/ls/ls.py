@@ -4,29 +4,18 @@ import argparse
 import os
 from ..util import member, is_today
 from .. import auth
-from . import pretty
+from . import board
 
 
 class Lister:
 	def __init__(self, name, debug=False):
-		if name == 'blog':
-			from . import domain_blogs
-			self.domain = domain_blogs
-
-		elif name == 'radio':
-			from . import domain_radio
-			self.domain = domain_radio
-
-		elif name == 'news':
-			from . import domain_news
-			self.domain = domain_news
-
+		self.name = name
 		self.debug = debug
 
 
 	def fetch(self, group, size, page, order='reservedAt:desc', categoryId=None):
 		response = requests.get(
-			self.domain.request_url(group),
+			board.request_url(self.name, group),
 			params={
 				'size': str(size),
 				'page': str(page),
@@ -36,7 +25,7 @@ class Lister:
 			cookies={},
 			headers={
 				'origin': 'https://girls2-fc.jp',
-				'x-from': self.domain.contents_url(group),
+				'x-from': board.from_name(self.name, group),
 				'x-authorization': auth.update(auth.load()),
 			})
 
@@ -45,46 +34,32 @@ class Lister:
 
 		if self.debug:
 			query = categoryId if categoryId else group
-			path = os.path.join(self.debug, f'{self.domain.name}-{query}.json')
+			path = os.path.join(self.debug, f'{self.name}-{query}.json')
 			with open(path, 'w') as f:
 				json.dump(response.json(), f, indent=2)
 
 		return response.json()
 
 
-	def list_group(self, group, size=10, page=1, order='reservedAt:desc', formatter=pretty.Formatter()):
-		formatter.page_url = self.domain.contents_url(group)
-		formatter.group = group
-		items = self.fetch(group, size, page, order)['list']
-		for i in items:
-			print(formatter.format(i))
+	def list_group(self, group, size=10, page=1, order='reservedAt:desc'):
+		return self.fetch(group, size, page, order)['list']
 
 
-	def list_member(self, name, group=None, size=10, page=1, order='reservedAt:desc', formatter=pretty.Formatter()):
+	def list_member(self, name, group=None, size=10, page=1, order='reservedAt:desc'):
 		member_data = member.get()[name]
-		categoryId = member_data['categoryId'][self.domain.name]
+		categoryId = member_data['categoryId'][self.name]
 		group_list = member_data['group']
 		if not group in group_list:
 			group = group_list[0]
 
-		formatter.page_url = self.domain.contents_url(group)
-		formatter.group = group
-
-		items = self.fetch(group, size, page, order, categoryId=categoryId)['list']
-		for i in items:
-			print(formatter.format(i))
+		return self.fetch(group, size, page, order, categoryId=categoryId)['list']
 
 
-	def list_today(self, formatter=pretty.Formatter()):
-		for group in ['girls2', 'lucky2']:
-			formatter.page_url = self.domain.contents_url(group)
-			formatter.group = group
-			items = filter(
-				lambda i: is_today(i['openingAt']),
-				self.fetch(group, size=10, page=1)['list'])
-
-			for i in items:
-				print(formatter.format(i))
+	def list_today(self):
+		return filter(
+			lambda i: is_today(i['openingAt']),
+			sum((self.fetch(group, size=10, page=1)['list'] for group in ['girls2', 'lucky2']), [])
+		)
 
 
 def add_args(parser):
