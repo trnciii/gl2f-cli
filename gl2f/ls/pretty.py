@@ -21,7 +21,7 @@ class Formatter:
 		try:
 			_, v = member.from_id(item['categoryId'])
 			fullname = v['fullname']
-			colf, colb = v['color'][self.group].values()
+			colf, colb = v['color'][board.to_group(item['boardId'])].values()
 		except StopIteration:
 			fullname = item['category']['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]

@@ -42,7 +42,6 @@ class Lister:
 
 
 	def list_group(self, group, size=10, page=1, order='reservedAt:desc', formatter=pretty.Formatter()):
-		formatter.group = group
 		items = self.fetch(group, size, page, order)['list']
 		for i in items:
 			print(formatter.format(i))
@@ -55,7 +54,6 @@ class Lister:
 		if not group in group_list:
 			group = group_list[0]
 
-		formatter.group = group
 
 		items = self.fetch(group, size, page, order, categoryId=categoryId)['list']
 		for i in items:
@@ -64,7 +62,6 @@ class Lister:
 
 	def list_today(self, formatter=pretty.Formatter()):
 		for group in ['girls2', 'lucky2']:
-			formatter.group = group
 			items = filter(
 				lambda i: is_today(i['openingAt']),
 				self.fetch(group, size=10, page=1)['list'])
