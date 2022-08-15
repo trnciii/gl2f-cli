@@ -1,4 +1,5 @@
 from ..util import terminal as term, to_datetime, member, article
+from . import board
 import os
 
 class Formatter:
@@ -39,7 +40,8 @@ class Formatter:
 		return term.mod(item['values']['title'], [term.bold()])
 
 	def url(self, item):
-		return term.mod(os.path.join(self.page_url, item['contentId']), [term.dim()])
+		url = os.path.join(board.from_id(item['boardId']), item['contentId'])
+		return term.mod(url, [term.dim()])
 
 	def date_p(self, item):
 		return to_datetime(item['openingAt']).strftime(self.fdstring)
