@@ -16,13 +16,16 @@ def core(args):
 	fm.reset_index(digits=len(str(args.number)))
 
 	if member.is_group(args.name):
-		lister.list_group(args.name, args.number, args.page, order=args.order, formatter=fm)
+		for i in lister.list_group(args.name, args.number, args.page, order=args.order):
+			fm.print(i)
 
 	elif member.is_member(args.name):
-		lister.list_member(args.name, group=args.group, page=args.page, size=args.number, order=args.order, formatter=fm)
+		for i in lister.list_member(args.name, group=args.group, page=args.page, size=args.number, order=args.order):
+			fm.print(i)
 
 	elif args.name == 'today':
-		lister.list_today(formatter=fm)
+		for i in lister.list_today():
+			fm.print(i)
 
 
 def main():

@@ -4,7 +4,7 @@ import argparse
 import os
 from ..util import member, is_today
 from .. import auth
-from . import pretty, board
+from . import board
 
 
 class Lister:
@@ -41,33 +41,25 @@ class Lister:
 		return response.json()
 
 
-	def list_group(self, group, size=10, page=1, order='reservedAt:desc', formatter=pretty.Formatter()):
-		items = self.fetch(group, size, page, order)['list']
-		for i in items:
-			print(formatter.format(i))
+	def list_group(self, group, size=10, page=1, order='reservedAt:desc'):
+		return self.fetch(group, size, page, order)['list']
 
 
-	def list_member(self, name, group=None, size=10, page=1, order='reservedAt:desc', formatter=pretty.Formatter()):
+	def list_member(self, name, group=None, size=10, page=1, order='reservedAt:desc'):
 		member_data = member.get()[name]
 		categoryId = member_data['categoryId'][self.name]
 		group_list = member_data['group']
 		if not group in group_list:
 			group = group_list[0]
 
-
-		items = self.fetch(group, size, page, order, categoryId=categoryId)['list']
-		for i in items:
-			print(formatter.format(i))
+		return self.fetch(group, size, page, order, categoryId=categoryId)['list']
 
 
-	def list_today(self, formatter=pretty.Formatter()):
-		for group in ['girls2', 'lucky2']:
-			items = filter(
-				lambda i: is_today(i['openingAt']),
-				self.fetch(group, size=10, page=1)['list'])
-
-			for i in items:
-				print(formatter.format(i))
+	def list_today(self):
+		return filter(
+			lambda i: is_today(i['openingAt']),
+			sum((self.fetch(group, size=10, page=1)['list'] for group in ['girls2', 'lucky2']), [])
+		)
 
 
 def add_args(parser):

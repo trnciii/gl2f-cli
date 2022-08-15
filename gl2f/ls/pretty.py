@@ -73,6 +73,9 @@ class Formatter:
 
 		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
 
+	def print(self, item, end='\n'):
+		print(self.format(item, end))
+
 
 def add_args(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
