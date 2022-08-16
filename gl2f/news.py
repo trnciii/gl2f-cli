@@ -1,5 +1,5 @@
 import argparse
-from .util import member
+from .util import member, article
 from .ls import pretty, ls
 
 
@@ -17,6 +17,8 @@ def core(args):
 
 	for i in lister.list_group(args.name, args.number, args.page, args.order):
 		fm.print(i)
+		if args.dl_media:
+			article.save_media(i)
 
 
 def main():

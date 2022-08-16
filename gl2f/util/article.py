@@ -46,7 +46,7 @@ def to_text(body, key):
 		return ''.join(map(compose_line, paragraphs(body)))
 
 
-def extract_media(item):
+def save_media(item):
 	import requests, urllib.request
 	from gl2f import auth
 

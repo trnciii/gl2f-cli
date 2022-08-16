@@ -1,5 +1,5 @@
 import argparse
-from .util import member
+from .util import member, article
 from .ls import pretty, ls
 
 
@@ -15,13 +15,18 @@ def core(args):
 	fm = pretty.Formatter(f=args.format, fd=args.date_format, sep=args.sep)
 	fm.reset_index(digits=len(str(args.number)))
 
+	items = []
 	if member.is_group(args.name):
-		for i in lister.list_group(args.name, args.number, args.page, args.order):
-			fm.print(i)
+		items = lister.list_group(args.name, args.number, args.page, args.order)
 
 	elif member.is_member(args.name):
-		for i in lister.list_member(args.name, args.group, args.number, args.page, order=args.order):
-			fm.print(i)
+		items = lister.list_member(args.name, args.group, args.number, args.page, order=args.order)
+
+
+	for i in items:
+		fm.print(i)
+		if args.dl_media:
+			article.save_media(i)
 
 
 def main():
