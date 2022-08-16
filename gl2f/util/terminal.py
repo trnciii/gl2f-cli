@@ -1,4 +1,5 @@
 import re
+import os
 
 def justzen(s, w):
 	len_displayed = len(re.sub(r'\033\[.*?m', '', s))
@@ -6,6 +7,11 @@ def justzen(s, w):
 		return s + '　'*(w-len_displayed)
 	else:
 		return s
+
+def clean_row():
+	w, _ = os.get_terminal_size()
+	print('\r' + ' '*(w-1), end='\r', flush=True)
+
 
 def rgb(r, g, b, bg='f'):
 	if bg in ['b', 'bg', 'background']:
