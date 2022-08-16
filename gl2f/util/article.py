@@ -51,14 +51,17 @@ def save_media(item, dump=False):
 	from gl2f import auth
 	import json
 
+	boardId = item['boardId']
+	contentId = item['contentId']
+
 	li = ptn_media.findall(item['values']['body'])
 
 	l = len(li)
 	dig = len(str(l))
 
-	for i, (media_id, _) in enumerate(li):
+	def sub(i, media_id):
 		response = requests.get(
-			f"https://api.fensi.plus/v1/sites/girls2-fc/boards/{item['boardId']}/contents/{item['contentId']}/medias/{media_id}",
+			f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{media_id}',
 			headers={
 				'origin': 'https://girls2-fc.jp',
 				'x-authorization': auth.update(auth.load()),
@@ -67,15 +70,22 @@ def save_media(item, dump=False):
 
 		if response.ok:
 			data = response.json()
-			url = data['accessUrl']
-			filename = f"{media_id}.{data['meta']['ext']}"
-
-			if dump:
-				with open(f'{media_id}.json', 'w') as f:
-					json.dump(data, f, indent=2)
+			filename = f'{media_id}.{data["meta"]["ext"]}'
 
 			print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] {filename}',
 				end='', flush=True)
 
-			urllib.request.urlretrieve(url, filename)
+			urllib.request.urlretrieve(data['accessUrl'], filename)
+
+			return data
+
+		else:
+			return {}
+
+	result = [sub(i, media_id) for i, (media_id, _) in enumerate(li)]
+
 	term.clean_row()
+
+	if dump:
+		with open(f"media-{item['contentId']}.json", 'w') as f:
+			json.dump(result, f, indent=2)
