@@ -1,5 +1,5 @@
 import re, html
-from . import terminal as term
+from gl2f.util import terminal as term
 
 ptn_paragraph = re.compile(r'<p>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?type="(.+?)".*?></fns-media>')
@@ -44,3 +44,27 @@ def to_text(body, key):
 
 	elif key == 'compressed':
 		return ''.join(map(compose_line, paragraphs(body)))
+
+
+def extract_media(item):
+	import requests, urllib.request
+	from gl2f import auth
+
+	ptn_media_id = re.compile(r'<fns-media.*?media-id="(.+?)".*?></fns-media>')
+
+
+	for media_id in ptn_media_id.findall(item['values']['body']):
+
+		response = requests.get(
+			f"https://api.fensi.plus/v1/sites/girls2-fc/boards/{item['boardId']}/contents/{item['contentId']}/medias/{media_id}",
+			headers={
+				'origin': 'https://girls2-fc.jp',
+				'x-authorization': auth.update(auth.load()),
+				'x-from': 'https://girls2-fc.jp',
+			})
+
+		if response.ok:
+			data = response.json()
+			url = data['accessUrl']
+			filename = f"{media_id}.{data['meta']['ext']}"
+			urllib.request.urlretrieve(url, filename)
