@@ -14,14 +14,21 @@ def paragraphs(body):
 	return [ptn_paragraph.sub(r'\1', line) for line in ptn_paragraph.findall(body)]
 
 
-def compose_line(p, use_sixel=False):
+def media_rep_type(p):
+	return ptn_media.sub(term.mod('[\\2]', [term.dim()]), p)
 
-	if use_sixel and ptn_media.sub('\\2', p) == 'image':
-		media_id = ptn_media.sub('\\1', p)
-		p = sixel.img(sixel.media_file_from_id(media_id))
-	else:
-		p = ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
+def media_rep_type_id(p):
+	return ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
 
+def media_rep_sixel(p):
+	if ptn_media.sub('\\2', p) != 'image':
+		return media_rep_type_id(p)
+
+	return sixel.img(sixel.media_file_from_id(ptn_media.sub('\\1', p)))
+
+
+def compose_line(p, media_rep):
+	p = media_rep(p)
 	p = ptn_strong.sub(term.mod('\\1', [term.color('white', 'fl'), term.bold(), term.underline()]), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
@@ -42,14 +49,14 @@ def to_text(body, key):
 
 
 	if key == 'full':
-		return '\n'.join([compose_line(p, True) for p in paragraphs(body)]).rstrip('\n')
+		return '\n'.join([compose_line(p, media_rep_sixel) for p in paragraphs(body)]).rstrip('\n')
 
 	elif key == 'compact':
-		text = '\n'.join([compose_line(p, True) for p in paragraphs(body)]).rstrip('\n')
+		text = '\n'.join([compose_line(p, media_rep_sixel) for p in paragraphs(body)]).rstrip('\n')
 		return re.sub(r'\n+', '\n', text)
 
 	elif key == 'compressed':
-		return ''.join([compose_line(p, False) for p in paragraphs(body)])
+		return ''.join([compose_line(p, media_rep_type) for p in paragraphs(body)])
 
 
 def save_media(item):
