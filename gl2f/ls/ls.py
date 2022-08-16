@@ -25,7 +25,7 @@ class Lister:
 			cookies={},
 			headers={
 				'origin': 'https://girls2-fc.jp',
-				'x-from': board.from_name(self.name, group),
+				'x-from': 'https://girls2-fc.jp',
 				'x-authorization': auth.update(auth.load()),
 			})
 
