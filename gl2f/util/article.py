@@ -1,5 +1,6 @@
 import re, html
 from gl2f.util import terminal as term
+import argparse
 
 ptn_paragraph = re.compile(r'<p>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
@@ -46,7 +47,7 @@ def to_text(body, key):
 		return ''.join(map(compose_line, paragraphs(body)))
 
 
-def save_media(item, dump=False):
+def save_media(item, option, dump=False):
 	import requests, urllib.request
 	from gl2f import auth
 	import json
@@ -54,8 +55,11 @@ def save_media(item, dump=False):
 	boardId = item['boardId']
 	contentId = item['contentId']
 
-	li = ptn_media.findall(item['values']['body'])
+	save_original = option != 'stream'
+	skip = option == 'skip'
 
+
+	li = ptn_media.findall(item['values']['body'])
 	l = len(li)
 	dig = len(str(l))
 
@@ -70,22 +74,31 @@ def save_media(item, dump=False):
 
 		if response.ok:
 			data = response.json()
-			filename = f'{media_id}.{data["meta"]["ext"]}'
+			filename = f'{data["mediaId"]}.{data["meta"]["ext"]}'
 
-			print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] {filename}',
-				end='', flush=True)
+			if not skip:
+				print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] {filename}',
+					end='', flush=True)
 
-			urllib.request.urlretrieve(data['accessUrl'], filename)
+				urllib.request.urlretrieve(
+					data['originalUrl'] if (save_original and 'originalUrl' in data.keys()) else data['accessUrl'],
+					filename
+				)
 
 			return data
 
 		else:
 			return {}
 
-	result = [sub(i, media_id) for i, (media_id, _) in enumerate(li)]
+	result = {media_id: sub(i, media_id) for i, (media_id, _) in enumerate(li)}
 
 	term.clean_row()
 
 	if dump:
 		with open(f"media-{item['contentId']}.json", 'w') as f:
 			json.dump(result, f, indent=2)
+
+
+def add_args(parser):
+	parser.add_argument('--dl-media', type=str, nargs='?', const='original', choices=['stream', 'original', 'skip'],
+		help='save media')

@@ -80,6 +80,3 @@ def add_args(parser):
 
 	parser.add_argument('--dump-response', type=str, nargs='?', const='.',
 		help='dump response from server as ./response.json')
-
-	parser.add_argument('--dl-media', action='store_true',
-		help='save media')
