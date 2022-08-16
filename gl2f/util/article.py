@@ -1,5 +1,5 @@
 import re, html
-from gl2f.util import terminal as term
+from gl2f.util import terminal as term, sixel
 
 ptn_paragraph = re.compile(r'<p>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
@@ -14,8 +14,14 @@ def paragraphs(body):
 	return [ptn_paragraph.sub(r'\1', line) for line in ptn_paragraph.findall(body)]
 
 
-def compose_line(p):
-	p = ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
+def compose_line(p, use_sixel=False):
+
+	if use_sixel and ptn_media.sub('\\2', p) == 'image':
+		media_id = ptn_media.sub('\\1', p)
+		p = sixel.img(sixel.media_file_from_id(media_id))
+	else:
+		p = ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
+
 	p = ptn_strong.sub(term.mod('\\1', [term.color('white', 'fl'), term.bold(), term.underline()]), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
@@ -36,14 +42,14 @@ def to_text(body, key):
 
 
 	if key == 'full':
-		return '\n'.join(map(compose_line, paragraphs(body))).rstrip('\n')
+		return '\n'.join([compose_line(p, True) for p in paragraphs(body)]).rstrip('\n')
 
 	elif key == 'compact':
-		text = '\n'.join(map(compose_line, paragraphs(body))).rstrip('\n')
+		text = '\n'.join([compose_line(p, True) for p in paragraphs(body)]).rstrip('\n')
 		return re.sub(r'\n+', '\n', text)
 
 	elif key == 'compressed':
-		return ''.join(map(compose_line, paragraphs(body)))
+		return ''.join([compose_line(p, False) for p in paragraphs(body)])
 
 
 def save_media(item):

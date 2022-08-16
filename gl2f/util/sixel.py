@@ -5,7 +5,9 @@ from io import BytesIO
 
 
 def media_file_from_id(media_id):
-	files = glob.glob(f"./{media_id}.*")
+	path = f'./{media_id}.*'
+	print(path)
+	files = glob.glob(path)
 	assert len(files) == 1
 	return files[0]
 
