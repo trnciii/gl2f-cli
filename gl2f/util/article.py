@@ -46,9 +46,10 @@ def to_text(body, key):
 		return ''.join(map(compose_line, paragraphs(body)))
 
 
-def save_media(item):
+def save_media(item, dump=False):
 	import requests, urllib.request
 	from gl2f import auth
+	import json
 
 	li = ptn_media.findall(item['values']['body'])
 
@@ -68,6 +69,10 @@ def save_media(item):
 			data = response.json()
 			url = data['accessUrl']
 			filename = f"{media_id}.{data['meta']['ext']}"
+
+			if dump:
+				with open(f'{media_id}.json', 'w') as f:
+					json.dump(data, f, indent=2)
 
 			print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] {filename}',
 				end='', flush=True)

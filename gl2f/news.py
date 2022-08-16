@@ -18,7 +18,7 @@ def core(args):
 	for i in lister.list_group(args.name, args.number, args.page, args.order):
 		fm.print(i)
 		if args.dl_media:
-			article.save_media(i)
+			article.save_media(i, dump=args.dump_response)
 
 
 def main():
