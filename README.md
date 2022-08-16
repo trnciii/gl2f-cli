@@ -86,13 +86,12 @@ gl2f news family # GL2 family 両方のニュース。 https://girls2-fc.jp/page
 
 [issues](https://github.com/trnciii/gl2f-cli/issues) を見てください。
 また希望があれば追加してください。
-
 分類のため、以下のタグを用意しています。
 
 * listing リストする情報や整理について
 * appearance リストや記事の表示・整形について
 
-twitter @trnciii @trncix でも報告等を受け付けます。
+twitter [@trnciii](https://twitter.com/trnciii) [@trncix](https://twitter.com/trncix) でも報告等を受け付けます。
 
 
 ## コマンドの例
