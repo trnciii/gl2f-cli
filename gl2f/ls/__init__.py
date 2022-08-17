@@ -1,9 +1,9 @@
-from . import pretty, ls
-from .ls import Lister
+from . import pretty, lister
+from .lister import Lister
 import argparse
 
 def add_args(parser):
-	ls.add_args(parser)
+	lister.add_args(parser)
 	pretty.add_args(parser)
 
 
