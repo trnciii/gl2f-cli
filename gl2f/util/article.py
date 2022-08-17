@@ -1,8 +1,6 @@
 import re, html
 from gl2f.util import terminal as term
 import argparse
-import os
-from gl2f.util import path
 
 
 ptn_paragraph = re.compile(r'<p>(.*?)</p>')
@@ -54,6 +52,9 @@ def save_media(item, option, dump=False):
 	import requests, urllib.request
 	from gl2f import auth
 	import json
+	import os, re
+	from gl2f.util import path
+
 
 	boardId = item['boardId']
 	contentId = item['contentId']
@@ -67,6 +68,10 @@ def save_media(item, option, dump=False):
 	dig = len(str(l))
 
 	def sub(i, media_id):
+		ptn = re.compile(media_id + r'\..+')
+		if any(map(ptn.search, path.ls('media'))):
+			return 'file already exists'
+
 		term.clean_row()
 		print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] ', end='', flush=True)
 
@@ -79,7 +84,7 @@ def save_media(item, option, dump=False):
 			})
 
 		if not response.ok:
-			return {}
+			return 'bad response'
 
 		data = response.json()
 		basename = f'{data["mediaId"]}.{data["meta"]["ext"]}'
@@ -87,13 +92,7 @@ def save_media(item, option, dump=False):
 
 		print(f'{basename} ', end='', flush=True)
 
-		if skip:
-			pass
-
-		elif os.path.exists(file):
-			print('already exists. skipping.', end='', flush=True)
-
-		else:
+		if not skip:
 			urllib.request.urlretrieve(
 				data['originalUrl'] if (save_original and 'originalUrl' in data.keys())\
 				else data['accessUrl'],
