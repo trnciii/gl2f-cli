@@ -10,11 +10,30 @@ def media_file_from_id(media_id):
 	return files[0]
 
 
-def img(file):
-	s = BytesIO()
+def fit(image, size):
+	w, h = image.size
+	r = min(size[0]/w, size[1]/h)
+	w, h = int(r*w), int(r*h)
+	return image.resize((w, h))
 
+
+def limit(image, size):
+	w, h = image.size
+	r = min(size[0]/w, size[1]/h)
+	if r < 1:
+		w, h = int(r*w), int(r*h)
+	return image.resize((w, h))
+
+
+def img(media_id):
+	file = media_file_from_id(media_id)
 	image = Image.open(file)
-	width, height = image.size
+	image = limit(image, (1000, 1000))
+	return to_sixel(image)
+
+
+def to_sixel(image):
+	s = BytesIO()
 	try:
 		data = image.tobytes()
 	except NotImplementedError:
@@ -22,6 +41,7 @@ def img(file):
 	output = sx.sixel_output_new(lambda data, s: s.write(data), s)
 
 	try:
+		width, height = image.size
 		if image.mode == 'RGBA':
 			dither = sx.sixel_dither_new(256)
 			sx.sixel_dither_initialize(dither, data, width, height, sx.SIXEL_PIXELFORMAT_RGBA8888)
@@ -52,7 +72,8 @@ def img(file):
 
 
 if __name__ == '__main__':
-	media_id = "687482244532536160"
-	s = img(media_file_from_id(media_id)) or f'[image]({media_id})'
+	media_id = "688741780203504480"
+	s = img(media_id)
+	print('111')
 	print(s)
 
