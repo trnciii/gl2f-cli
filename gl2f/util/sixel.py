@@ -1,9 +1,17 @@
 import glob
-import libsixel as sx
 from PIL import Image
 from io import BytesIO
 from gl2f.util import path
 import os
+
+try:
+	import libsixel as sx
+	enabled = lambda: True
+
+except ImportError:
+	print('failed to import libsixel.')
+	enabled = lambda: False
+
 
 def media_file_from_id(media_id):
 	files = glob.glob(f'{os.path.join(path.media(), media_id)}.*')

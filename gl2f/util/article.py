@@ -22,14 +22,20 @@ def media_rep_type(p):
 def media_rep_type_id(p):
 	return ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
 
-def media_rep_sixel(p):
-	match = ptn_media.search(p)
-	if not match:
-		return p
-	i, t = match.group(1, 2)
-	if t != 'image':
-		return media_rep_type_id(p)
-	return sixel.img(i)
+
+if sixel.enabled():
+	def media_rep_sixel(p):
+		match = ptn_media.search(p)
+		if not match:
+			return p
+		i, t = match.group(1, 2)
+		if t != 'image':
+			return media_rep_type_id(p)
+		return sixel.img(i)
+
+else:
+	media_rep_sixel = media_rep_type_id
+
 
 
 def compose_line(p, media_rep):
