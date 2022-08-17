@@ -68,7 +68,7 @@ class Formatter:
 			'date-c': self.date_c,
 			'text': self.text,
 			'index': self.inc_index,
-			'\\n': self.breakline,
+			'n': self.breakline,
 		}
 
 		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
