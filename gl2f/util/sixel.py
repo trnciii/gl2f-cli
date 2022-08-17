@@ -2,10 +2,11 @@ import glob
 import libsixel as sx
 from PIL import Image
 from io import BytesIO
-
+from gl2f.util import path
+import os
 
 def media_file_from_id(media_id):
-	files = glob.glob(f'./{media_id}.*')
+	files = glob.glob(f'{os.path.join(path.media(), media_id)}.*')
 	assert len(files) == 1
 	return files[0]
 

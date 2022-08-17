@@ -1,5 +1,7 @@
 import re, html
-from gl2f.util import terminal as term, sixel
+from gl2f.util import terminal as term
+import argparse
+from gl2f.util import sixel
 
 ptn_paragraph = re.compile(r'<p>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
@@ -62,22 +64,69 @@ def to_text(body, key):
 		return ''.join([compose_line(p, media_rep_type) for p in paragraphs(body)])
 
 
-def save_media(item):
+def save_media(item, option, dump=False):
 	import requests, urllib.request
 	from gl2f import auth
+	import json
+	import os, re
+	from gl2f.util import path
 
-	for media_id, _ in ptn_media.findall(item['values']['body']):
+
+	boardId = item['boardId']
+	contentId = item['contentId']
+
+	save_original = option != 'stream'
+	skip = option == 'skip'
+
+
+	li = ptn_media.findall(item['values']['body'])
+	l = len(li)
+	dig = len(str(l))
+
+	def sub(i, media_id):
+		ptn = re.compile(media_id + r'\..+')
+		if any(map(ptn.search, path.ls('media'))):
+			return 'file already exists'
+
+		term.clean_row()
+		print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] ', end='', flush=True)
 
 		response = requests.get(
-			f"https://api.fensi.plus/v1/sites/girls2-fc/boards/{item['boardId']}/contents/{item['contentId']}/medias/{media_id}",
+			f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{media_id}',
 			headers={
 				'origin': 'https://girls2-fc.jp',
 				'x-authorization': auth.update(auth.load()),
 				'x-from': 'https://girls2-fc.jp',
 			})
 
-		if response.ok:
-			data = response.json()
-			url = data['accessUrl']
-			filename = f"{media_id}.{data['meta']['ext']}"
-			urllib.request.urlretrieve(url, filename)
+		if not response.ok:
+			return 'bad response'
+
+		data = response.json()
+		basename = f'{data["mediaId"]}.{data["meta"]["ext"]}'
+		file = os.path.join(path.media(), basename)
+
+		print(f'{basename} ', end='', flush=True)
+
+		if not skip:
+			urllib.request.urlretrieve(
+				data['originalUrl'] if (save_original and 'originalUrl' in data.keys())\
+				else data['accessUrl'],
+				file
+			)
+
+		return data
+
+
+	result = {media_id: sub(i, media_id) for i, (media_id, _) in enumerate(li)}
+
+	term.clean_row()
+
+	if dump:
+		with open(f"media-{item['contentId']}.json", 'w') as f:
+			json.dump(result, f, indent=2)
+
+
+def add_args(parser):
+	parser.add_argument('--dl-media', type=str, nargs='?', const='original', choices=['stream', 'original', 'skip'],
+		help='save media')

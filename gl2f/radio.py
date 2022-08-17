@@ -6,6 +6,7 @@ from .ls import pretty, ls
 def add_args(parser):
 	ls.add_args(parser)
 	pretty.add_args(parser)
+	article.add_args(parser)
 
 
 def core(args):
@@ -26,7 +27,7 @@ def core(args):
 	for i in items:
 		fm.print(i)
 		if args.dl_media:
-			article.save_media(i)
+			article.save_media(i, option=args.dl_media, dump=args.dump_response)
 
 
 def main():
