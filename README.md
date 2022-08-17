@@ -74,10 +74,10 @@ gl2f news family # GL2 family 両方のニュース。 https://girls2-fc.jp/page
 	* `date-p` 記事が公開された日時
 	* `date-c` 記事がアップロードされた日時
 	* `index` リスト上での番号を振ります
-	* `\n` 改行。
+	* `br` 改行。
 * `-df, --date-format` 日時のフォーマット指定。デフォルトは月/日(`%m/%d`)。書式については[こちら](https://docs.python.org/ja/3/library/datetime.html#strftime-strptime-behavior)
 * `--preview <オプション>` 記事本文を表示します。会員限定コンテンツは認証が必要なので、ニュースだけ見れる状態かと思います。オプションは `full, compact, compressed` がありいずれも全文を表示しますが、後のものほど改行等が短縮され短く表示されます。オプションを入力しなければ `compact` となります。
-* `--break-urls` URLを改行して表示します。 `-f` で `url -> \n:url` と置き換えることと同じです。
+* `--break-urls` URLを改行して表示します。 `-f` で `url -> br:url` と置き換えることと同じです。
 * `--enum` リストに番号を振ります。 `-f` に `index` を含めることと同じです。
 * `-d, --date` リストの左側に公開日時を表示します。 `-f` に `date-p` を含めることと同じです。
 
@@ -226,7 +226,7 @@ gl2f radio misaki -f date-p:author:title:url
 ```sh
 gl2f blogs tsubaki --break-urls
 # もしくは
-gl2f blogs tsubaki -f author:title:\n:url
+gl2f blogs tsubaki -f author:title:br:url
 ```
 
 lovely2 スタッフのブログを、投稿日と公開日とともに表示する。日時は秒まで表示する。

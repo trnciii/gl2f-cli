@@ -68,7 +68,7 @@ class Formatter:
 			'date-c': self.date_c,
 			'text': self.text,
 			'index': self.inc_index,
-			'n': self.breakline,
+			'br': self.breakline,
 		}
 
 		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
@@ -104,7 +104,7 @@ def add_args(parser):
 
 def post_argparse(args):
 	if args.break_urls:
-		args.format = args.format.replace('url', '\\n:url')
+		args.format = args.format.replace('url', 'br:url')
 
 	if args.date:
 		args.format = 'date-p:' + args.format
