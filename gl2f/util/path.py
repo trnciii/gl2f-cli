@@ -20,7 +20,7 @@ def media():
 	return return_path(path)
 
 def ls(path):
-	return os.listdir(os.path.join(home(), path))
+	return os.listdir(return_path(os.path.join(home(), path)))
 
 
 if __name__ == '__main__':
