@@ -3,3 +3,5 @@ build/
 *.egg-info
 *.json
 gl2f/auth
+
+.DS_Store
