@@ -67,6 +67,9 @@ def save_media(item, option, dump=False):
 	dig = len(str(l))
 
 	def sub(i, media_id):
+		term.clean_row()
+		print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] ', end='', flush=True)
+
 		response = requests.get(
 			f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{media_id}',
 			headers={
@@ -75,23 +78,30 @@ def save_media(item, option, dump=False):
 				'x-from': 'https://girls2-fc.jp',
 			})
 
-		if response.ok:
-			data = response.json()
-			filename = f'{data["mediaId"]}.{data["meta"]["ext"]}'
+		if not response.ok:
+			return {}
 
-			if not skip:
-				print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] {filename}',
-					end='', flush=True)
+		data = response.json()
+		basename = f'{data["mediaId"]}.{data["meta"]["ext"]}'
+		file = os.path.join(path.media(), basename)
 
-				urllib.request.urlretrieve(
-					data['originalUrl'] if (save_original and 'originalUrl' in data.keys()) else data['accessUrl'],
-					os.path.join(path.media(), filename)
-				)
+		print(f'{basename} ', end='', flush=True)
 
-			return data
+		if skip:
+			pass
+
+		elif os.path.exists(file):
+			print('already exists. skipping.', end='', flush=True)
 
 		else:
-			return {}
+			urllib.request.urlretrieve(
+				data['originalUrl'] if (save_original and 'originalUrl' in data.keys())\
+				else data['accessUrl'],
+				file
+			)
+
+		return data
+
 
 	result = {media_id: sub(i, media_id) for i, (media_id, _) in enumerate(li)}
 
