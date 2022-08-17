@@ -1,6 +1,9 @@
 import re, html
 from gl2f.util import terminal as term
 import argparse
+import os
+from gl2f.util import path
+
 
 ptn_paragraph = re.compile(r'<p>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
@@ -82,7 +85,7 @@ def save_media(item, option, dump=False):
 
 				urllib.request.urlretrieve(
 					data['originalUrl'] if (save_original and 'originalUrl' in data.keys()) else data['accessUrl'],
-					filename
+					os.path.join(path.media(), filename)
 				)
 
 			return data
