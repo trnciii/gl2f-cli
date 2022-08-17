@@ -1,32 +1,16 @@
 import argparse
 from .util import member
-from .ls import pretty, ls
-
-
-def add_args(parser):
-	ls.add_args(parser)
-	pretty.add_args(parser)
+from .ls import Lister, make_main
 
 
 def core(args):
-	lister = ls.Lister('radio', debug=args.dump_response)
-	pretty.post_argparse(args)
-
-	fm = pretty.Formatter(f=args.format, fd=args.date_format, sep=args.sep)
-	fm.reset_index(digits=len(str(args.number)))
+	lister = Lister('radio', debug=args.dump_response)
 
 	if member.is_group(args.name):
-		for i in lister.list_group(args.name, args.number, args.page, args.order):
-			fm.print(i)
+		return lister.list_group(args.name, args.number, args.page, args.order)
 
 	elif member.is_member(args.name):
-		for i in lister.list_member(args.name, args.group, args.number, args.page, order=args.order):
-			fm.print(i)
+		return lister.list_member(args.name, args.group, args.number, args.page, order=args.order)
 
 
-def main():
-	parser = argparse.ArgumentParser()
-	add_args(parser)
-	args = parser.parse_args()
-
-	core(args)
+main = make_main(core)
