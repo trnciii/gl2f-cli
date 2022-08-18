@@ -1,6 +1,6 @@
 import re
 import os
-import termios, tty, sys
+import termios, sys
 
 def justzen(s, w):
 	len_displayed = len(re.sub(r'\033\[.*?m', '', s))
@@ -83,9 +83,11 @@ def query(q, end):
 	fd = sys.stdout.fileno()
 
 	old = termios.tcgetattr(fd)
+	tc = termios.tcgetattr(fd)
+	tc[3] &= ~(termios.ICANON | termios.ECHO)
 
 	try:
-		tty.setcbreak(sys.stdin.fileno())
+		termios.tcsetattr(fd, termios.TCSANOW, tc)
 
 		sys.stdout.write(q)
 		sys.stdout.flush()
