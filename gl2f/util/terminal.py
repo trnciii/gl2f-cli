@@ -1,5 +1,6 @@
 import re
 import os
+import termios, tty, sys
 
 def justzen(s, w):
 	len_displayed = len(re.sub(r'\033\[.*?m', '', s))
@@ -76,6 +77,31 @@ def strikeline():
 
 def mod(s, cc):
 	return '\033[{}m'.format(';'.join(cc)) + s + '\033[{}m'.format(reset_all())
+
+
+def query(q, end):
+	fd = sys.stdout.fileno()
+
+	old = termios.tcgetattr(fd)
+
+	try:
+		tty.setcbreak(sys.stdin.fileno())
+
+		sys.stdout.write(q)
+		sys.stdout.flush()
+
+		s = ''
+		while True:
+			c = sys.stdin.read(1)
+			s += c
+			if c == end:
+				break
+
+	finally:
+		termios.tcsetattr(fd, termios.TCSANOW, old)
+
+	return s
+
 
 if __name__ == '__main__':
 	import terminal as term, member

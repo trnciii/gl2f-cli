@@ -3,14 +3,24 @@ from PIL import Image
 from io import BytesIO
 from gl2f.util import path
 import os
+from gl2f.util import terminal
+import re
 
 try:
-	import libsixel as sx
-	enabled = lambda: True
+	import libsixel
 
 except ImportError:
 	print('failed to import libsixel.')
-	enabled = lambda: False
+	libsixel = None
+
+
+def supported():
+	if libsixel == None:
+		return False
+
+	r = terminal.query('\033[c', 'c')
+	n = ';'.join(re.search(r'\?(.*?)c', r).group(1)).split(';')
+	return '4' in n
 
 
 def media_file_from_id(media_id):
@@ -47,42 +57,43 @@ def to_sixel(image):
 		data = image.tobytes()
 	except NotImplementedError:
 		data = image.tostring()
-	output = sx.sixel_output_new(lambda data, s: s.write(data), s)
+	output = libsixel.sixel_output_new(lambda data, s: s.write(data), s)
 
 	try:
 		width, height = image.size
 		if image.mode == 'RGBA':
-			dither = sx.sixel_dither_new(256)
-			sx.sixel_dither_initialize(dither, data, width, height, sx.SIXEL_PIXELFORMAT_RGBA8888)
+			dither = libsixel.sixel_dither_new(256)
+			libsixel.sixel_dither_initialize(dither, data, width, height, libsixel.SIXEL_PIXELFORMAT_RGBA8888)
 		elif image.mode == 'RGB':
-			dither = sx.sixel_dither_new(256)
-			sx.sixel_dither_initialize(dither, data, width, height, sx.SIXEL_PIXELFORMAT_RGB888)
+			dither = libsixel.sixel_dither_new(256)
+			libsixel.sixel_dither_initialize(dither, data, width, height, libsixel.SIXEL_PIXELFORMAT_RGB888)
 		elif image.mode == 'P':
 			palette = image.getpalette()
-			dither = sx.sixel_dither_new(256)
-			sx.sixel_dither_set_palette(dither, palette)
-			sx.sixel_dither_set_pixelformat(dither, sx.SIXEL_PIXELFORMAT_PAL8)
+			dither = libsixel.sixel_dither_new(256)
+			libsixel.sixel_dither_set_palette(dither, palette)
+			libsixel.sixel_dither_set_pixelformat(dither, libsixel.SIXEL_PIXELFORMAT_PAL8)
 		elif image.mode == 'L':
-			dither = sixel_dither_get(sx.SIXEL_BUILTIN_G8)
-			sx.sixel_dither_set_pixelformat(dither, sx.SIXEL_PIXELFORMAT_G8)
+			dither = sixel_dither_get(libsixel.SIXEL_BUILTIN_G8)
+			libsixel.sixel_dither_set_pixelformat(dither, libsixel.SIXEL_PIXELFORMAT_G8)
 		elif image.mode == '1':
-			dither = sixel_dither_get(sx.SIXEL_BUILTIN_G1)
-			sx.sixel_dither_set_pixelformat(dither, sx.SIXEL_PIXELFORMAT_G1)
+			dither = sixel_dither_get(libsixel.SIXEL_BUILTIN_G1)
+			libsixel.sixel_dither_set_pixelformat(dither, libsixel.SIXEL_PIXELFORMAT_G1)
 		else:
 			raise RuntimeError('unexpected image mode')
 
 		try:
-			sx.sixel_encode(data, width, height, 1, dither, output)
+			libsixel.sixel_encode(data, width, height, 1, dither, output)
 			return s.getvalue().decode('ascii')
 		finally:
-			sx.sixel_dither_unref(dither)
+			libsixel.sixel_dither_unref(dither)
 	finally:
-		sx.sixel_output_unref(output)
+		libsixel.sixel_output_unref(output)
 
 
 if __name__ == '__main__':
+	import time
 	media_id = "688741780203504480"
 	s = img(media_id)
 	print('111')
 	print(s)
-
+	print(f'{supported()=}')

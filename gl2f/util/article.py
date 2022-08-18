@@ -23,7 +23,7 @@ def media_rep_type_id(p):
 	return ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
 
 
-if sixel.enabled():
+if sixel.supported():
 	def media_rep_sixel(p):
 		match = ptn_media.search(p)
 		if not match:
