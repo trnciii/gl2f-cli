@@ -19,7 +19,7 @@ def supported():
 		return False
 
 	r = terminal.query('\033[c', 'c')
-	n = ';'.join(re.search(r'\?(.*?)c', r).group(1)).split(';')
+	n = re.search(r'\?(.*?)c', r).group(1).split(';')
 	return '4' in n
 
 
