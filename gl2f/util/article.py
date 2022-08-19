@@ -23,7 +23,7 @@ def compose_line(p):
 
 	# after processing tags
 	p = html.unescape(p)
-	p = ptn_http.sub(term.mod(r'\1', [term.color('blue', 'fl')]), p)
+	p = ptn_http.sub(term.mod(r' \1 ', [term.color('blue', 'fl')]), p)
 
 	return p
 
