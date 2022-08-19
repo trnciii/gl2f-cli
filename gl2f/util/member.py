@@ -200,11 +200,13 @@ def get():
 
 
 def from_id(categoryId):
-	ret = next(filter(
-		lambda item: categoryId in item[1]['categoryId'].values(),
-		get().items()
-	))
-	return ret
+	try:
+		return next(filter(
+			lambda item: categoryId in item[1]['categoryId'].values(),
+			get().items()
+		))
+	except StopIteration:
+		return None, None
 
 
 def is_group(group):
