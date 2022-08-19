@@ -1,6 +1,5 @@
 import re
 import os
-import termios, sys
 
 def justzen(s, w):
 	len_displayed = len(re.sub(r'\033\[.*?m', '', s))
@@ -79,30 +78,53 @@ def mod(s, cc):
 	return '\033[{}m'.format(';'.join(cc)) + s + '\033[{}m'.format(reset_all())
 
 
-def query(q, end):
-	fd = sys.stdout.fileno()
+if os.name == 'nt':
+	print('on Windows')
+	import msvcrt, sys
 
-	old = termios.tcgetattr(fd)
-	tc = termios.tcgetattr(fd)
-	tc[3] &= ~(termios.ICANON | termios.ECHO)
-
-	try:
-		termios.tcsetattr(fd, termios.TCSANOW, tc)
-
+	def query(q, end):
 		sys.stdout.write(q)
 		sys.stdout.flush()
 
 		s = ''
 		while True:
-			c = sys.stdin.read(1)
+			c = msvcrt.getch().decode('ascii')
 			s += c
-			if c == end:
+			if c == 'c':
 				break
+		return s
 
-	finally:
-		termios.tcsetattr(fd, termios.TCSANOW, old)
+elif os.name == 'posix':
+	print('on Unix')
+	import termios, sys
 
-	return s
+	def query(q, end):
+		fd = sys.stdout.fileno()
+
+		old = termios.tcgetattr(fd)
+		tc = termios.tcgetattr(fd)
+		tc[3] &= ~(termios.ICANON | termios.ECHO)
+
+		try:
+			termios.tcsetattr(fd, termios.TCSANOW, tc)
+
+			sys.stdout.write(q)
+			sys.stdout.flush()
+
+			s = ''
+			while True:
+				c = sys.stdin.read(1)
+				s += c
+				if c == end:
+					break
+
+		finally:
+			termios.tcsetattr(fd, termios.TCSANOW, old)
+
+		return s
+
+else:
+	raise InportError('terminal working on unknown os.')
 
 
 if __name__ == '__main__':
