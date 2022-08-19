@@ -9,6 +9,7 @@ setup(
 	install_requires=[
 		'requests',
 		'libsixel-python',
+        'Pillow'
 	],
 	entry_points={
 		'console_scripts': [
