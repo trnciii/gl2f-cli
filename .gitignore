@@ -1,7 +1,8 @@
 *__pycache__
 build/
 *.egg-info
-*.json
 gl2f/auth
+
+gl2f-log
 
 .DS_Store
