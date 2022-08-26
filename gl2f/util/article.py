@@ -1,7 +1,7 @@
 import re, html
 from . import terminal as term
 
-ptn_paragraph = re.compile(r'<p>(.*?)</p>')
+ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?type="(.+?)".*?></fns-media>')
 ptn_break = re.compile(r'<br>')
 ptn_link = re.compile(r'<a href="(.+?)".*?>.+?</a>')
