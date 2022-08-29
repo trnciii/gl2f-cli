@@ -79,7 +79,6 @@ def mod(s, cc):
 
 
 if os.name == 'nt':
-	print('on Windows')
 	import msvcrt, sys
 
 	def query(q, end):
@@ -95,7 +94,6 @@ if os.name == 'nt':
 		return s
 
 elif os.name == 'posix':
-	print('on Unix')
 	import termios, sys
 
 	def query(q, end):

@@ -6,21 +6,31 @@ import os
 from gl2f.util import terminal
 import re
 
-try:
-	import libsixel
 
-except ImportError:
-	print('failed to import libsixel.')
-	libsixel = None
-
-
-def supported():
-	if libsixel == None:
-		return False
-
+def supported_terminal():
 	r = terminal.query('\033[c', 'c')
 	n = re.search(r'\?(.*?)c', r).group(1).split(';')
 	return '4' in n
+
+
+try:
+	assert supported_terminal()
+	import libsixel
+
+except Exception as e:
+	libsixel = None
+
+	if type(e) == AssertionError:
+		print('terminal does not support sixel')
+	elif type(e) == ImportError:
+		print('failed to import libsixel')
+	else:
+		import traceback, sys
+		traceback.print_exc(file=sys.stdout)
+
+
+def supported():
+	return libsixel != None
 
 
 def media_file_from_id(media_id):
