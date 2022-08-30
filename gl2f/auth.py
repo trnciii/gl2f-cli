@@ -54,8 +54,9 @@ def update(au):
 	return token
 
 
-def set_token():
-	token = update(input('enter token:'))
+def set_token(token=None):
+	if token == None:
+		token = update(input('enter token:'))
 	if token:
 		print('success')
 		save(token)
@@ -88,7 +89,7 @@ def login():
 				pass
 
 
-	def wait_finding_token(driver):
+	def wait_finding_token(driver, timeout):
 		dump = []
 		start = time.time()
 
@@ -103,7 +104,7 @@ def login():
 			if token != None:
 				return token, dump
 
-			if time.time() - start > 120:
+			if time.time() - start > timeout:
 				print('timeout')
 				return None, dump
 
@@ -114,15 +115,11 @@ def login():
 	d['goog:loggingPrefs'] = {'performance':'ALL'}
 	driver = webdriver.Chrome(ChromeDriverManager().install(), desired_capabilities=d)
 
-	token, dump = wait_finding_token(driver)
+	token, dump = wait_finding_token(driver, 120)
 
 	driver.close()
 
-
-	token = update(token)
-	if token:
-		print('success')
-		save(token)
+	set_token(token)
 
 	with open('login.json', 'w') as f:
 		json.dump(dump, f, indent=2)
@@ -146,7 +143,7 @@ def add_args(parser):
 
 
 def core(args):
-	commands()[args.command](*args.args)
+	commands()[args.command](*args.args[1:])
 
 
 def main():
