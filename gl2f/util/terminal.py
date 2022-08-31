@@ -88,6 +88,7 @@ def move_cursor(n):
 if os.name == 'nt':
 	import msvcrt, sys
 	def select(items):
+		print(mod(" { space: toggle, 'a': all, 'c': clear }", [color('yellow', 'fl')]))
 		n = len(items)
 		selected = [False]*n
 		cursor = 0
@@ -104,10 +105,13 @@ if os.name == 'nt':
 			if ch == b'\r':
 				return selected
 
+			elif ch == b'\x03':
+				exit()
+
 			elif ch == b'a':
 				selected = [True]*n
-			elif ch == b'i':
-				selected = [not s for s in selected]
+			elif ch == b'c':
+				selected = [False]*n
 			elif ch == b' ':
 				selected[cursor] = not selected[cursor]
 
@@ -133,6 +137,7 @@ elif os.name == 'posix':
 		try:
 			termios.tcsetattr(fd, termios.TCSANOW, tc)
 
+			print(mod("space: toggle, 'a': all, 'c': clear", [color('yellow', 'fl')]))
 			n = len(items)
 			selected = [False]*n
 			cursor = 0
@@ -151,8 +156,8 @@ elif os.name == 'posix':
 
 				elif ch == 'a':
 					selected = [True]*n
-				elif ch == 'i':
-					selected = [not s for s in selected]
+				elif ch == 'c':
+					selected = [False]*n
 				elif ch == ' ':
 					selected[cursor] = not selected[cursor]
 
