@@ -24,7 +24,6 @@ class Formatter:
 				fullname = v['fullname']
 				colf, colb = v['color'][board.to_group(item['boardId'])].values()
 			else:
-				print('no category found')
 				fullname = item['category']['name']
 				colf, colb = [255, 255, 255], [157, 157, 157]
 		except KeyError:
