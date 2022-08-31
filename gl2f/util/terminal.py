@@ -121,8 +121,52 @@ if os.name == 'nt':
 			move_cursor(-n-1)
 
 elif os.name == 'posix':
+	import termios, sys
+
 	def select(items):
-		pass
+		fd = sys.stdout.fileno()
+
+		old = termios.tcgetattr(fd)
+		tc = termios.tcgetattr(fd)
+		tc[3] &= ~(termios.ICANON | termios.ECHO)
+
+		try:
+			termios.tcsetattr(fd, termios.TCSANOW, tc)
+
+			n = len(items)
+			selected = [False]*n
+			cursor = 0
+			while True:
+				cursor = max(0, min(cursor, n-1))
+
+				for i, (item, s) in enumerate(zip(items, selected)):
+					clean_row()
+					print(('>' if cursor==i else ' ') + ('[x]' if s else '[ ]'), item)
+
+				ch = sys.stdin.read(1)
+				# print(ch)
+
+				if ch == '\n':
+					return selected
+
+				elif ch == 'a':
+					selected = [True]*n
+				elif ch == 'i':
+					selected = [not s for s in selected]
+				elif ch == ' ':
+					selected[cursor] = not selected[cursor]
+
+				elif ch == '\x1b':
+					ch = sys.stdin.read(2)
+					if ch == '[A':
+						cursor -= 1
+					elif ch == '[B':
+						cursor += 1
+
+				move_cursor(-n-1)
+
+		finally:
+			termios.tcsetattr(fd, termios.TCSANOW, old)
 
 
 if __name__ == '__main__':
