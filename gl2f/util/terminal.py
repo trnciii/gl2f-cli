@@ -1,4 +1,5 @@
 import re
+import os
 
 def justzen(s, w):
 	len_displayed = len(re.sub(r'\033\[.*?m', '', s))
@@ -6,6 +7,11 @@ def justzen(s, w):
 		return s + '　'*(w-len_displayed)
 	else:
 		return s
+
+def clean_row():
+	w, _ = os.get_terminal_size()
+	print('\r' + ' '*(w-1), end='\r', flush=True)
+
 
 def rgb(r, g, b, bg='f'):
 	if bg in ['b', 'bg', 'background']:
@@ -70,6 +76,54 @@ def strikeline():
 
 def mod(s, cc):
 	return '\033[{}m'.format(';'.join(cc)) + s + '\033[{}m'.format(reset_all())
+
+
+def move_cursor(n):
+	if n<0:
+		print(f'\033[{-n}A')
+	elif n>0:
+		print(f'\033[{n}B')
+
+
+if os.name == 'nt':
+	import msvcrt, sys
+	def select(items):
+		n = len(items)
+		selected = [False]*n
+		cursor = 0
+		while True:
+			cursor = max(0, min(cursor, n-1))
+
+			for i, (item, s) in enumerate(zip(items, selected)):
+				clean_row()
+				print(('>' if cursor==i else ' ') + ('[x]' if s else '[ ]'), item)
+
+			ch = msvcrt.getch()
+			# print(ch)
+
+			if ch == b'\r':
+				return selected
+
+			elif ch == b'a':
+				selected = [True]*n
+			elif ch == b'i':
+				selected = [not s for s in selected]
+			elif ch == b' ':
+				selected[cursor] = not selected[cursor]
+
+			elif ch == b'\xe0':
+				ch = msvcrt.getch()
+				if ch == b'H':
+					cursor -= 1
+				elif ch == b'P':
+					cursor += 1
+
+			move_cursor(-n-1)
+
+elif os.name == 'posix':
+	def select(items):
+		pass
+
 
 if __name__ == '__main__':
 	import terminal as term, member
