@@ -1,5 +1,5 @@
 import argparse
-from ..util import member
+from ..util import member, article
 from . import Lister, lister, pretty
 
 
@@ -35,6 +35,7 @@ def radio(args):
 def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
+	article.add_args(parser)
 
 def post_argparse(args):
 	pretty.post_argparse(args)
@@ -48,6 +49,8 @@ def make_subcommand(core):
 		fm.reset_index(digits=len(str(args.number)))
 
 		for i in core(args):
+			if args.dl_media:
+				article.save_media(i, option=args.dl_media, dump=args.dump_response)
 			fm.print(i)
 
 	return subcommand
