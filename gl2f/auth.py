@@ -109,21 +109,24 @@ def login():
 				return None, dump
 
 
-	print('Login with the browser opening now.')
+	try:
+		print('login with the browser opening now.')
 
-	d = DesiredCapabilities.CHROME
-	d['goog:loggingPrefs'] = {'performance':'ALL'}
-	driver = webdriver.Chrome(ChromeDriverManager().install(), desired_capabilities=d)
+		d = DesiredCapabilities.CHROME
+		d['goog:loggingPrefs'] = {'performance':'ALL'}
+		driver = webdriver.Chrome(ChromeDriverManager().install(), desired_capabilities=d)
 
-	token, dump = wait_finding_token(driver, 120)
+		token, dump = wait_finding_token(driver, 120)
 
-	driver.close()
+		driver.close()
+
+		with open('login.json', 'w') as f:
+			json.dump(dump, f, indent=2)
+
+	except:
+		token = input('failed to open a browser. enter a token ')
 
 	set_token(token)
-
-	with open('login.json', 'w') as f:
-		json.dump(dump, f, indent=2)
-
 
 
 def commands():
