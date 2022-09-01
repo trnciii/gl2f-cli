@@ -56,10 +56,10 @@ def update(au):
 
 def set_token(token=None):
 	if token == None:
-		token = update(input('enter token:'))
-	if token:
+		token = input('enter token:')
+
+	if update(token):
 		print('success')
-		save(token)
 
 
 def update_cli():
@@ -146,7 +146,7 @@ def add_args(parser):
 
 
 def core(args):
-	commands()[args.command](*args.args[1:])
+	commands()[args.command](*args.args)
 
 
 def main():
