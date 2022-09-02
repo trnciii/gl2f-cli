@@ -95,7 +95,7 @@ if os.name == 'nt':
 		while True:
 			c = msvcrt.getch().decode('ascii')
 			s += c
-			if c == 'c':
+			if c == end:
 				break
 		return s
 
