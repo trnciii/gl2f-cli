@@ -118,3 +118,9 @@ def listers():
 		'radio': radio,
 		'news': news
 	}
+
+
+def add_args_boardwise(parser, cmd):
+	subparsers = parser.add_subparsers()
+	for k in listers().keys():
+		cmd.add_args(subparsers.add_parser(k), k)

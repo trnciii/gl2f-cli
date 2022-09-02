@@ -1,5 +1,18 @@
 import argparse
 from . import auth, opener, ls
+from .core import lister
+
+
+def board_subcommand_parsers(subparsers):
+	return [( cmd, subparsers.add_parser(cmd.name()) ) for cmd in [opener, ls]]
+
+
+def ex(parser):
+	args = parser.parse_args()
+	if hasattr(args, 'handler'):
+		args.handler(args)
+	else:
+		parser.print_help()
 
 
 def main():
@@ -10,41 +23,19 @@ def main():
 	auth.add_args(parser_auth)
 	parser_auth.set_defaults(handler=auth.core)
 
-	parser_open = subparsers.add_parser('open')
-	opener.add_args(parser_open)
+	for c, p in board_subcommand_parsers(subparsers):
+		lister.add_args_boardwise(p, c)
 
-	parser_ls = subparsers.add_parser('ls')
-	ls.add_args(parser_ls)
+	ex(parser)
 
-
-	args = parser.parse_args()
-
-	if hasattr(args, 'handler'):
-		args.handler(args)
-	else:
-		parser.print_help()
 
 
 def make_partial(board):
-
 	def f():
 		parser = argparse.ArgumentParser()
-		subparsers = parser.add_subparsers()
-
-
-		parser_ls = subparsers.add_parser('ls')
-		ls.add_args_partially(parser_ls, board)
-
-		parser_open = subparsers.add_parser('open')
-		opener.add_args_partially(parser_open, board)
-
-
-		args = parser.parse_args()
-
-		if hasattr(args, 'handler'):
-			args.handler(args)
-		else:
-			parser.print_help()
+		for c, p in board_subcommand_parsers(parser.add_subparsers()):
+			c.add_args(p, board)
+		ex(parser)
 
 	return f
 

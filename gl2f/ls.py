@@ -1,6 +1,7 @@
 import argparse
 from .core import lister, pretty, article
 
+def name(): return 'ls'
 
 def make_subcommand(core):
 	def subcommand(args):
@@ -17,18 +18,7 @@ def make_subcommand(core):
 	return subcommand
 
 
-def add_args(parser):
-	subparsers = parser.add_subparsers()
-
-	for k, v in lister.listers().items():
-		p = subparsers.add_parser(k)
-		lister.add_args(p)
-		pretty.add_args(p)
-		article.add_args(p)
-		p.set_defaults(handler=make_subcommand(v))
-
-
-def add_args_partially(parser, board):
+def add_args(parser, board):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	article.add_args(parser)

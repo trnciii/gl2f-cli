@@ -3,6 +3,7 @@ import argparse
 import os
 from .core import board, lister, pretty, terminal as term
 
+def name(): return 'open'
 
 def open_url(i):
 	url = os.path.join(board.from_id(i['boardId']), i['contentId'])
@@ -26,19 +27,7 @@ def make_opener(f):
 	return g
 
 
-def add_args(parser):
-	subparsers = parser.add_subparsers()
-
-	for k, v in lister.listers().items():
-		p = subparsers.add_parser(k)
-		lister.add_args(p)
-		p.set_defaults(handler=make_opener(v))
-
-	parser.add_argument('-a', '--all', action='store_true',
-		help='open all items')
-
-
-def add_args_partially(parser, board):
+def add_args(parser, board):
 	lister.add_args(parser)
 	parser.set_defaults(handler=make_opener(lister.listers()[board]))
 
