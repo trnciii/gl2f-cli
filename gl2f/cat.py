@@ -6,6 +6,8 @@ def name(): return 'cat'
 def cat(i, args):
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
+	if args.option != 'compressed':
+		article.save_media(i, option='stream', dump=args.dump)
 	print(article.to_text(i, args.option))
 
 
