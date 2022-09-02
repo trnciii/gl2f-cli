@@ -18,12 +18,12 @@ def add_args(parser, board):
 
 		if args.all:
 			for i in items:
-				article.save_media(i, option=args.option, dump=args.dump_response)
+				article.save_media(i, option=args.option, dump=args.dump)
 		else:
 			fm_list = pretty.Formatter(f='date-p:author:title', sep=' ')
 			selected = term.select([fm_list.format(i) for i in items])
 			for i in [i for s, i in zip(selected, items) if s]:
-				article.save_media(i, option=args.option, dump=args.dump_response)
+				article.save_media(i, option=args.option, dump=args.dump)
 
 
 	parser.set_defaults(handler=subcommand)

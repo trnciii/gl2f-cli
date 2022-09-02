@@ -80,12 +80,12 @@ def add_args(parser):
 	parser.add_argument('--group', type=str,
 		help='specify group when name is a member.')
 
-	parser.add_argument('--dump-response', type=str, nargs='?', const='.',
+	parser.add_argument('--dump', type=str, nargs='?', const='.',
 		help='dump response from server as ./response.json')
 
 
 def blogs(args):
-	lister = Lister('blog', debug=args.dump_response)
+	lister = Lister('blog', debug=args.dump)
 
 	if member.is_group(args.name):
 		return lister.list_group(args.name, args.number, args.page, order=args.order)
@@ -98,12 +98,12 @@ def blogs(args):
 
 
 def news(args):
-	lister = Lister('news', debug=args.dump_response)
+	lister = Lister('news', debug=args.dump)
 	return lister.list_group(args.name, args.number, args.page, args.order)
 
 
 def radio(args):
-	lister = Lister('radio', debug=args.dump_response)
+	lister = Lister('radio', debug=args.dump)
 
 	if member.is_group(args.name):
 		return lister.list_group(args.name, args.number, args.page, args.order)
