@@ -1,7 +1,8 @@
 import os
 
 def filepath():
-	return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'auth')
+	from .util import path
+	return os.path.join(path.home(), 'auth')
 
 def file():
 	path = filepath()
