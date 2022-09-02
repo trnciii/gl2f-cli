@@ -1,12 +1,12 @@
 import argparse
-from . import auth, opener, ls, cat
+from . import auth, opener, ls, cat, dl
 from .core import lister
 
 
 def board_subcommand_parsers(subparsers):
 	return [
 		( cmd, subparsers.add_parser(cmd.name()) )
-		for cmd in [opener, ls, cat]
+		for cmd in [opener, ls, cat, dl]
 	]
 
 
