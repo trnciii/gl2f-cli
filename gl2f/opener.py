@@ -32,15 +32,15 @@ def add_args(parser):
 
 	parser_blogs = subparsers.add_parser('blogs')
 	core.lister.add_args(parser_blogs)
-	parser_blogs.set_defaults(handler=make_opener(core.main.blogs))
+	parser_blogs.set_defaults(handler=make_opener(core.lister.blogs))
 
 	parser_radio = subparsers.add_parser('radio')
 	core.lister.add_args(parser_radio)
-	parser_radio.set_defaults(handler=make_opener(core.main.radio))
+	parser_radio.set_defaults(handler=make_opener(core.lister.radio))
 
 	parser_news = subparsers.add_parser('news')
 	core.lister.add_args(parser_news)
-	parser_news.set_defaults(handler=make_opener(core.main.news))
+	parser_news.set_defaults(handler=make_opener(core.lister.news))
 
 
 	parser.add_argument('-a', '--all', action='store_true',

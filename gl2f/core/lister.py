@@ -82,3 +82,31 @@ def add_args(parser):
 
 	parser.add_argument('--dump-response', type=str, nargs='?', const='.',
 		help='dump response from server as ./response.json')
+
+
+def blogs(args):
+	lister = Lister('blog', debug=args.dump_response)
+
+	if member.is_group(args.name):
+		return lister.list_group(args.name, args.number, args.page, order=args.order)
+
+	elif member.is_member(args.name):
+		return lister.list_member(args.name, group=args.group, page=args.page, size=args.number, order=args.order)
+
+	elif args.name == 'today':
+		return lister.list_today()
+
+
+def news(args):
+	lister = Lister('news', debug=args.dump_response)
+	return lister.list_group(args.name, args.number, args.page, args.order)
+
+
+def radio(args):
+	lister = Lister('radio', debug=args.dump_response)
+
+	if member.is_group(args.name):
+		return lister.list_group(args.name, args.number, args.page, args.order)
+
+	elif member.is_member(args.name):
+		return lister.list_member(args.name, args.group, args.number, args.page, order=args.order)
