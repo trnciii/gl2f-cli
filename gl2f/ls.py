@@ -20,20 +20,9 @@ def make_subcommand(core):
 def add_args(parser):
 	subparsers = parser.add_subparsers()
 
-	parser_blogs = subparsers.add_parser('blogs')
-	lister.add_args(parser_blogs)
-	pretty.add_args(parser_blogs)
-	article.add_args(parser_blogs)
-	parser_blogs.set_defaults(handler=make_subcommand(lister.blogs))
-
-	parser_radio = subparsers.add_parser('radio')
-	lister.add_args(parser_radio)
-	pretty.add_args(parser_radio)
-	article.add_args(parser_radio)
-	parser_radio.set_defaults(handler=make_subcommand(lister.radio))
-
-	parser_news = subparsers.add_parser('news')
-	lister.add_args(parser_news)
-	pretty.add_args(parser_news)
-	article.add_args(parser_news)
-	parser_news.set_defaults(handler=make_subcommand(lister.news))
+	for k, v in lister.listers().items():
+		p = subparsers.add_parser(k)
+		lister.add_args(p)
+		pretty.add_args(p)
+		article.add_args(p)
+		p.set_defaults(handler=make_subcommand(v))

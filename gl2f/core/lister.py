@@ -110,3 +110,11 @@ def radio(args):
 
 	elif member.is_member(args.name):
 		return lister.list_member(args.name, args.group, args.number, args.page, order=args.order)
+
+
+def listers():
+	return {
+		'blogs': blogs,
+		'radio': radio,
+		'news': news
+	}

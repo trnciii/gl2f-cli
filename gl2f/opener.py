@@ -1,18 +1,17 @@
 import webbrowser
 import argparse
 import os
-from . import core
-from .core import terminal as term
+from .core import board, lister, pretty, terminal as term
 
 
 def open_url(i):
-	url = os.path.join(core.board.from_id(i['boardId']), i['contentId'])
+	url = os.path.join(board.from_id(i['boardId']), i['contentId'])
 	webbrowser.open(url, new=0, autoraise=True)
 
 def make_opener(f):
 	def g(args):
 		items = list(f(args))
-		fm = core.pretty.Formatter(f='date-p:author:title', sep=' ', preview=False)
+		fm = pretty.Formatter(f='date-p:author:title', sep=' ', preview=False)
 		fm.reset_index(digits=len(str(args.number)))
 
 		if args.all:
@@ -30,18 +29,10 @@ def make_opener(f):
 def add_args(parser):
 	subparsers = parser.add_subparsers()
 
-	parser_blogs = subparsers.add_parser('blogs')
-	core.lister.add_args(parser_blogs)
-	parser_blogs.set_defaults(handler=make_opener(core.lister.blogs))
-
-	parser_radio = subparsers.add_parser('radio')
-	core.lister.add_args(parser_radio)
-	parser_radio.set_defaults(handler=make_opener(core.lister.radio))
-
-	parser_news = subparsers.add_parser('news')
-	core.lister.add_args(parser_news)
-	parser_news.set_defaults(handler=make_opener(core.lister.news))
-
+	for k, v in lister.listers().items():
+		p = subparsers.add_parser(k)
+		lister.add_args(p)
+		p.set_defaults(handler=make_opener(v))
 
 	parser.add_argument('-a', '--all', action='store_true',
 		help='open all items')
