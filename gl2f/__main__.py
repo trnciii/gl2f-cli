@@ -1,38 +1,50 @@
 import argparse
-from . import auth, ls, opener
+from . import auth, opener, ls, cat, dl
+from .core import lister
+
+
+def board_subcommand_parsers(subparsers):
+	return [
+		( cmd, subparsers.add_parser(cmd.name()) )
+		for cmd in [opener, ls, cat, dl]
+	]
+
+
+def ex(parser):
+	args = parser.parse_args()
+	if hasattr(args, 'handler'):
+		args.handler(args)
+	else:
+		parser.print_help()
 
 
 def main():
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers()
 
-
-	parser_blogs = subparsers.add_parser('blogs')
-	ls.add_args(parser_blogs)
-	parser_blogs.set_defaults(handler=ls.subcommand.blogs)
-
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)
-	parser_auth.set_defaults(handler=auth.core)
 
-	parser_radio = subparsers.add_parser('radio')
-	ls.add_args(parser_radio)
-	parser_radio.set_defaults(handler=ls.subcommand.radio)
+	for c, p in board_subcommand_parsers(subparsers):
+		lister.add_args_boardwise(p, c)
 
-	parser_news = subparsers.add_parser('news')
-	ls.add_args(parser_news)
-	parser_news.set_defaults(handler=ls.subcommand.news)
-
-	parser_open = subparsers.add_parser('open')
-	opener.add_args(parser_open)
+	ex(parser)
 
 
-	args = parser.parse_args()
 
-	if hasattr(args, 'handler'):
-		args.handler(args)
-	else:
-		parser.print_help()
+def make_partial(board):
+	def f():
+		parser = argparse.ArgumentParser()
+		for c, p in board_subcommand_parsers(parser.add_subparsers()):
+			c.add_args(p, board)
+		ex(parser)
+
+	return f
+
+class partial:
+	blogs = make_partial('blogs')
+	radio = make_partial('radio')
+	news = make_partial('news')
 
 
 if __name__ == '__main__':

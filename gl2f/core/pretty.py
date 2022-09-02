@@ -1,5 +1,4 @@
-from ..util import terminal as term, to_datetime, member, article
-from . import board
+from . import board, article, member, terminal as term, date
 import os
 
 class Formatter:
@@ -7,7 +6,6 @@ class Formatter:
 		self.fstring = f
 		self.fdstring = fd
 		self.sep = sep
-		self.preview = preview
 
 		self.index = 0
 		self.digits = 2
@@ -49,13 +47,10 @@ class Formatter:
 		return term.mod(url, [term.dim()])
 
 	def date_p(self, item):
-		return to_datetime(item['openingAt']).strftime(self.fdstring)
+		return date.to_datetime(item['openingAt']).strftime(self.fdstring)
 
 	def date_c(self, item):
-		return to_datetime(item['createdAt']).strftime(self.fdstring)
-
-	def text(self, item):
-		return '\n{}\n'.format(article.to_text(item['values']['body'], self.preview))
+		return date.to_datetime(item['createdAt']).strftime(self.fdstring)
 
 	def breakline(self, item):
 		return '\n'
@@ -71,7 +66,6 @@ class Formatter:
 			'url': self.url,
 			'date-p': self.date_p,
 			'date-c': self.date_c,
-			'text': self.text,
 			'index': self.inc_index,
 			'br': self.breakline,
 		}
@@ -88,20 +82,14 @@ def add_args(parser):
 		.format(', '.join(Formatter.format.__code__.co_consts[1]))
 	)
 
-	parser.add_argument('--date-format', '-df', type=str, default='%m/%d',
-		help='date formatting.')
-
 	parser.add_argument('--sep', type=str, default=' ',
 		help='separator string.')
 
 	parser.add_argument('--break-urls', action='store_true',
 		help='break before url')
 
-	parser.add_argument('--preview', type=str, nargs='?', const='compact', choices=article.to_text_option,
-		help='show blog text')
-
-	parser.add_argument('--date', '-d', action='store_true',
-		help='show publish date on the left')
+	parser.add_argument('--date', '-d', type=str, nargs='?', const='%m/%d',
+		help='date formatting')
 
 	parser.add_argument('--enum', action='store_true',
 		help='show index on the left (lefter than date)')
@@ -111,13 +99,11 @@ def post_argparse(args):
 	if args.break_urls:
 		args.format = args.format.replace('url', 'br:url')
 
-	if args.date:
+	if args.date and ('date-p' not in args.format):
 		args.format = 'date-p:' + args.format
 
 	if args.enum:
 		args.format = 'index:' + args.format
 
-	if args.preview and not 'text' in args.format:
-		args.format += ':text'
 
 	args.format = args.format.rstrip(':').lstrip(':')

@@ -215,19 +215,3 @@ elif os.name == 'posix':
 
 else:
 	raise InportError('terminal working on unknown os.')
-
-
-if __name__ == '__main__':
-	import terminal as term, member
-
-	fullname = '森朱里'
-	colf, colb = [255, 255, 255], [32, 203, 115]
-	mods = [
-		term.bold(),
-		term.rgb(*colf),
-		term.rgb(*colb, 'b')
-	]
-	print(term.justzen(
-		term.mod(fullname, mods),
-		member.name_width()
-	))

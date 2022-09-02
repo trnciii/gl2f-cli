@@ -1,7 +1,8 @@
 import os
 
 def filepath():
-	return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'auth')
+	from .core import path
+	return os.path.join(path.home(), 'auth')
 
 def file():
 	path = filepath()
@@ -60,6 +61,7 @@ def set_token(token=None):
 
 	if update(token):
 		print('success')
+		save(token)
 
 
 def update_cli():
@@ -143,17 +145,6 @@ def commands():
 def add_args(parser):
 	parser.add_argument('command', type=str, choices=list(commands().keys()))
 	parser.add_argument('args', nargs='*')
-
-
-def core(args):
-	commands()[args.command](*args.args)
-
-
-def main():
-	import argparse
-
-	parser = argparse.ArgumentParser()
-	add_args(parser)
-	args = parser.parse_args()
-
-	core(args)
+	parser.set_defaults(
+		handler = lambda args:commands()[args.command](*args.args)
+	)

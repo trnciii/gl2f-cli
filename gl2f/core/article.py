@@ -1,7 +1,7 @@
 import re, html
-from gl2f.util import terminal as term
 import argparse
-from gl2f.util import sixel
+from . import terminal as term, sixel
+
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
@@ -52,22 +52,24 @@ def compose_line(p, media_rep):
 	return p
 
 
-to_text_option = {'full', 'compact', 'compressed'}
+def to_text_options(): return {'full', 'compact', 'compressed'}
 
-def to_text(body, key):
-	if key not in to_text_option:
-		key = 'compact'
-
+def to_text(item, key):
+	body = item['values']['body']
 
 	if key == 'full':
-		return '\n'.join([compose_line(p, media_rep_sixel) for p in paragraphs(body)]).rstrip('\n')
+		return '{}\n'.format(
+			'\n'.join([compose_line(p, media_rep_sixel) for p in paragraphs(body)])
+		)
 
 	elif key == 'compact':
-		text = '\n'.join([compose_line(p, media_rep_sixel) for p in paragraphs(body)]).rstrip('\n')
-		return re.sub(r'\n+', '\n', text)
+		return '{}\n'.format(re.sub(r'\n+', '\n',
+			'\n'.join([compose_line(p, media_rep_sixel) for p in paragraphs(body)])
+		))
 
 	elif key == 'compressed':
-		return ''.join([compose_line(p, media_rep_type) for p in paragraphs(body)])
+		return '{}\n'.format(''.join([compose_line(p, media_rep_type) for p in paragraphs(body)]))
+
 
 
 def dl_medium(boardId, contentId, mediaId, skip, save_original):
@@ -103,10 +105,12 @@ def dl_medium(boardId, contentId, mediaId, skip, save_original):
 		return 'bad response', None
 
 
+def save_media_options(): return {'stream', 'original', 'skip'}
+
 def save_media(item, option, dump=False):
 	import json
 	import os
-	from gl2f.util import path
+	from . import path
 
 
 	boardId = item['boardId']
@@ -143,8 +147,3 @@ def save_media(item, option, dump=False):
 	if dump:
 		with open(f'media-{contentId}.json', 'w') as f:
 			json.dump(dump_data, f, indent=2)
-
-
-def add_args(parser):
-	parser.add_argument('--dl-media', type=str, nargs='?', const='original', choices=['stream', 'original', 'skip'],
-		help='save media')

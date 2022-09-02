@@ -1,5 +1,4 @@
 import os
-import gl2f
 
 def return_path(path):
 	if not os.path.exists(path):
@@ -7,9 +6,6 @@ def return_path(path):
 		print('created', path)
 	return path
 
-
-def package():
-	return os.path.dirname(os.path.abspath(gl2f.__file__))
 
 def home():
 	path = os.path.join(os.path.expanduser('~'), 'gl2f')
@@ -24,7 +20,6 @@ def ls(path):
 
 
 if __name__ == '__main__':
-	print(package())
 	print(home())
 	print(media())
 	print(ls('media'))

@@ -1,9 +1,8 @@
 import glob
 from PIL import Image
 from io import BytesIO
-from gl2f.util import path
+from . import path, terminal
 import os
-from gl2f.util import terminal
 import re
 
 
