@@ -3,7 +3,7 @@ from gl2f.util import terminal as term
 import argparse
 from gl2f.util import sixel
 
-ptn_paragraph = re.compile(r'<p>(.*?)</p>')
+ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
 ptn_break = re.compile(r'<br>')
 ptn_link = re.compile(r'<a href="(.+?)".*?>.+?</a>')
@@ -47,7 +47,7 @@ def compose_line(p, media_rep):
 
 	# after processing tags
 	p = html.unescape(p)
-	p = ptn_http.sub(term.mod(r'\1', [term.color('blue', 'fl')]), p)
+	p = ptn_http.sub(term.mod(r' \1 ', [term.color('blue', 'fl')]), p)
 
 	return p
 
@@ -70,11 +70,42 @@ def to_text(body, key):
 		return ''.join([compose_line(p, media_rep_type) for p in paragraphs(body)])
 
 
-def save_media(item, option, dump=False):
-	import requests, urllib.request
+def dl_medium(boardId, contentId, mediaId, skip, save_original):
+	import requests
 	from gl2f import auth
+
+	response = requests.get(
+		f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
+		headers={
+			'origin': 'https://girls2-fc.jp',
+			'x-authorization': auth.update(auth.load()),
+			'x-from': 'https://girls2-fc.jp',
+		})
+
+	if not response.ok:
+		return 'bad response', None
+
+	data = response.json()
+
+	if skip:
+		return data, None
+
+
+	response = requests.get(
+		data['originalUrl'] if (save_original and 'originalUrl' in data.keys())\
+		else data['accessUrl']
+	)
+
+	if response.ok:
+		return data, response.content
+
+	else:
+		return 'bad response', None
+
+
+def save_media(item, option, dump=False):
 	import json
-	import os, re
+	import os
 	from gl2f.util import path
 
 
@@ -89,48 +120,29 @@ def save_media(item, option, dump=False):
 	l = len(li)
 	dig = len(str(l))
 
-	def sub(i, media_id):
-		ptn = re.compile(media_id + r'\..+')
+	dump_data = []
+	for i, (mediaId, _) in enumerate(li):
+
+		ptn = re.compile(mediaId + r'\..+')
 		if any(map(ptn.search, path.ls('media'))):
-			return 'file already exists'
+			continue
 
 		term.clean_row()
-		print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] ', end='', flush=True)
-
-		response = requests.get(
-			f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{media_id}',
-			headers={
-				'origin': 'https://girls2-fc.jp',
-				'x-authorization': auth.update(auth.load()),
-				'x-from': 'https://girls2-fc.jp',
-			})
-
-		if not response.ok:
-			return 'bad response'
-
-		data = response.json()
-		basename = f'{data["mediaId"]}.{data["meta"]["ext"]}'
-		file = os.path.join(path.media(), basename)
-
-		print(f'{basename} ', end='', flush=True)
-
-		if not skip:
-			urllib.request.urlretrieve(
-				data['originalUrl'] if (save_original and 'originalUrl' in data.keys())\
-				else data['accessUrl'],
-				file
-			)
-
-		return data
+		print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] {mediaId}', end='', flush=True)
 
 
-	result = {media_id: sub(i, media_id) for i, (media_id, _) in enumerate(li)}
+		info, image = dl_medium(boardId, contentId, mediaId, skip, save_original)
+		dump_data.append(info)
+
+		file = os.path.join(path.media(), f'{info["mediaId"]}.{info["meta"]["ext"]}')
+		with open(file, 'wb') as f:
+			f.write(image)
 
 	term.clean_row()
 
 	if dump:
-		with open(f"media-{item['contentId']}.json", 'w') as f:
-			json.dump(result, f, indent=2)
+		with open(f'media-{contentId}.json', 'w') as f:
+			json.dump(dump_data, f, indent=2)
 
 
 def add_args(parser):

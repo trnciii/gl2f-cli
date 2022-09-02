@@ -33,8 +33,10 @@ class Lister:
 			return
 
 		if self.debug:
-			query = categoryId if categoryId else group
-			path = os.path.join(self.debug, f'{self.name}-{query}.json')
+			import datetime
+			query = member.from_id(categoryId)[0] if categoryId else group
+			now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
+			path = os.path.join(self.debug, f'{self.name}-{query}-{now}.json')
 			with open(path, 'w') as f:
 				json.dump(response.json(), f, indent=2)
 

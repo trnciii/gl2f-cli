@@ -54,13 +54,12 @@ def update(au):
 	return token
 
 
-def login():
-	token = update(input('enter token:'))
-	if token:
+def set_token(token=None):
+	if token == None:
+		token = input('enter token:')
+
+	if update(token):
 		print('success')
-		save(token)
-	else:
-		print('fail')
 
 
 def update_cli():
@@ -75,13 +74,69 @@ def update_cli():
 		print('token updated')
 
 
+def login():
+	from selenium import webdriver
+	from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+	from webdriver_manager.chrome import ChromeDriverManager
+	import json
+	import time
+
+	def find_token(log):
+		for e in log:
+			try:
+				return json.loads(e['message'])['message']['params']['headers']['x-authorization']
+			except:
+				pass
+
+
+	def wait_finding_token(driver, timeout):
+		dump = []
+		start = time.time()
+
+		driver.get('https://girls2-fc.jp/')
+		while True:
+			time.sleep(1)
+
+			log = driver.get_log('performance')
+			dump.append([json.loads(e['message']) for e in log])
+
+			token = find_token(log)
+			if token != None:
+				return token, dump
+
+			if time.time() - start > timeout:
+				print('timeout')
+				return None, dump
+
+
+	try:
+		print('login with the browser opening now.')
+
+		d = DesiredCapabilities.CHROME
+		d['goog:loggingPrefs'] = {'performance':'ALL'}
+		driver = webdriver.Chrome(ChromeDriverManager().install(), desired_capabilities=d)
+
+		token, dump = wait_finding_token(driver, 120)
+
+		driver.close()
+
+		with open('login.json', 'w') as f:
+			json.dump(dump, f, indent=2)
+
+	except:
+		token = input('failed to open a browser. enter a token ')
+
+	set_token(token)
+
+
 def commands():
 	return {
 		'remove': remove,
 		'file': lambda: print(file()),
 		'load': lambda: print(load()),
-		'login': login,
+		'set-token': set_token,
 		'update': update_cli,
+		'login': login
 	}
 
 

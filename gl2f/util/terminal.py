@@ -78,6 +78,12 @@ def mod(s, cc):
 	return '\033[{}m'.format(';'.join(cc)) + s + '\033[{}m'.format(reset_all())
 
 
+def move_cursor(n):
+	if n<0:
+		print(f'\033[{-n}A')
+	elif n>0:
+		print(f'\033[{n}B')
+
 if os.name == 'nt':
 	import msvcrt, sys
 
@@ -92,6 +98,45 @@ if os.name == 'nt':
 			if c == 'c':
 				break
 		return s
+
+
+	def select(items):
+		print(mod(" { space: toggle, 'a': all, 'c': clear }", [color('yellow', 'fl')]))
+		n = len(items)
+		selected = [False]*n
+		cursor = 0
+		while True:
+			cursor = max(0, min(cursor, n-1))
+
+			for i, (item, s) in enumerate(zip(items, selected)):
+				clean_row()
+				print(('>' if cursor==i else ' ') + ('[x]' if s else '[ ]'), item)
+
+			ch = msvcrt.getch()
+			# print(ch)
+
+			if ch == b'\r':
+				return selected
+
+			elif ch == b'\x03':
+				exit()
+
+			elif ch == b'a':
+				selected = [True]*n
+			elif ch == b'c':
+				selected = [False]*n
+			elif ch == b' ':
+				selected[cursor] = not selected[cursor]
+
+			elif ch == b'\xe0':
+				ch = msvcrt.getch()
+				if ch == b'H':
+					cursor -= 1
+				elif ch == b'P':
+					cursor += 1
+
+			move_cursor(-n-1)
+
 
 elif os.name == 'posix':
 	import termios, sys
@@ -120,6 +165,53 @@ elif os.name == 'posix':
 			termios.tcsetattr(fd, termios.TCSANOW, old)
 
 		return s
+
+
+	def select(items):
+		fd = sys.stdout.fileno()
+
+		old = termios.tcgetattr(fd)
+		tc = termios.tcgetattr(fd)
+		tc[3] &= ~(termios.ICANON | termios.ECHO)
+
+		try:
+			termios.tcsetattr(fd, termios.TCSANOW, tc)
+
+			print(mod("space: toggle, 'a': all, 'c': clear", [color('yellow', 'fl')]))
+			n = len(items)
+			selected = [False]*n
+			cursor = 0
+			while True:
+				cursor = max(0, min(cursor, n-1))
+
+				for i, (item, s) in enumerate(zip(items, selected)):
+					clean_row()
+					print(('>' if cursor==i else ' ') + ('[x]' if s else '[ ]'), item)
+
+				ch = sys.stdin.read(1)
+				# print(ch)
+
+				if ch == '\n':
+					return selected
+
+				elif ch == 'a':
+					selected = [True]*n
+				elif ch == 'c':
+					selected = [False]*n
+				elif ch == ' ':
+					selected[cursor] = not selected[cursor]
+
+				elif ch == '\x1b':
+					ch = sys.stdin.read(2)
+					if ch == '[A':
+						cursor -= 1
+					elif ch == '[B':
+						cursor += 1
+
+				move_cursor(-n-1)
+
+		finally:
+			termios.tcsetattr(fd, termios.TCSANOW, old)
 
 else:
 	raise InportError('terminal working on unknown os.')

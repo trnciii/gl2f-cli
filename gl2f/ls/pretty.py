@@ -20,10 +20,15 @@ class Formatter:
 	def author(self, item):
 		try:
 			_, v = member.from_id(item['categoryId'])
-			fullname = v['fullname']
-			colf, colb = v['color'][board.to_group(item['boardId'])].values()
-		except StopIteration:
-			fullname = item['category']['name']
+			if v:
+				fullname = v['fullname']
+				colf, colb = v['color'][board.to_group(item['boardId'])].values()
+			else:
+				print('no category found')
+				fullname = item['category']['name']
+				colf, colb = [255, 255, 255], [157, 157, 157]
+		except KeyError:
+			fullname = '---'
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
 		mods = [
@@ -68,7 +73,7 @@ class Formatter:
 			'date-c': self.date_c,
 			'text': self.text,
 			'index': self.inc_index,
-			'n': self.breakline,
+			'br': self.breakline,
 		}
 
 		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
@@ -104,7 +109,7 @@ def add_args(parser):
 
 def post_argparse(args):
 	if args.break_urls:
-		args.format = args.format.replace('url', '\\n:url')
+		args.format = args.format.replace('url', 'br:url')
 
 	if args.date:
 		args.format = 'date-p:' + args.format

@@ -32,11 +32,22 @@ pip でこのリポジトリから直接インストール
 pip install git+https://github.com/trnciii/gl2f-cli
 ```
 
+
+## ログイン
+
+Chrome がインストールされている環境では、次のコマンドを使うことでブラウザを使ってログインすることができます。
+ログイン後は日記の本文や画像のダウンロードができるようになります。
+
+```
+gl2f auth login
+```
+
+
 ## 使い方
 
 とりあえず[#コマンドの例](#コマンドの例)を実行してみると良いと思います。
 
-`gl2f <サブコマンド>` またはその短縮コマンドを使います。
+**記事をリストする** ためには、 `gl2f <サブコマンド>` またはその短縮コマンドを使います。
 サブコマンドには以下のものがあり、取得するページの最新情報をリストします。
 
 | コマンド | 短縮 | 取得するページ |
@@ -44,6 +55,10 @@ pip install git+https://github.com/trnciii/gl2f-cli
 | `gl2f blogs` | `gl2b` | ブログ （ https://girls2-fc.jp/page/blogs 等） |
 | `gl2f radio` | `gl2r` | ラジオ ( https://girls2-fc.jp/page/lucky2radio 等) |
 | `gl2f news` | `gl2n` | ニュース ( https://girls2-fc.jp/page/familyNews 等) |
+
+
+`gl2f open <blogs...>` 等とすることで、リストした記事を**ブラウザで開く**ことができます。
+チェックボックスが出ますので、スペースキーで選択しEnterで確定してください。
 
 
 ### サブコマンドの引数
@@ -74,13 +89,13 @@ gl2f news family # GL2 family 両方のニュース。 https://girls2-fc.jp/page
 	* `date-p` 記事が公開された日時
 	* `date-c` 記事がアップロードされた日時
 	* `index` リスト上での番号を振ります
-	* `\n` 改行。
+	* `br` 改行。
 * `-df, --date-format` 日時のフォーマット指定。デフォルトは月/日(`%m/%d`)。書式については[こちら](https://docs.python.org/ja/3/library/datetime.html#strftime-strptime-behavior)
-* `--break-urls` URLを改行して表示します。 `-f` で `url -> \n:url` と置き換えることと同じです。
+* `--break-urls` URLを改行して表示します。 `-f` で `url -> br:url` と置き換えることと同じです。
 * `--enum` リストに番号を振ります。 `-f` に `index` を含めることと同じです。
 * `-d, --date` リストの左側に公開日時を表示します。 `-f` に `date-p` を含めることと同じです。
-* `--preview <オプション>` 記事本文を表示します。会員限定コンテンツは認証が必要なので、ニュースだけ見れる状態かと思います。オプションは `full, compact, compressed` がありいずれも全文を表示しますが、後のものほど改行等が短縮され短く表示されます。オプションを入力しなければ `compact` となります。
-* `--dl-media <オプション>` 記事中の画像や動画をカレントディレクトリに保存します（アクセスできる場合のみ）。オプションは主に動画のために用意しました。何も指定しない場合にはファイルをそのままダウンロードします。`stream` を指定すると、動画をストリーム視聴するためのファイルが保存され、待ち時間が減ります。`skip` でメディアを実際にはダウンロードしなくなります。
+* `--preview <オプション>` 記事本文を表示します。会員限定コンテンツはログインが必要です。オプションは `full, compact, compressed` がありいずれも全文を表示しますが、後のものほど改行等が短縮され短く表示されます。オプションを入力しなければ `compact` となります。
+* `--dl-media <オプション>` 記事中の画像や動画を保存します（アクセスできる場合のみ）。オプションは主に動画のために用意しました。何も指定しない場合にはファイルをそのままダウンロードします。`stream` を指定すると、動画をストリーム視聴するためのファイルが保存され、待ち時間が減ります。`skip` でメディアを実際にはダウンロードしなくなります。
 
 
 ## 開発予定
@@ -227,7 +242,7 @@ gl2f radio misaki -f date-p:author:title:url
 ```sh
 gl2f blogs tsubaki --break-urls
 # もしくは
-gl2f blogs tsubaki -f author:title:\n:url
+gl2f blogs tsubaki -f author:title:br:url
 ```
 
 lovely2 スタッフのブログを、投稿日と公開日とともに表示する。日時は秒まで表示する。
