@@ -21,7 +21,6 @@ def main():
 
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)
-	parser_auth.set_defaults(handler=auth.core)
 
 	for c, p in board_subcommand_parsers(subparsers):
 		lister.add_args_boardwise(p, c)
