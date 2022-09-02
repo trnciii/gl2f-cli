@@ -29,7 +29,21 @@ def make_opener(f):
 
 def add_args(parser, board):
 	lister.add_args(parser)
-	parser.set_defaults(handler=make_opener(lister.listers()[board]))
+
+	def subcommand(args):
+		items = list(lister.listers()[board](args))
+		fm = pretty.Formatter(f='date-p:author:title', sep=' ', preview=False)
+
+		if args.all:
+			for i in items:
+				fm.print(i)
+				open_url(i)
+		else:
+			selected = term.select([fm.format(i) for i in items])
+			for i in [i for s, i in zip(selected, items) if s]:
+				open_url(i)
+
+	parser.set_defaults(handler=subcommand)
 
 	parser.add_argument('-a', '--all', action='store_true',
 		help='open all items')
