@@ -1,19 +1,18 @@
 import webbrowser
-from . import ls
+from . import core
 import argparse
 import os
-from .ls import board
 from .util import terminal as term
 
 
 def open_url(i):
-	url = os.path.join(board.from_id(i['boardId']), i['contentId'])
+	url = os.path.join(core.board.from_id(i['boardId']), i['contentId'])
 	webbrowser.open(url, new=0, autoraise=True)
 
 def make_opener(f):
 	def g(args):
 		items = list(f(args))
-		fm = ls.pretty.Formatter(f='date-p:author:title', sep=' ', preview=False)
+		fm = core.pretty.Formatter(f='date-p:author:title', sep=' ', preview=False)
 		fm.reset_index(digits=len(str(args.number)))
 
 		if args.all:
@@ -32,16 +31,16 @@ def add_args(parser):
 	subparsers = parser.add_subparsers()
 
 	parser_blogs = subparsers.add_parser('blogs')
-	ls.lister.add_args(parser_blogs)
-	parser_blogs.set_defaults(handler=make_opener(ls.main.blogs))
+	core.lister.add_args(parser_blogs)
+	parser_blogs.set_defaults(handler=make_opener(core.main.blogs))
 
 	parser_radio = subparsers.add_parser('radio')
-	ls.lister.add_args(parser_radio)
-	parser_radio.set_defaults(handler=make_opener(ls.main.radio))
+	core.lister.add_args(parser_radio)
+	parser_radio.set_defaults(handler=make_opener(core.main.radio))
 
 	parser_news = subparsers.add_parser('news')
-	ls.lister.add_args(parser_news)
-	parser_news.set_defaults(handler=make_opener(ls.main.news))
+	core.lister.add_args(parser_news)
+	parser_news.set_defaults(handler=make_opener(core.main.news))
 
 
 	parser.add_argument('-a', '--all', action='store_true',
