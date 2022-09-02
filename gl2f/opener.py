@@ -7,8 +7,7 @@ from .util import terminal as term
 
 
 def open_url(i):
-	url = os.path.join(board.from_id(i['boardId']), i['contentId'])
-	webbrowser.open(url, new=0, autoraise=True)
+	webbrowser.open(board.content_url(i), new=0, autoraise=True)
 
 def make_opener(f):
 	def g(args):

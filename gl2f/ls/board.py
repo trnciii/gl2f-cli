@@ -49,6 +49,10 @@ def request_url(domain, group):
 	}[domain][group]
 
 
+def content_url(item):
+	return f"{from_id(item['boardId'])}/{item['contentId']}"
+
+
 if __name__ == '__main__':
 	boardId = [
 		'271474317252887717',

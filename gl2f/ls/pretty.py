@@ -44,8 +44,7 @@ class Formatter:
 		return term.mod(item['values']['title'], [term.bold()])
 
 	def url(self, item):
-		url = os.path.join(board.from_id(item['boardId']), item['contentId'])
-		return term.mod(url, [term.dim()])
+		return term.mod(board.content_url(item), [term.dim()])
 
 	def date_p(self, item):
 		return to_datetime(item['openingAt']).strftime(self.fdstring)
