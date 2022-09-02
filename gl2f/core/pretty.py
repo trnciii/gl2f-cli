@@ -82,17 +82,14 @@ def add_args(parser):
 		.format(', '.join(Formatter.format.__code__.co_consts[1]))
 	)
 
-	parser.add_argument('--date-format', '-df', type=str, default='%m/%d',
-		help='date formatting.')
-
 	parser.add_argument('--sep', type=str, default=' ',
 		help='separator string.')
 
 	parser.add_argument('--break-urls', action='store_true',
 		help='break before url')
 
-	parser.add_argument('--date', '-d', action='store_true',
-		help='show publish date on the left')
+	parser.add_argument('--date', '-d', type=str, nargs='?', const='%m/%d',
+		help='date formatting')
 
 	parser.add_argument('--enum', action='store_true',
 		help='show index on the left (lefter than date)')
@@ -102,7 +99,7 @@ def post_argparse(args):
 	if args.break_urls:
 		args.format = args.format.replace('url', 'br:url')
 
-	if args.date:
+	if args.date and ('date-p' not in args.format):
 		args.format = 'date-p:' + args.format
 
 	if args.enum:

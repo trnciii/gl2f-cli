@@ -4,7 +4,7 @@ from .core import lister, pretty, article, terminal as term
 def name(): return 'cat'
 
 def cat(i, args):
-	fm = pretty.Formatter(f=args.format, fd=args.date_format, sep=args.sep)
+	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
 	print(article.to_text(i, args.option))
 
