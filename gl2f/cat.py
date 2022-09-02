@@ -6,15 +6,16 @@ def name(): return 'cat'
 def cat(i, args):
 	fm = pretty.Formatter(f=args.format, fd=args.date_format, sep=args.sep)
 	fm.print(i)
-	print(article.to_text(i, args.type))
+	print(article.to_text(i, args.option))
 
 
 def add_args(parser, board):
 	lister.add_args(parser)
 	pretty.add_args(parser)
-	article.add_args(parser)
+	parser.add_argument('--option', type=str, choices=article.to_text_options(), default='compact')
 	parser.add_argument('-a', '--all', action='store_true',
 		help='preview all items')
+
 
 	def subcommand(args):
 		pretty.post_argparse(args)
