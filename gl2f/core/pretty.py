@@ -6,7 +6,6 @@ class Formatter:
 		self.fstring = f
 		self.fdstring = fd
 		self.sep = sep
-		self.preview = preview
 
 		self.index = 0
 		self.digits = 2
@@ -53,9 +52,6 @@ class Formatter:
 	def date_c(self, item):
 		return date.to_datetime(item['createdAt']).strftime(self.fdstring)
 
-	def text(self, item):
-		return '\n{}\n'.format(article.to_text(item['values']['body'], self.preview))
-
 	def breakline(self, item):
 		return '\n'
 
@@ -70,7 +66,6 @@ class Formatter:
 			'url': self.url,
 			'date-p': self.date_p,
 			'date-c': self.date_c,
-			'text': self.text,
 			'index': self.inc_index,
 			'br': self.breakline,
 		}
@@ -96,9 +91,6 @@ def add_args(parser):
 	parser.add_argument('--break-urls', action='store_true',
 		help='break before url')
 
-	parser.add_argument('--preview', type=str, nargs='?', const='compact', choices=article.to_text_option,
-		help='show blog text')
-
 	parser.add_argument('--date', '-d', action='store_true',
 		help='show publish date on the left')
 
@@ -116,7 +108,5 @@ def post_argparse(args):
 	if args.enum:
 		args.format = 'index:' + args.format
 
-	if args.preview and not 'text' in args.format:
-		args.format += ':text'
 
 	args.format = args.format.rstrip(':').lstrip(':')

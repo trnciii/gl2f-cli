@@ -12,7 +12,7 @@ def open_url(i):
 def make_opener(f):
 	def g(args):
 		items = list(f(args))
-		fm = pretty.Formatter(f='date-p:author:title', sep=' ', preview=False)
+		fm = pretty.Formatter(f='date-p:author:title', sep=' ')
 		fm.reset_index(digits=len(str(args.number)))
 
 		if args.all:
@@ -29,10 +29,13 @@ def make_opener(f):
 
 def add_args(parser, board):
 	lister.add_args(parser)
+	parser.add_argument('-a', '--all', action='store_true',
+		help='open all items')
+
 
 	def subcommand(args):
 		items = list(lister.listers()[board](args))
-		fm = pretty.Formatter(f='date-p:author:title', sep=' ', preview=False)
+		fm = pretty.Formatter(f='date-p:author:title', sep=' ')
 
 		if args.all:
 			for i in items:
@@ -44,6 +47,3 @@ def add_args(parser, board):
 				open_url(i)
 
 	parser.set_defaults(handler=subcommand)
-
-	parser.add_argument('-a', '--all', action='store_true',
-		help='open all items')
