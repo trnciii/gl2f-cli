@@ -36,3 +36,11 @@ def add_args(parser):
 
 	parser.add_argument('-a', '--all', action='store_true',
 		help='open all items')
+
+
+def add_args_partially(parser, board):
+	lister.add_args(parser)
+	parser.set_defaults(handler=make_opener(lister.listers()[board]))
+
+	parser.add_argument('-a', '--all', action='store_true',
+		help='open all items')
