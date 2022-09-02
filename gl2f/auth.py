@@ -60,6 +60,7 @@ def set_token(token=None):
 
 	if update(token):
 		print('success')
+		save(token)
 
 
 def update_cli():
