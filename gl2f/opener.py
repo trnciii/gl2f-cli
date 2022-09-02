@@ -1,8 +1,8 @@
 import webbrowser
-from . import core
 import argparse
 import os
-from .util import terminal as term
+from . import core
+from .core import terminal as term
 
 
 def open_url(i):

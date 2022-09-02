@@ -1,6 +1,6 @@
 import re, html
-from gl2f.util import terminal as term
 import argparse
+from . import terminal as term
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -84,7 +84,7 @@ def dl_medium(boardId, contentId, mediaId, skip, save_original):
 def save_media(item, option, dump=False):
 	import json
 	import os
-	from gl2f.util import path
+	from . import path
 
 
 	boardId = item['boardId']

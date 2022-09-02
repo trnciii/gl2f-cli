@@ -2,9 +2,9 @@ import requests
 import json
 import argparse
 import os
-from ..util import member, is_today
 from .. import auth
-from . import board
+from . import board, member
+from .date import is_today
 
 
 class Lister:

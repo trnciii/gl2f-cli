@@ -1,7 +1,7 @@
 import os
 
 def filepath():
-	from .util import path
+	from .core import path
 	return os.path.join(path.home(), 'auth')
 
 def file():
