@@ -36,7 +36,7 @@ pip install git+https://github.com/trnciii/gl2f-cli
 
 とりあえず[#コマンドの例](#コマンドの例)を実行してみると良いと思います。
 
-`gl2f <サブコマンド>` またはその短縮コマンドを使います。
+**記事をリストする** ためには、 `gl2f <サブコマンド>` またはその短縮コマンドを使います。
 サブコマンドには以下のものがあり、取得するページの最新情報をリストします。
 
 | コマンド | 短縮 | 取得するページ |
@@ -44,6 +44,10 @@ pip install git+https://github.com/trnciii/gl2f-cli
 | `gl2f blogs` | `gl2b` | ブログ （ https://girls2-fc.jp/page/blogs 等） |
 | `gl2f radio` | `gl2r` | ラジオ ( https://girls2-fc.jp/page/lucky2radio 等) |
 | `gl2f news` | `gl2n` | ニュース ( https://girls2-fc.jp/page/familyNews 等) |
+
+
+`gl2f open <blogs...>` 等とすることで、リストした記事を**ブラウザで開く**ことができます。
+チェックボックスが出ますので、スペースキーで選択しEnterで確定してください。
 
 
 ### サブコマンドの引数

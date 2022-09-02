@@ -9,7 +9,7 @@ def from_id(i):
 		'415001844964656065': 'https://girls2-fc.jp/page/lovely2news',
 		'540071356465677115': 'https://girls2-fc.jp/page/lucky2news',
 
-		'455630760846558145': 'https://girls2-fc.jp/page/girls2Radio',
+		'455630760846558145': 'https://girls2-fc.jp/page/girls2radio',
 		'540071136604455739': 'https://girls2-fc.jp/page/lucky2radio',
 	}[i]
 

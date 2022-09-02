@@ -1,5 +1,5 @@
 import argparse
-from . import auth, ls
+from . import auth, ls, opener
 
 
 def main():
@@ -22,6 +22,9 @@ def main():
 	parser_news = subparsers.add_parser('news')
 	ls.add_args(parser_news)
 	parser_news.set_defaults(handler=ls.subcommand.news)
+
+	parser_open = subparsers.add_parser('open')
+	opener.add_args(parser_open)
 
 
 	args = parser.parse_args()
