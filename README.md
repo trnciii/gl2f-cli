@@ -32,6 +32,17 @@ pip でこのリポジトリから直接インストール
 pip install git+https://github.com/trnciii/gl2f-cli
 ```
 
+
+## ログイン
+
+Chrome がインストールされている環境では、次のコマンドを使うことでブラウザを使ってログインすることができます。
+ログイン後は日記の本文や画像のダウンロードができるようになります。
+
+```
+gl2f auth login
+```
+
+
 ## 使い方
 
 とりあえず[#コマンドの例](#コマンドの例)を実行してみると良いと思います。
@@ -76,7 +87,7 @@ gl2f news family # GL2 family 両方のニュース。 https://girls2-fc.jp/page
 	* `index` リスト上での番号を振ります
 	* `br` 改行。
 * `-df, --date-format` 日時のフォーマット指定。デフォルトは月/日(`%m/%d`)。書式については[こちら](https://docs.python.org/ja/3/library/datetime.html#strftime-strptime-behavior)
-* `--preview <オプション>` 記事本文を表示します。会員限定コンテンツは認証が必要なので、ニュースだけ見れる状態かと思います。オプションは `full, compact, compressed` がありいずれも全文を表示しますが、後のものほど改行等が短縮され短く表示されます。オプションを入力しなければ `compact` となります。
+* `--preview <オプション>` 記事本文を表示します。会員限定コンテンツはログインが必要です。オプションは `full, compact, compressed` がありいずれも全文を表示しますが、後のものほど改行等が短縮され短く表示されます。オプションを入力しなければ `compact` となります。
 * `--break-urls` URLを改行して表示します。 `-f` で `url -> br:url` と置き換えることと同じです。
 * `--enum` リストに番号を振ります。 `-f` に `index` を含めることと同じです。
 * `-d, --date` リストの左側に公開日時を表示します。 `-f` に `date-p` を含めることと同じです。
