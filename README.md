@@ -116,62 +116,62 @@ twitter [@trnciii](https://twitter.com/trnciii) [@trncix](https://twitter.com/tr
 
 Girls2 のブログを表示する
 ```sh
-gl2f blogs girls2
+gl2f ls blogs girls2
 ```
 
 渡辺未優のブログを表示する
 ```sh
-gl2f blogs miyu
+gl2f ls blogs miyu
 ```
 
 今日投稿されたブログを表示する（`today` は `blogs` でのみ使えます）
 ```sh
-gl2f blogs today
+gl2f ls blogs today
 ```
 
 山口莉愛 の lovely2 の頃のブログを表示する。
 ```sh
-gl2f blogs rina --group lovely2
+gl2f ls blogs rina --group lovely2
 ```
 
 Lucky2 のラジオを表示する
 ```sh
-gl2f radio lucky2
+gl2f ls radio lucky2
 ```
 
 杉浦優來のラジオを表示する
 ```sh
-gl2f radio yura
+gl2f ls radio yura
 ```
 
 Girls2 のニュースを表示する
 ```sh
-gl2f news girls2
+gl2f ls news girls2
 ```
 
 Girls2, Lucky2 両方のニュースを表示する（`family` は `news` でのみ指定できます）
 ```sh
-gl2f news family
+gl2f ls news family
 ```
 
 lovely2 のブログを20件表示する
 ```sh
-gl2f blogs lovely2 -n 20
+gl2f ls blogs lovely2 -n 20
 ```
 
 Lucky2 のニュースの最新6番目から10番目を表示する (1ページあたり5件の2ページ目)
 ```sh
-gl2f news lucky2 -n 5 -p 2
+gl2f ls news lucky2 -n 5 -p 2
 ```
 
 lovely2 のニュースを公開日の早いものから10件表示する（コメント部分を書くと公開年月日も表示する）
 ```sh
-gl2f news lovely2 --order reservedAt:asc # --date --date-format '%Y/%m/%d'
+gl2f ls news lovely2 --order reservedAt:asc # --date --date-format '%Y/%m/%d'
 ```
 
 原田都愛のブログをタイトル降順で30件表示する
 ```sh
-gl2f blogs toa --order name:desc -n 30
+gl2f ls blogs toa --order name:desc -n 30
 ```
 ```sh
 原田都愛　 🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆 https://girls2-fc.jp/page/blogs/305718498280080541
@@ -209,43 +209,38 @@ gl2f blogs toa --order name:desc -n 30
 
 ### 表示方法を指定する
 
-Girls2 のニュースを本文とともに表示する。本文は連続した改行を省略する。
+Girls2 のニュース本文を表示する。
 ```sh
-gl2f news girls2 --preview
+gl2f cat news girls2
 ```
 
-Lucky2 のニュース99件を、改行の全くない本文とともに表示する。
+GL2 family のニュースを、すべての改行を維持して表示する。
 ```sh
-gl2f news lucky2 -n 99 --preview compressed
-```
-
-GL2 family のニュース最新5件を、すべての改行を維持して表示する。
-```sh
-gl2f news family -n 5 --preview full
+gl2f cat --opetion full news family
 ```
 
 森朱里のブログを、左端に番号を振って表示する
 ```sh
-gl2f blogs akari --enum
+gl2f ls blogs akari --enum
 # もしくは
-gl2f blogs akari -f index:author:title:url
+gl2f ls blogs akari -f index:author:title:url
 ```
 
 鶴屋美咲のラジオを公開日とともに表示する
 ```sh
-gl2f radio misaki -d
+gl2f ls radio misaki -d
 # もしくは
-gl2f radio misaki -f date-p:author:title:url
+gl2f ls radio misaki -f date-p:author:title:url
 ```
 
 永山椿のブログを url を改行して表示する
 ```sh
-gl2f blogs tsubaki --break-urls
+gl2f ls blogs tsubaki --break-urls
 # もしくは
-gl2f blogs tsubaki -f author:title:br:url
+gl2f ls blogs tsubaki -f author:title:br:url
 ```
 
 lovely2 スタッフのブログを、投稿日と公開日とともに表示する。日時は秒まで表示する。
 ```sh
-gl2f blogs lovely2staff -f author:date-p:date-c:title:url -df '%m/%d %H:%M:%S'
+gl2f ls blogs lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 ```
