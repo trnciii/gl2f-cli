@@ -2,7 +2,7 @@ from . import board, article, member, terminal as term, date
 import os
 
 class Formatter:
-	def __init__(self, f='author:title:url', fd='%m/%d', sep=' ', preview='compact'):
+	def __init__(self, f='author:title:url', fd='%m/%d', sep=' '):
 		self.fstring = f
 		self.fdstring = fd
 		self.sep = sep
