@@ -96,14 +96,16 @@ def add_args(parser):
 
 
 def post_argparse(args):
+	args.format = args.format.rstrip(':').lstrip(':')
+
 	if args.break_urls:
 		args.format = args.format.replace('url', 'br:url')
 
-	if args.date and ('date-p' not in args.format):
-		args.format = 'date-p:' + args.format
+	if args.date:
+		if 'date-p' not in args.format:
+			args.format = 'date-p:' + args.format
+	else:
+		args.date = '%m/%d'
 
 	if args.enum:
 		args.format = 'index:' + args.format
-
-
-	args.format = args.format.rstrip(':').lstrip(':')
