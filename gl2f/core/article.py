@@ -93,6 +93,7 @@ def save_media(item, skip, stream, force, dump=False):
 	boardId = item['boardId']
 	contentId = item['contentId']
 
+	out = path.ref('media')
 
 	li = ptn_media.findall(item['values']['body'])
 	l = len(li)
@@ -102,7 +103,7 @@ def save_media(item, skip, stream, force, dump=False):
 	for i, (mediaId, _) in enumerate(li):
 
 		ptn = re.compile(mediaId + r'\..+')
-		if (not force) and any(map(ptn.search, path.ls('media'))):
+		if (not force) and any(map(ptn.search, os.listdir(out))):
 			continue
 
 		term.clean_row()
@@ -113,7 +114,7 @@ def save_media(item, skip, stream, force, dump=False):
 		dump_data.append(info)
 
 		if image:
-			file = os.path.join(path.media(), f'{info["mediaId"]}.{info["meta"]["ext"]}')
+			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
 			with open(file, 'wb') as f:
 				f.write(image)
 
