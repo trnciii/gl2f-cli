@@ -84,17 +84,13 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 		return 'bad response', None
 
 
-def save_media(item, out=None, skip=False, stream=False, force=False, dump=False):
+def save_media(item, out, boardId, contentId,
+	skip=False, stream=False, force=False, dump=False
+):
 	import json
 	import os
 	from . import path
 
-
-	boardId = item['boardId']
-	contentId = item['contentId']
-
-	if not out:
-		out = path.ref(os.path.join(boardId, contentId))
 
 	li = ptn_media.findall(item['values']['body'])
 	l = len(li)
