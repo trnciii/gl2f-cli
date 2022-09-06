@@ -94,7 +94,7 @@ def save_media(item, out=None, skip=False, stream=False, force=False, dump=False
 	contentId = item['contentId']
 
 	if not out:
-		out = path.ref('media')
+		out = path.ref(os.path.join(boardId, contentId))
 
 	li = ptn_media.findall(item['values']['body'])
 	l = len(li)

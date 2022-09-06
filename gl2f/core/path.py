@@ -2,8 +2,7 @@ import os, re
 
 def return_path(path):
 	if not os.path.exists(path):
-		os.mkdir(path)
-		print('created', path)
+		os.makedirs(path)
 	return path
 
 
