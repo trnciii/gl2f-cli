@@ -67,6 +67,24 @@ gl2f open radio yuwa
 ```
 
 
+### `pg` Photo Gallery
+
+特設のフォトギャラリー ( https://girls2-fc.jp/page/ShangrilaPG?689409591506633568-page=1 ) を取得します。
+`pg` を省略できるメインコマンドはありません。
+
+指定できるのは以下のページです。
+
+* `shangrila` [Girls2 Live Tour 2022 Shangri-la](https://girls2-fc.jp/page/ShangrilaPG?689409591506633568-page=1)
+
+Shangri-la の画像をダウンロードする
+```sh
+gl2f dl pg shangrila
+```
+
+> **Note**
+> 特設ページをどうまとめるかまだ迷っていて、今後変更があるかもしれません。
+
+
 ## オプション
 
 リストを作るために共通して以下のオプションがあります。
