@@ -2,9 +2,9 @@ import requests
 import json
 import argparse
 import os
-from ..util import member, is_today
 from .. import auth
-from . import board
+from . import board, member
+from .date import is_today
 
 
 class Lister:
@@ -80,5 +80,47 @@ def add_args(parser):
 	parser.add_argument('--group', type=str,
 		help='specify group when name is a member.')
 
-	parser.add_argument('--dump-response', type=str, nargs='?', const='.',
+	parser.add_argument('--dump', type=str, nargs='?', const='.',
 		help='dump response from server as ./response.json')
+
+
+def blogs(args):
+	lister = Lister('blog', debug=args.dump)
+
+	if member.is_group(args.name):
+		return lister.list_group(args.name, args.number, args.page, order=args.order)
+
+	elif member.is_member(args.name):
+		return lister.list_member(args.name, group=args.group, page=args.page, size=args.number, order=args.order)
+
+	elif args.name == 'today':
+		return lister.list_today()
+
+
+def news(args):
+	lister = Lister('news', debug=args.dump)
+	return lister.list_group(args.name, args.number, args.page, args.order)
+
+
+def radio(args):
+	lister = Lister('radio', debug=args.dump)
+
+	if member.is_group(args.name):
+		return lister.list_group(args.name, args.number, args.page, args.order)
+
+	elif member.is_member(args.name):
+		return lister.list_member(args.name, args.group, args.number, args.page, order=args.order)
+
+
+def listers():
+	return {
+		'blogs': blogs,
+		'radio': radio,
+		'news': news
+	}
+
+
+def add_args_boardwise(parser, cmd):
+	subparsers = parser.add_subparsers()
+	for k in listers().keys():
+		cmd.add_args(subparsers.add_parser(k), k)

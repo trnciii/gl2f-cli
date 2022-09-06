@@ -1,6 +1,6 @@
 import re, html
-from gl2f.util import terminal as term
 import argparse
+from . import terminal as term
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -30,22 +30,25 @@ def compose_line(p):
 	return p
 
 
-to_text_option = {'full', 'compact', 'compressed'}
+def to_text_options(): return {'full', 'compact', 'compressed'}
 
-def to_text(body, key):
-	if key not in to_text_option:
-		key = 'compact'
-
+def to_text(item, key):
+	body = item['values']['body']
 
 	if key == 'full':
-		return '\n'.join(map(compose_line, paragraphs(body))).rstrip('\n')
+		return '{}\n'.format(
+			'\n'.join(map(compose_line, paragraphs(body))).rstrip('\n')
+		)
 
 	elif key == 'compact':
-		text = '\n'.join(map(compose_line, paragraphs(body))).rstrip('\n')
-		return re.sub(r'\n+', '\n', text)
+		return '{}\n'.format(
+			re.sub(r'\n+', '\n', '\n'.join(map(compose_line, paragraphs(body))).rstrip('\n'))
+		)
 
 	elif key == 'compressed':
-		return ''.join(map(compose_line, paragraphs(body)))
+		return '{}\n'.format(
+			''.join(map(compose_line, paragraphs(body)))
+		)
 
 
 def dl_medium(boardId, contentId, mediaId, skip, save_original):
@@ -81,10 +84,12 @@ def dl_medium(boardId, contentId, mediaId, skip, save_original):
 		return 'bad response', None
 
 
+def save_media_options(): return {'stream', 'original', 'skip'}
+
 def save_media(item, option, dump=False):
 	import json
 	import os
-	from gl2f.util import path
+	from . import path
 
 
 	boardId = item['boardId']
@@ -121,8 +126,3 @@ def save_media(item, option, dump=False):
 	if dump:
 		with open(f'media-{contentId}.json', 'w') as f:
 			json.dump(dump_data, f, indent=2)
-
-
-def add_args(parser):
-	parser.add_argument('--dl-media', type=str, nargs='?', const='original', choices=['stream', 'original', 'skip'],
-		help='save media')
