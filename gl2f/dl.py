@@ -19,6 +19,9 @@ def add_args(parser, board):
 	parser.add_argument('--force', action='store_true',
 		help='force download to overwrite existing files')
 
+	parser.add_argument('-o', type=str, default='',
+		help='output path')
+
 
 	def subcommand(args):
 		pretty.post_argparse(args)
@@ -27,12 +30,12 @@ def add_args(parser, board):
 
 		if args.all:
 			for i in items:
-				article.save_media(i, args.skip, args.stream, args.force, args.dump)
+				article.save_media(i, out=args.o, skip=args.skip, stream=args.stream, force=args.force, dump=args.dump)
 		else:
 			fm_list = pretty.Formatter(f='date-p:author:title', sep=' ')
 			selected = term.select([fm_list.format(i) for i in items])
 			for i in [i for s, i in zip(selected, items) if s]:
-				article.save_media(i, args.skip, args.stream, args.force, args.dump)
+				article.save_media(i, out=args.o, skip=args.skip, stream=args.stream, force=args.force, dump=args.dump)
 
 
 	parser.set_defaults(handler=subcommand)

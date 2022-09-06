@@ -51,7 +51,7 @@ def to_text(item, key):
 		)
 
 
-def dl_medium(boardId, contentId, mediaId, skip, stream):
+def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 	import requests
 	from gl2f import auth
 
@@ -84,7 +84,7 @@ def dl_medium(boardId, contentId, mediaId, skip, stream):
 		return 'bad response', None
 
 
-def save_media(item, skip, stream, force, dump=False):
+def save_media(item, out=None, skip=False, stream=False, force=False, dump=False):
 	import json
 	import os
 	from . import path
@@ -93,7 +93,8 @@ def save_media(item, skip, stream, force, dump=False):
 	boardId = item['boardId']
 	contentId = item['contentId']
 
-	out = path.ref('media')
+	if not out:
+		out = path.ref('media')
 
 	li = ptn_media.findall(item['values']['body'])
 	l = len(li)
