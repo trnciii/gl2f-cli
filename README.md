@@ -11,8 +11,8 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 
 ブログ・ラジオ・ニュースの記事について、以下のようなコマンドで操作ができるようになります。
 
-* [gl2f cat](./docs/commands.md#gl2f-auth-認証関係) ターミナル上に本文を表示する
-* [gl2f dl](./docs/commands.md#gl2f-cat-ターミナルで本文を読む) 記事に含まれる画像や動画をダウンロードする
+* [gl2f cat](./docs/commands.md#gl2f-cat-ターミナルで本文を読む) ターミナル上に本文を表示する
+* [gl2f dl](./docs/commands.md#gl2f-dl-記事に含まれる画像や動画をダウンロードする) 記事に含まれる画像や動画をダウンロードする
 * [gl2f ls](./docs/commands.md#gl2f-ls-記事の情報をリストする) 一覧表示する
 * [gl2f open](./docs/commands.md#gl2f-open-記事をブラウザで開く) ページを一括でブラウザで開く
 
