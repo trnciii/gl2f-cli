@@ -1,5 +1,22 @@
 import re
 import os, json
+from gl2f.core import path
+
+
+def load_content(i):
+	with open(os.path.join(path.ref('contents'), i, f'{i}.json')) as f:
+		return json.load(f)
+
+def ls(key=None):
+	from gl2f.core import pretty
+
+	items = [load_content(i) for i in os.listdir(path.ref('contents'))]
+	if key:
+		items.sort(key=key)
+
+	fm = pretty.Formatter(f='date-p:author:title')
+	for i in items:
+		fm.print(i)
 
 
 def extract_bodies(filename):
@@ -25,6 +42,7 @@ if __name__ == '__main__':
 
 	functions = {
 		'body': extract_bodies,
+		'ls': lambda:ls(key=lambda i:i['openingAt'])
 	}
 
 	for k, v in functions.items():
