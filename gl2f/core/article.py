@@ -84,7 +84,7 @@ def to_text(item, key):
 
 
 
-def dl_medium(boardId, contentId, mediaId, skip, save_original):
+def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 	import requests
 	from gl2f import auth
 
@@ -106,7 +106,7 @@ def dl_medium(boardId, contentId, mediaId, skip, save_original):
 
 
 	response = requests.get(
-		data['originalUrl'] if (save_original and 'originalUrl' in data.keys())\
+		data['originalUrl'] if ('originalUrl' in data.keys() and not stream)\
 		else data['accessUrl']
 	)
 
@@ -117,19 +117,12 @@ def dl_medium(boardId, contentId, mediaId, skip, save_original):
 		return 'bad response', None
 
 
-def save_media_options(): return {'stream', 'original', 'skip'}
-
-def save_media(item, option, dump=False):
+def save_media(item, out, boardId, contentId,
+	skip=False, stream=False, force=False, dump=False
+):
 	import json
 	import os
 	from . import path
-
-
-	boardId = item['boardId']
-	contentId = item['contentId']
-
-	save_original = option != 'stream'
-	skip = option == 'skip'
 
 
 	li = ptn_media.findall(item['values']['body'])
@@ -140,19 +133,20 @@ def save_media(item, option, dump=False):
 	for i, (mediaId, _) in enumerate(li):
 
 		ptn = re.compile(mediaId + r'\..+')
-		if any(map(ptn.search, path.ls('media'))):
+		if (not force) and any(map(ptn.search, os.listdir(out))):
 			continue
 
 		term.clean_row()
 		print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] {mediaId}', end='', flush=True)
 
 
-		info, image = dl_medium(boardId, contentId, mediaId, skip, save_original)
+		info, image = dl_medium(boardId, contentId, mediaId, skip, stream)
 		dump_data.append(info)
 
-		file = os.path.join(path.media(), f'{info["mediaId"]}.{info["meta"]["ext"]}')
-		with open(file, 'wb') as f:
-			f.write(image)
+		if image:
+			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
+			with open(file, 'wb') as f:
+				f.write(image)
 
 	term.clean_row()
 

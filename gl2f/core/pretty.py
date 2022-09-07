@@ -2,7 +2,7 @@ from . import board, article, member, terminal as term, date
 import os
 
 class Formatter:
-	def __init__(self, f='author:title:url', fd='%m/%d', sep=' ', preview='compact'):
+	def __init__(self, f='author:title:url', fd='%m/%d', sep=' '):
 		self.fstring = f
 		self.fdstring = fd
 		self.sep = sep
@@ -22,7 +22,6 @@ class Formatter:
 				fullname = v['fullname']
 				colf, colb = v['color'][board.to_group(item['boardId'])].values()
 			else:
-				print('no category found')
 				fullname = item['category']['name']
 				colf, colb = [255, 255, 255], [157, 157, 157]
 		except KeyError:
@@ -43,8 +42,7 @@ class Formatter:
 		return term.mod(item['values']['title'], [term.bold()])
 
 	def url(self, item):
-		url = os.path.join(board.from_id(item['boardId']), item['contentId'])
-		return term.mod(url, [term.dim()])
+		return term.mod(board.content_url(item), [term.dim()])
 
 	def date_p(self, item):
 		return date.to_datetime(item['openingAt']).strftime(self.fdstring)
@@ -96,14 +94,16 @@ def add_args(parser):
 
 
 def post_argparse(args):
+	args.format = args.format.rstrip(':').lstrip(':')
+
 	if args.break_urls:
 		args.format = args.format.replace('url', 'br:url')
 
-	if args.date and ('date-p' not in args.format):
-		args.format = 'date-p:' + args.format
+	if args.date:
+		if 'date-p' not in args.format:
+			args.format = 'date-p:' + args.format
+	else:
+		args.date = '%m/%d'
 
 	if args.enum:
 		args.format = 'index:' + args.format
-
-
-	args.format = args.format.rstrip(':').lstrip(':')
