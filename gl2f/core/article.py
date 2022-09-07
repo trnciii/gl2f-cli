@@ -51,6 +51,9 @@ class MediaRep:
 			image = Image.open(file)
 		else:
 			_, data = dl_medium(self.boardId, self.contentId, i, False, False)
+			if data:
+				with open(os.path.join(path.ref('cache'), i), 'wb') as f:
+					f.write(data)
 			image = Image.open(BytesIO(data))
 
 		sixel.limit(image, (1000, 1000))
@@ -58,6 +61,10 @@ class MediaRep:
 
 
 	def search_local(self, mediaId):
+		cache = os.path.join(path.ref('cache'), mediaId)
+		if os.path.exists(cache):
+			return cache
+
 		directory = path.ref_untouch(f'contents/{self.contentId}')
 		if not os.path.exists(directory):
 			return None
