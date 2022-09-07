@@ -127,7 +127,7 @@ def get():
 		'tsubaki': {
 			'group': ['lucky2'],
 			'fullname': '永山椿',
-			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [31, 82, 209]}},
+			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
 			'categoryId': {
 				'blog': '540078282813473595',
 				'radio': '562927300052517691',
