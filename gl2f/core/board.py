@@ -9,8 +9,10 @@ def from_id(i):
 		'415001844964656065': 'https://girls2-fc.jp/page/lovely2news',
 		'540071356465677115': 'https://girls2-fc.jp/page/lucky2news',
 
-		'455630760846558145': 'https://girls2-fc.jp/page/girls2Radio',
+		'455630760846558145': 'https://girls2-fc.jp/page/girls2radio',
 		'540071136604455739': 'https://girls2-fc.jp/page/lucky2radio',
+
+		'689409591506633568': 'https://girls2-fc.jp/page/ShangrilaPG'
 	}[i]
 
 def to_group(i):
@@ -45,8 +47,15 @@ def request_url(domain, group):
 		'radio': {
 			'girls2': 'https://api.fensi.plus/v1/sites/girls2-fc/texts/girls2Radio/contents',
 			'lucky2': 'https://api.fensi.plus/v1/sites/girls2-fc/texts/lucky2Radio/contents'
+		},
+		'pg': {
+			'shangrila': 'https://api.fensi.plus/v1/sites/girls2-fc/texts/689409591506633568/contents',
 		}
 	}[domain][group]
+
+
+def content_url(item):
+	return f"{from_id(item['boardId'])}/{item['contentId']}"
 
 
 if __name__ == '__main__':
