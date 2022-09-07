@@ -16,30 +16,37 @@ def paragraphs(body):
 	return [ptn_paragraph.sub(r'\1', line) for line in ptn_paragraph.findall(body)]
 
 
-def media_rep_type(p):
-	return ptn_media.sub(term.mod('[\\2]', [term.dim()]), p)
+class MediaRep:
+	def __init__(self, item, rep):
+		self.boardId = item['boardId']
+		self.contentId = item['contentId']
 
-def media_rep_type_id(p):
-	return ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
+		if rep == 'type':
+			self.rep = self.media_rep_type
+		elif rep == 'sixel' and sixel.supported():
+			self.rep = self.media_rep_sixel
+		else:
+			self.rep = self.media_rep_type_id
 
 
-if sixel.supported():
-	def media_rep_sixel(p):
+	def media_rep_type(self, p):
+		return ptn_media.sub(term.mod('[\\2]', [term.dim()]), p)
+
+	def media_rep_type_id(self, p):
+		return ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
+
+	def media_rep_sixel(self, p):
 		match = ptn_media.search(p)
 		if not match:
 			return p
 		i, t = match.group(1, 2)
 		if t != 'image':
-			return media_rep_type_id(p)
+			return self.media_rep_type_id(p)
 		return sixel.img(i)
-
-else:
-	media_rep_sixel = media_rep_type_id
-
 
 
 def compose_line(p, media_rep):
-	p = media_rep(p)
+	p = media_rep.rep(p)
 	p = ptn_strong.sub(term.mod('\\1', [term.color('white', 'fl'), term.bold(), term.underline()]), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
@@ -58,17 +65,20 @@ def to_text(item, key):
 	body = item['values']['body']
 
 	if key == 'full':
+		mediarep = MediaRep(item, 'sixel')
 		return '{}\n'.format(
-			'\n'.join([compose_line(p, media_rep_sixel) for p in paragraphs(body)])
+			'\n'.join([compose_line(p, mediarep) for p in paragraphs(body)])
 		)
 
 	elif key == 'compact':
+		mediarep = MediaRep(item, 'sixel')
 		return '{}\n'.format(re.sub(r'\n+', '\n',
-			'\n'.join([compose_line(p, media_rep_sixel) for p in paragraphs(body)])
+			'\n'.join([compose_line(p, mediarep) for p in paragraphs(body)])
 		))
 
 	elif key == 'compressed':
-		return '{}\n'.format(''.join([compose_line(p, media_rep_type) for p in paragraphs(body)]))
+		mediarep = MediaRep(item, 'type')
+		return '{}\n'.format(''.join([compose_line(p, mediarep) for p in paragraphs(body)]))
 
 
 
