@@ -42,7 +42,9 @@ class MediaRep:
 		i, t = match.group(1, 2)
 		if t != 'image':
 			return self.media_rep_type_id(p)
-		return sixel.img(i)
+
+		_, data = dl_medium(self.boardId, self.contentId, i, False, False)
+		return sixel.from_bytes(data, (1000, 1000))
 
 
 def compose_line(p, media_rep):

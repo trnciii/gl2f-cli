@@ -32,12 +32,6 @@ def supported():
 	return libsixel != None
 
 
-def media_file_from_id(media_id):
-	files = glob.glob(f'{os.path.join(path.media(), media_id)}.*')
-	assert len(files) == 1
-	return files[0]
-
-
 def fit(image, size):
 	w, h = image.size
 	r = min(size[0]/w, size[1]/h)
@@ -53,10 +47,9 @@ def limit(image, size):
 	return image.resize((w, h))
 
 
-def img(media_id):
-	file = media_file_from_id(media_id)
-	image = Image.open(file)
-	image = limit(image, (1000, 1000))
+def from_bytes(data, size):
+	image = Image.open(BytesIO(data))
+	limit(image, size)
 	return to_sixel(image)
 
 
@@ -97,12 +90,3 @@ def to_sixel(image):
 			libsixel.sixel_dither_unref(dither)
 	finally:
 		libsixel.sixel_output_unref(output)
-
-
-if __name__ == '__main__':
-	import time
-	media_id = "688741780203504480"
-	s = img(media_id)
-	print('111')
-	print(s)
-	print(f'{supported()=}')
