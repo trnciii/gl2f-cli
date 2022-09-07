@@ -13,7 +13,8 @@ def home():
 def ref(path):
 	return return_path(os.path.join(home(), path))
 
+def ref_untouch(path):
+	return os.path.join(home(), path)
 
 if __name__ == '__main__':
 	print(home())
-	print(os.listdir(ref('media')))

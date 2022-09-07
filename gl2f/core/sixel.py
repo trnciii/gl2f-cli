@@ -47,12 +47,6 @@ def limit(image, size):
 	return image.resize((w, h))
 
 
-def from_bytes(data, size):
-	image = Image.open(BytesIO(data))
-	limit(image, size)
-	return to_sixel(image)
-
-
 def to_sixel(image):
 	s = BytesIO()
 	try:

@@ -1,6 +1,7 @@
 import re, html
 import argparse
-from . import terminal as term, sixel
+from . import terminal as term, sixel, path
+import os
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -36,6 +37,9 @@ class MediaRep:
 		return ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
 
 	def media_rep_sixel(self, p):
+		from io import BytesIO
+		from PIL import Image
+
 		match = ptn_media.search(p)
 		if not match:
 			return p
@@ -43,8 +47,28 @@ class MediaRep:
 		if t != 'image':
 			return self.media_rep_type_id(p)
 
-		_, data = dl_medium(self.boardId, self.contentId, i, False, False)
-		return sixel.from_bytes(data, (1000, 1000))
+		if file:=self.search_local(i):
+			image = Image.open(file)
+		else:
+			_, data = dl_medium(self.boardId, self.contentId, i, False, False)
+			image = Image.open(BytesIO(data))
+
+		sixel.limit(image, (1000, 1000))
+		return sixel.to_sixel(image)
+
+
+	def search_local(self, mediaId):
+		directory = path.ref_untouch(f'contents/{self.contentId}')
+		if not os.path.exists(directory):
+			return None
+
+		pattern = re.compile(rf'{mediaId}.*')
+		li = filter(pattern.match, os.listdir(directory))
+
+		try:
+			return os.path.join(directory, next(li))
+		except:
+			return None
 
 
 def compose_line(p, media_rep):
@@ -121,9 +145,6 @@ def save_media(item, out, boardId, contentId,
 	skip=False, stream=False, force=False, dump=False
 ):
 	import json
-	import os
-	from . import path
-
 
 	li = ptn_media.findall(item['values']['body'])
 	l = len(li)
