@@ -13,7 +13,7 @@ def save(item, args):
 	if args.o:
 		out = args.o
 	else:
-		out = path.ref(os.path.join(boardId, contentId))
+		out = path.ref(os.path.join('contents', contentId))
 
 	with open(os.path.join(out, f'{contentId}.json'), 'w') as f:
 		f.write(json.dumps(item, indent=2))
