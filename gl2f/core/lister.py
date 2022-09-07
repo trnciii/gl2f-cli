@@ -58,10 +58,10 @@ class Lister:
 
 
 	def list_today(self):
-		return filter(
+		return list(filter(
 			lambda i: is_today(i['openingAt']),
 			sum((self.fetch(group, size=10, page=1)['list'] for group in ['girls2', 'lucky2']), [])
-		)
+		))
 
 
 def add_args(parser):

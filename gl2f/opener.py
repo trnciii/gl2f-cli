@@ -8,23 +8,6 @@ def name(): return 'open'
 def open_url(i):
 	webbrowser.open(board.content_url(i), new=0, autoraise=True)
 
-def make_opener(f):
-	def g(args):
-		items = list(f(args))
-		fm = pretty.Formatter(f='date-p:author:title', sep=' ')
-		fm.reset_index(digits=len(str(args.number)))
-
-		if args.all:
-			for i in items:
-				fm.print(i)
-				open_url(i)
-		else:
-			selected = term.select([fm.format(i) for i in items])
-			for i in [i for s, i in zip(selected, items) if s]:
-				open_url(i)
-
-	return g
-
 
 def add_args(parser, board):
 	lister.add_args(parser)
@@ -33,7 +16,7 @@ def add_args(parser, board):
 
 
 	def subcommand(args):
-		items = list(lister.listers()[board](args))
+		items = lister.listers()[board](args)
 		fm = pretty.Formatter(f='date-p:author:title', sep=' ')
 
 		if args.all:

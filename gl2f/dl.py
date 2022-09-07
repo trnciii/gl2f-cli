@@ -42,7 +42,7 @@ def add_args(parser, board):
 
 
 	def subcommand(args):
-		items = list(lister.listers()[board](args))
+		items = lister.listers()[board](args)
 
 		if args.all:
 			for i in items:
