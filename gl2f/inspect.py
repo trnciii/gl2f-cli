@@ -7,12 +7,13 @@ def load_content(i):
 	with open(os.path.join(path.ref('contents'), i, f'{i}.json')) as f:
 		return json.load(f)
 
-def ls(key=None):
+def ls(args):
 	from gl2f.core import pretty
 
 	items = [load_content(i) for i in os.listdir(path.ref('contents'))]
-	if key:
-		items.sort(key=key)
+	if args.order:
+		a = args.order.split(':')
+		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
 
 	fm = pretty.Formatter(f='date-p:author:title')
 	for i in items:
@@ -37,12 +38,20 @@ def extract_bodies(filename):
 			f.write(body)
 
 
+def add_args(parser):
+	sub = parser.add_subparsers()
+
+	p = sub.add_parser('ls')
+	p.add_argument('--order', type=str,
+		help='sort order')
+	p.set_defaults(handler=ls)
+
+
 if __name__ == '__main__':
 	import sys
 
 	functions = {
 		'body': extract_bodies,
-		'ls': lambda:ls(key=lambda i:i['openingAt'])
 	}
 
 	for k, v in functions.items():

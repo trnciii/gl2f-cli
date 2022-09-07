@@ -1,5 +1,5 @@
 import argparse
-from . import auth, opener, ls, cat, dl
+from . import auth, opener, ls, cat, dl, inspect
 from .core import lister
 
 
@@ -24,6 +24,10 @@ def main():
 
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)
+
+	p = subparsers.add_parser('local')
+	inspect.add_args(p)
+
 
 	for c, p in board_subcommand_parsers(subparsers):
 		lister.add_args_boardwise(p, c)
