@@ -118,7 +118,7 @@ if os.name == 'nt':
 			if ch == b'\r':
 				return selected
 
-			elif ch == b'\x03':
+			elif (ch == b'\x03') or (ch == b'q'):
 				exit()
 
 			elif ch == b'a':
@@ -177,7 +177,7 @@ elif os.name == 'posix':
 		try:
 			termios.tcsetattr(fd, termios.TCSANOW, tc)
 
-			print(mod("space: toggle, 'a': all, 'c': clear", [color('yellow', 'fl')]))
+			print(mod("{ space: toggle, 'a': all, 'c': clear, 'q': quit }", [color('yellow', 'fl')]))
 			n = len(items)
 			selected = [False]*n
 			cursor = 0
@@ -193,6 +193,9 @@ elif os.name == 'posix':
 
 				if ch == '\n':
 					return selected
+
+				elif ch == 'q':
+					exit()
 
 				elif ch == 'a':
 					selected = [True]*n
