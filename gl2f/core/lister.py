@@ -74,20 +74,20 @@ def blogs(args):
 		return list_member(domain, args)
 
 	elif args.name == 'today':
-		return filter(
+		return list(filter(
 			lambda i: is_today(i['openingAt']),
 			sum((fetch(domain, group, size=10, page=1, dump=args.dump)['list'] for group in ['girls2', 'lucky2']), [])
-		)
+		))
 
 
 def news(args):
 	domain = 'news'
 
 	if args.name == 'today':
-		return filter(
+		return list(filter(
 			lambda i: is_today(i['openingAt']),
 			fetch(domain, 'family', size=10, page=1, dump=args.dump)['list']
-		)
+		))
 
 	else:
 		return fetch(domain, args.name, args.number, args.page, args.order, dump=args.dump)['list']
