@@ -1,9 +1,12 @@
 import argparse
 from .core import lister, pretty, article, terminal as term
+from .dl import save
 
 def name(): return 'cat'
 
 def cat(i, args):
+	if args.dl:
+		save(i, args)
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
 	print(article.to_text(i, args.option))
@@ -15,6 +18,18 @@ def add_args(parser, board):
 	parser.add_argument('--option', type=str, choices=article.to_text_options(), default='compact')
 	parser.add_argument('-a', '--all', action='store_true',
 		help='preview all items')
+	parser.add_argument('--dl', action='store_true',
+		help='also downloads the article')
+
+	# options from dl
+	parser.add_argument('--stream', action='store_true',
+		help='save video files as stream')
+	parser.add_argument('--skip', action='store_true',
+		help='not actually download video files')
+	parser.add_argument('--force', action='store_true',
+		help='force download to overwrite existing files')
+	parser.add_argument('-o', type=str, default='',
+		help='output path')
 
 
 	def subcommand(args):
