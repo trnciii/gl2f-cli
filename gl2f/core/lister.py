@@ -54,7 +54,7 @@ def get_IDs(domain, args):
 
 
 def add_args(parser):
-	parser.add_argument('name', type=str,
+	parser.add_argument('name', type=str, nargs='?',
 		help='group or member name')
 
 	parser.add_argument('-n', '--number', type=int, default=10,
@@ -111,8 +111,9 @@ def radio(args):
 		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 
-def pg(args):
-	return fetch('689409591506633568', args.number, args.page, args.order, dump=args.dump)['list']
+def shangrila(args):
+	boardId = '689409591506633568'
+	return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 
 def listers():
@@ -120,7 +121,7 @@ def listers():
 		'blogs': blogs,
 		'radio': radio,
 		'news': news,
-		'pg': pg,
+		'shangrila': shangrila,
 	}
 
 
