@@ -10,7 +10,7 @@ def open_url(i):
 
 def make_opener(f):
 	def g(args):
-		items = list(f(args))
+		items = f(args)
 		fm = pretty.Formatter(f='date-p:author:title', sep=' ')
 		fm.reset_index(digits=len(str(args.number)))
 
@@ -33,7 +33,7 @@ def add_args(parser, board):
 
 
 	def subcommand(args):
-		items = list(lister.listers()[board](args))
+		items = lister.listers()[board](args)
 		fm = pretty.Formatter(f='date-p:author:title', sep=' ')
 
 		if args.all:

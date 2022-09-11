@@ -7,65 +7,54 @@ from . import board, member
 from .date import is_today
 
 
-class Lister:
-	def __init__(self, name, debug=False):
-		self.name = name
-		self.debug = debug
+def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, template='texts', dump=False):
+	response = requests.get(
+		f'https://api.fensi.plus/v1/sites/girls2-fc/{template}/{boardId}/contents',
+		params={
+			'size': str(size),
+			'page': str(page),
+			'order': str(order),
+			'categoryId': categoryId
+		},
+		cookies={},
+		headers={
+			'origin': 'https://girls2-fc.jp',
+			'x-from': 'https://girls2-fc.jp',
+			'x-authorization': auth.update(auth.load()),
+		})
+
+	if not response.ok:
+		return
+
+	if dump:
+		import datetime
+		boarddata = board.get()[boardId]
+		kind = boarddata['kind']
+		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
+		if categoryId:
+			name, _ = member.from_id(categoryId)
+		else:
+			name = boarddata['group']
+
+		with open(os.path.join(dump,  f'{kind}-{name}-{now}.json'), 'w') as f:
+			json.dump(response.json(), f, indent=2)
+
+	return response.json()
 
 
-	def fetch(self, group, size, page, order='reservedAt:desc', categoryId=None):
-		response = requests.get(
-			board.request_url(self.name, group),
-			params={
-				'size': str(size),
-				'page': str(page),
-				'order': str(order),
-				'categoryId': categoryId
-			},
-			cookies={},
-			headers={
-				'origin': 'https://girls2-fc.jp',
-				'x-from': 'https://girls2-fc.jp',
-				'x-authorization': auth.update(auth.load()),
-			})
+def get_IDs(domain, args):
+	data = member.get()[args.name]
+	group_list = data['group']
+	group = args.group if args.group in group_list else group_list[0]
 
-		if not response.ok:
-			return
-
-		if self.debug:
-			import datetime
-			query = member.from_id(categoryId)[0] if categoryId else group
-			now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-			path = os.path.join(self.debug, f'{self.name}-{query}-{now}.json')
-			with open(path, 'w') as f:
-				json.dump(response.json(), f, indent=2)
-
-		return response.json()
-
-
-	def list_group(self, group, size=10, page=1, order='reservedAt:desc'):
-		return self.fetch(group, size, page, order)['list']
-
-
-	def list_member(self, name, group=None, size=10, page=1, order='reservedAt:desc'):
-		member_data = member.get()[name]
-		categoryId = member_data['categoryId'][self.name]
-		group_list = member_data['group']
-		if not group in group_list:
-			group = group_list[0]
-
-		return self.fetch(group, size, page, order, categoryId=categoryId)['list']
-
-
-	def list_today(self):
-		return filter(
-			lambda i: is_today(i['openingAt']),
-			sum((self.fetch(group, size=10, page=1)['list'] for group in ['girls2', 'lucky2']), [])
-		)
+	if domain == 'blog':
+		return board.blogs(group), data['categoryId'][domain]
+	elif domain == 'radio':
+		return board.radio(group), data['categoryId'][domain]
 
 
 def add_args(parser):
-	parser.add_argument('name', type=str,
+	parser.add_argument('name', type=str, nargs='?',
 		help='group or member name')
 
 	parser.add_argument('-n', '--number', type=int, default=10,
@@ -85,35 +74,46 @@ def add_args(parser):
 
 
 def blogs(args):
-	lister = Lister('blog', debug=args.dump)
-
 	if member.is_group(args.name):
-		return lister.list_group(args.name, args.number, args.page, order=args.order)
+		boardId = board.blogs(args.name)
+		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 	elif member.is_member(args.name):
-		return lister.list_member(args.name, group=args.group, page=args.page, size=args.number, order=args.order)
+		boardId, categoryId = get_IDs('blog', args)
+		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 	elif args.name == 'today':
-		return lister.list_today()
+		return list(filter(
+			lambda i: is_today(i['openingAt']),
+			sum((fetch(board.blogs(group), size=10, page=1, dump=args.dump)['list'] for group in ['girls2', 'lucky2']), [])
+		))
 
 
 def news(args):
-	lister = Lister('news', debug=args.dump)
-	return lister.list_group(args.name, args.number, args.page, args.order)
+	if args.name == 'today':
+		return list(filter(
+			lambda i: is_today(i['openingAt']),
+			fetch(board.news('family'), size=10, page=1, dump=args.dump)['list']
+		))
+
+	else:
+		boardId = board.news(args.name)
+		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 
 def radio(args):
-	lister = Lister('radio', debug=args.dump)
-
 	if member.is_group(args.name):
-		return lister.list_group(args.name, args.number, args.page, args.order)
+		boardId = board.radio(args.name)
+		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 	elif member.is_member(args.name):
-		return lister.list_member(args.name, args.group, args.number, args.page, order=args.order)
+		boardId, categoryId = get_IDs('radio', args)
+		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
-def pg(args):
-	lister = Lister('pg', debug=args.dump)
-	return lister.list_group(args.name, args.number, args.page, args.order)
+
+def shangrila(args):
+	boardId = '689409591506633568'
+	return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 
 def listers():
@@ -121,7 +121,7 @@ def listers():
 		'blogs': blogs,
 		'radio': radio,
 		'news': news,
-		'pg': pg,
+		'shangrila': shangrila,
 	}
 
 

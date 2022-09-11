@@ -1,7 +1,7 @@
 # リストの作り方
 
 サブコマンド `cat, ls, open` は、対象となるリストや表示の整形を指示する必要があります（[コマンドの説明](./commands.md)）。
-リストの指定はページの種類（ブログ、ニュース、ラジオ）とグループまたはメンバーを与えて行います、。
+リストの指定はページの種類（ブログ、ニュース、ラジオ等）と、さらに必要なグループまたはメンバーを与えて行います、。
 またメインコマンドとして `gl2b / gl2n / gl2r` を使うとページの種類を省略することができます。
 
 Girls2 のブログを開く
@@ -67,18 +67,14 @@ gl2f open radio yuwa
 ```
 
 
-### `pg` Photo Gallery
+### `shangrila` Girls2 Live Tour 2022 Shangri-la Photo Gallery
 
-特設のフォトギャラリー ( https://girls2-fc.jp/page/ShangrilaPG?689409591506633568-page=1 ) を取得します。
+Shangri-la のフォトギャラリー ( https://girls2-fc.jp/page/ShangrilaPG ) を取得します。
 `pg` を省略できるメインコマンドはありません。
 
-指定できるのは以下のページです。
-
-* `shangrila` [Girls2 Live Tour 2022 Shangri-la](https://girls2-fc.jp/page/ShangrilaPG?689409591506633568-page=1)
-
-Shangri-la の画像をダウンロードする
+Shangri-la Photo Gallery の画像をダウンロードする
 ```sh
-gl2f dl pg shangrila
+gl2f dl shangrila
 ```
 
 > **Note**
