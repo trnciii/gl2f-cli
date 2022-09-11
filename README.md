@@ -255,3 +255,9 @@ gl2f ls blogs lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 * appearance リストや記事の表示・整形について
 
 twitter [@trnciii](https://twitter.com/trnciii) [@trncix](https://twitter.com/trncix) に伝えてもらっても構いません。
+
+
+## 依存
+
+* requests
+* selenium, webdriver_manager (`gl2f auth login` で使います)
