@@ -1,5 +1,4 @@
 import re, html
-import argparse
 from . import terminal as term
 
 

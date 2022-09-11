@@ -1,10 +1,10 @@
-import argparse
-from .core import lister, pretty, article, terminal as term
-from .dl import save
+from .core import lister, pretty, article
 
 def name(): return 'cat'
 
 def cat(i, args):
+	from .dl import save
+
 	if args.dl:
 		save(i, args)
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
@@ -33,6 +33,8 @@ def add_args(parser, board):
 
 
 	def subcommand(args):
+		from .core import terminal as term
+
 		pretty.post_argparse(args)
 
 		items = lister.listers()[board](args)

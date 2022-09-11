@@ -1,5 +1,4 @@
-from . import board, article, member, terminal as term, date
-import os
+from . import board, member, terminal as term, date
 
 class Formatter:
 	def __init__(self, f='author:title:url', fd='%m/%d', sep=' '):

@@ -1,10 +1,8 @@
 import requests
-import json
-import argparse
-import os
 from .. import auth
 from . import board, member
 from .date import is_today
+import datetime, os, json
 
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, template='texts', dump=False):
@@ -27,8 +25,6 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 		return
 
 	if dump:
-		import datetime
-
 		filename = board.get()[boardId]['page']
 		if categoryId:
 			name, _ = member.from_id(categoryId)

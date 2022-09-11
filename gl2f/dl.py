@@ -1,11 +1,10 @@
-import argparse
-from .core import lister, pretty, article, terminal as term
+from .core import lister
 
 def name(): return 'dl'
 
 def save(item, args):
 	import json, os
-	from .core import path
+	from .core import path, article
 
 	boardId = item['boardId']
 	contentId = item['contentId']
@@ -42,6 +41,8 @@ def add_args(parser, board):
 
 
 	def subcommand(args):
+		from .core import terminal as term, pretty
+
 		items = lister.listers()[board](args)
 
 		if args.all:

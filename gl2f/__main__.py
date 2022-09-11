@@ -1,6 +1,5 @@
 import argparse
-from . import auth, opener, ls, cat, dl
-from .core import lister
+from . import opener, ls, cat, dl
 
 
 def board_subcommand_parsers(subparsers):
@@ -19,6 +18,9 @@ def ex(parser):
 
 
 def main():
+	from . import auth
+	from .core import lister
+
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers()
 
