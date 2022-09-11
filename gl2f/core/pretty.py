@@ -15,17 +15,13 @@ class Formatter:
 
 
 	def author(self, item):
-		try:
-			_, v = member.from_id(item['categoryId'])
-			if v:
-				fullname = v['fullname']
-				group = board.get()[item['boardId']]['group']
-				colf, colb = v['color'][group].values()
-			else:
-				fullname = item['category']['name']
-				colf, colb = [255, 255, 255], [157, 157, 157]
-		except KeyError:
-			fullname = '---'
+		_, v = member.from_id(item.get('categoryId'))
+		if v:
+			fullname = v['fullname']
+			group = board.get()[item['boardId']]['group']
+			colf, colb = v['color'][group].values()
+		else:
+			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
 		mods = [
