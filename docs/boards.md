@@ -34,6 +34,7 @@ gl2f open news family
 
 日記のリスト ( https://girls2-fc.jp/page/blogs 等 ) を取得します。
 指定できるのはグループ名 `girls2, loveky2, lucky2`, メンバーの下の名前のアルファベット小文字 `yuzuha, momoka, misaki, ...`, また当日の更新を取得する `today` です。
+メインコマンドを `gl2b` とすると `blogs` を省略できます。
 
 今日投稿されたブログを全て開く
 ```sh
@@ -46,6 +47,7 @@ gl2f open -a blogs today
 
 ニュースのリスト ( https://girls2-fc.jp/page/familyNews 等 ) を取得します。
 指定できるのはグループ名 `girls2, loveky2, lucky2` と、Girls2 + Lucky2 の `family` です。
+メインコマンドを `gl2n` とすると `news` を省略できます。
 
 GL2 family のニュース本文を表示する。
 ```sh
@@ -58,12 +60,25 @@ gl2f cat news family
 
 ラジオのリスト ( https://girls2-fc.jp/page/lucky2radio 等 ) を取得します。
 指定できるのはグループ名 `girls2, loveky2, lucky2`, メンバーの下の名前のアルファベット小文字 `yuzuha, momoka, misaki, ...` です。
+メインコマンドを `gl2r` とすると `radio` を省略できます。
 
 比嘉優和のラジオをブラウザで開く
 ```sh
 gl2r open yuwa
 # or
 gl2f open radio yuwa
+```
+
+### `gtube` Gtube
+
+Gtube ( https://girls2-fc.jp/page/gtube ) を取得します。
+メインコマンドを `gl2t` とすると `gtube` を省略できます。
+
+Gtube をブラウザで開く
+```sh
+gl2t open
+# or
+gl2f open gtube
 ```
 
 

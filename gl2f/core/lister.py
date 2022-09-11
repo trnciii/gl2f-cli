@@ -111,9 +111,8 @@ def radio(args):
 		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 
-def shangrila(args):
-	boardId = '689409591506633568'
-	return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+def make_simple_lister(boardId):
+	return lambda args: fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 
 def listers():
@@ -121,7 +120,8 @@ def listers():
 		'blogs': blogs,
 		'radio': radio,
 		'news': news,
-		'shangrila': shangrila,
+		'gtube': make_simple_lister('270809837141492901'),
+		'shangrila': make_simple_lister('689409591506633568'),
 	}
 
 

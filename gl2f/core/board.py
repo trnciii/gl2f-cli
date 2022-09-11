@@ -55,7 +55,12 @@ def get():
 			'page': 'lucky2radio',
 		},
 
-		# Shangri-la
+		# gtube
+		'270809837141492901': {
+			'page': 'gtube',
+		},
+
+		# Shangri-la Photo Gallery
 		'689409591506633568': {
 			'page': 'ShangrilaPG',
 		},

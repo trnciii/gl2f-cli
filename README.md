@@ -106,6 +106,13 @@ gl2n open family
 gl2f open news family
 ```
 
+Gtube を開く
+```sh
+gl2t open
+# or
+gl2f open gtube
+```
+
 lovely2 のブログを20件一覧表示する
 ```sh
 gl2b ls lovely2 -n 20
