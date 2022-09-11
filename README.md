@@ -22,7 +22,9 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 * [news](./docs/boards.md#news-ニュース) ニュース
 * [radio](./docs/boards.md#radio-ラジオ) ラジオ
 * [gtube](./docs/boards.md#gtube-Gtube) Gtube
+* [cm](./docs/boards.md#cm-commercial-movie) commercial movie
 * [shangrila](./docs/boards.md#shangrila-Girls2-Live-Tour-2022-Shangri-la-Photo-Gallery) Girls2 Live Tour 2022 Shangri-la Photo Gallery
+* [その他過去のページ](./docs/other_boards.md)
 
 です。
 
