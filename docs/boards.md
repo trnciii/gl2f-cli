@@ -30,7 +30,7 @@ gl2f open news family
 
 ページの種類によって、指定できるメンバー名などは変わります。
 
-### `blogs` ブログ
+### `blogs` 日記
 
 日記のリスト ( https://girls2-fc.jp/page/blogs 等 ) を取得します。
 指定できるのはグループ名 `girls2, loveky2, lucky2`, メンバーの下の名前のアルファベット小文字 `yuzuha, momoka, misaki, ...`, また当日の更新を取得する `today` です。
