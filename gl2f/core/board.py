@@ -3,55 +3,51 @@ def get():
 		# blogs
 		'271474317252887717': {
 			'group': 'girls2',
-			'kind': 'blogs',
 			'page': 'blogs',
 		},
 
 		'436708526618837819': {
 			'group': 'lovely2',
-			'kind': 'blogs',
 			'page': 'lovely2blogs',
 		},
 
 		'540071536506176315': {
 			'group': 'lucky2',
-			'kind': 'blogs',
 			'page': 'lucky2blogs',
 		},
 
 		# news
 		'540067120025699131': {
-			'kind': 'news',
 			'page': 'familyNews',
 		},
 
 		'270441012457899173': {
 			'group': 'girls2',
-			'kind': 'news',
 			'page': 'news',
 		},
 
 		'415001844964656065': {
 			'group': 'lovely2',
-			'kind': 'news',
 			'page': 'lovely2news',
 		},
 		'540071356465677115': {
 			'group': 'lucky2',
-			'kind': 'news',
 			'page': 'lucky2news',
+		},
+
+		'270810062216233612': {
+			'group': 'mirage2',
+			'page': 'mirage2news',
 		},
 
 		# radio
 		'455630760846558145': {
 			'group': 'girls2',
-			'kind': 'radio',
 			'page': 'girls2radio',
 		},
 
 		'540071136604455739': {
 			'group': 'lucky2',
-			'kind': 'radio',
 			'page': 'lucky2radio',
 		},
 
@@ -60,10 +56,87 @@ def get():
 			'page': 'gtube',
 		},
 
-		# Shangri-la Photo Gallery
+		# commercial movie
+		'504468501197489089':{
+			'page': 'commercialmovie',
+		},
+
+		# Shangri-la
 		'689409591506633568': {
 			'page': 'ShangrilaPG',
 		},
+
+		# Brand New World!
+		'666819802651689824':{
+			'page': 'FirstLiveCheerForL2',
+		},
+
+		'664746725843403713':{
+			'page': 'Lucky2FirstLivePG',
+		},
+
+		# daijoubu
+		'660050132594590761':{
+			'page': '3rdAnnivPG',
+		},
+
+		'653506325782725569':{
+			'page': '3rdAnnivCheerForG2',
+		},
+
+		# CL special live
+		'639636551948567355':{
+			'page': 'CLsplivepg',
+		},
+
+		# fan meeting
+		'613606146413953985':{
+			'group': 'girls2',
+			'page': 'G2fcmeetingpg',
+		},
+
+		'613607790937637825':{
+			'group': 'lucky2',
+			'page': 'L2fcmeetingpg',
+		},
+
+		# enjoy the good days
+		'558593359405384641':{
+			'group': 'girls2',
+			'page': 'EnjoyTheGoodDaysBackstage',
+		},
+
+		# famitok
+		'550521936032039739':{
+			'group': 'girls2',
+			'page': 'Girls2famitok',
+		},
+
+		'550521867736187707':{
+			'group': 'lucky2',
+			'page': 'Lucky2famitok',
+		},
+
+		# lovely2 special live
+		'527414639852520385':{
+			'page': 'lovely2Live2021Diary',
+		},
+
+		# garugaku live
+		'499846974107812667':{
+			'page': 'garugakuliveDiary',
+		},
+
+		# chuwapane
+		'357805845389509857':{
+			'page': 'chuwapaneDiary',
+		},
+
+		# onlinelive
+		'449506330521109545':{
+			'page': 'onlineliveDiary',
+		},
+
 	}
 
 
@@ -79,7 +152,8 @@ def news(key):
 		'family': '540067120025699131',
 		'girls2': '270441012457899173',
 		'lovely2': '415001844964656065',
-		'lucky2': '540071356465677115'
+		'lucky2': '540071356465677115',
+		'mirage2': '270810062216233612',
 	}[key]
 
 def radio(key):

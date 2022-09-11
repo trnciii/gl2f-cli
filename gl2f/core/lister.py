@@ -114,7 +114,10 @@ def radio(args):
 
 
 def make_simple_lister(boardId):
-	return lambda args: fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+	if isinstance(boardId, str):
+		return lambda args: fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+	else:
+		return lambda args: fetch(boardId[args.name], args.number, args.page, args.order, dump=args.dump)['list']
 
 
 def listers():
@@ -123,7 +126,18 @@ def listers():
 		'radio': radio,
 		'news': news,
 		'gtube': make_simple_lister('270809837141492901'),
+		'cm': make_simple_lister('504468501197489089'),
 		'shangrila': make_simple_lister('689409591506633568'),
+		'brandnewworld': make_simple_lister({'photo': '664746725843403713', 'cheer': '666819802651689824'}),
+		'daijoubu': make_simple_lister({'photo': '660050132594590761', 'cheer': '653506325782725569'}),
+		'cl': make_simple_lister('639636551948567355'),
+		'fm': make_simple_lister({'girls2': '613606146413953985', 'lucky2': '613607790937637825'}),
+		'enjoythegooddays': make_simple_lister('558593359405384641'),
+		'famitok': make_simple_lister({'girls2':'550521936032039739', 'lucky2': '550521867736187707'}),
+		'lovely2live': make_simple_lister('527414639852520385'),
+		'garugakulive': make_simple_lister('499846974107812667'),
+		'chuwapane': make_simple_lister('357805845389509857'),
+		'onlinelive2020': make_simple_lister('449506330521109545'),
 	}
 
 
