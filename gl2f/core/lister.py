@@ -7,9 +7,9 @@ from . import board, member
 from .date import is_today
 
 
-def fetch(domain, group, size, page, order='reservedAt:desc', categoryId=None, dump=False):
+def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, template='texts', dump=False):
 	response = requests.get(
-		board.request_url(domain, group),
+		f'https://api.fensi.plus/v1/sites/girls2-fc/{template}/{boardId}/contents',
 		params={
 			'size': str(size),
 			'page': str(page),
@@ -28,20 +28,30 @@ def fetch(domain, group, size, page, order='reservedAt:desc', categoryId=None, d
 
 	if dump:
 		import datetime
-		query = member.from_id(categoryId)[0] if categoryId else group
+		boardname = board.pagenames()[boardId]
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-		path = os.path.join(dump, f'{domain}-{query}-{now}.json')
-		with open(path, 'w') as f:
+
+		if categoryId:
+			name, _ = member.from_id(categoryId)
+			filename = f'{boardname}-{name}-{now}.json'
+		else:
+			filename = f'{boardname}-{now}.json'
+
+		with open(os.path.join(dump, filename), 'w') as f:
 			json.dump(response.json(), f, indent=2)
 
 	return response.json()
 
 
-def list_member(domain, args):
+def get_IDs(domain, args):
 	data = member.get()[args.name]
 	group_list = data['group']
 	group = args.group if args.group in group_list else group_list[0]
-	return fetch(domain, group, args.number, args.page, args.order, categoryId=data['categoryId'][domain], dump=args.dump)['list']
+
+	if domain == 'blog':
+		return board.blogs(group), data['categoryId'][domain]
+	elif domain == 'radio':
+		return board.radio(group), data['categoryId'][domain]
 
 
 def add_args(parser):
@@ -65,47 +75,45 @@ def add_args(parser):
 
 
 def blogs(args):
-	domain = 'blog'
-
 	if member.is_group(args.name):
-		return fetch(domain, args.name, args.number, args.page, args.order, dump=args.dump)['list']
+		boardId = board.blogs(args.name)
+		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 	elif member.is_member(args.name):
-		return list_member(domain, args)
+		boardId, categoryId = get_IDs('blog', args)
+		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 	elif args.name == 'today':
 		return list(filter(
 			lambda i: is_today(i['openingAt']),
-			sum((fetch(domain, group, size=10, page=1, dump=args.dump)['list'] for group in ['girls2', 'lucky2']), [])
+			sum((fetch(board.blogs(group), size=10, page=1, dump=args.dump)['list'] for group in ['girls2', 'lucky2']), [])
 		))
 
 
 def news(args):
-	domain = 'news'
-
 	if args.name == 'today':
 		return list(filter(
 			lambda i: is_today(i['openingAt']),
-			fetch(domain, 'family', size=10, page=1, dump=args.dump)['list']
+			fetch(board.news('family'), size=10, page=1, dump=args.dump)['list']
 		))
 
 	else:
-		return fetch(domain, args.name, args.number, args.page, args.order, dump=args.dump)['list']
+		boardId = board.news(args.name)
+		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 
 def radio(args):
-	domain = 'radio'
-
 	if member.is_group(args.name):
-		return fetch(domain, args.name, args.number, args.page, args.order, dump=args.dump)['list']
+		boardId = board.radio(args.name)
+		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 	elif member.is_member(args.name):
-		return list_member(domain, args)
+		boardId, categoryId = get_IDs('radio', args)
+		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 
 def pg(args):
-	domain = 'pg'
-	return fetch(domain, args.name, args.number, args.page, args.order, dump=args.dump)['list']
+	return fetch('689409591506633568', args.number, args.page, args.order, dump=args.dump)['list']
 
 
 def listers():
