@@ -1,12 +1,65 @@
-def to_group(i):
+def get():
 	return {
-		'271474317252887717': 'girls2',
-		'436708526618837819': 'lovely2',
-		'540071536506176315': 'lucky2',
+		# blogs
+		'271474317252887717': {
+			'group': 'girls2',
+			'kind': 'blogs',
+			'page': 'blogs',
+		},
 
-		'455630760846558145': 'girls2',
-		'540071136604455739': 'lucky2',
-	}[i]
+		'436708526618837819': {
+			'group': 'lovely2',
+			'kind': 'blogs',
+			'page': 'lovely2blogs',
+		},
+
+		'540071536506176315': {
+			'group': 'lucky2',
+			'kind': 'blogs',
+			'page': 'lucky2blogs',
+		},
+
+		# news
+		'540067120025699131': {
+			'kind': 'news',
+			'page': 'familyNews',
+		},
+
+		'270441012457899173': {
+			'group': 'girls2',
+			'kind': 'news',
+			'page': 'news',
+		},
+
+		'415001844964656065': {
+			'group': 'lovely2',
+			'kind': 'news',
+			'page': 'lovely2news',
+		},
+		'540071356465677115': {
+			'group': 'lucky2',
+			'kind': 'news',
+			'page': 'lucky2news',
+		},
+
+		# radio
+		'455630760846558145': {
+			'group': 'girls2',
+			'kind': 'radio',
+			'page': 'girls2radio',
+		},
+
+		'540071136604455739': {
+			'group': 'lucky2',
+			'kind': 'radio',
+			'page': 'lucky2radio',
+		},
+
+		# Shangri-la
+		'689409591506633568': {
+			'page': 'ShangrilaPG',
+		},
+	}
 
 
 def blogs(key):
@@ -31,25 +84,7 @@ def radio(key):
 	}[key]
 
 
-def pagenames():
-	return {
-		'271474317252887717': 'blogs',
-		'436708526618837819': 'lovely2blogs',
-		'540071536506176315': 'lucky2blogs',
-
-		'540067120025699131': 'familyNews',
-		'270441012457899173': 'news',
-		'415001844964656065': 'lovely2news',
-		'540071356465677115': 'lucky2news',
-
-		'455630760846558145': 'girls2radio',
-		'540071136604455739': 'lucky2radio',
-
-		'689409591506633568': 'ShangrilaPG',
-	}
-
-
 def content_url(item):
-	page = pagenames()[item['boardId']]
+	page = get()[item['boardId']]['page']
 	content = item['contentId']
 	return f'https://girls2-fc.jp/page/{page}/{content}'

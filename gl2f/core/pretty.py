@@ -20,7 +20,8 @@ class Formatter:
 			_, v = member.from_id(item['categoryId'])
 			if v:
 				fullname = v['fullname']
-				colf, colb = v['color'][board.to_group(item['boardId'])].values()
+				group = board.get()[item['boardId']]['group']
+				colf, colb = v['color'][group].values()
 			else:
 				fullname = item['category']['name']
 				colf, colb = [255, 255, 255], [157, 157, 157]

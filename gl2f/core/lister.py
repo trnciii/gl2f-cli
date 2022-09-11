@@ -28,16 +28,15 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 
 	if dump:
 		import datetime
-		boardname = board.pagenames()[boardId]
+		boarddata = board.get()[boardId]
+		kind = boarddata['kind']
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-
 		if categoryId:
 			name, _ = member.from_id(categoryId)
-			filename = f'{boardname}-{name}-{now}.json'
 		else:
-			filename = f'{boardname}-{now}.json'
+			name = boarddata['group']
 
-		with open(os.path.join(dump, filename), 'w') as f:
+		with open(os.path.join(dump,  f'{kind}-{name}-{now}.json'), 'w') as f:
 			json.dump(response.json(), f, indent=2)
 
 	return response.json()
