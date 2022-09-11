@@ -123,6 +123,11 @@ gl2t open
 gl2f open gtube
 ```
 
+commercial movie をブラウザで開く
+```sh
+gl2f ls cm
+```
+
 lovely2 のブログを20件一覧表示する
 ```sh
 gl2b ls lovely2 -n 20

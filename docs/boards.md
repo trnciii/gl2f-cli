@@ -72,13 +72,22 @@ gl2f open radio yuwa
 ### `gtube` Gtube
 
 Gtube ( https://girls2-fc.jp/page/gtube ) を取得します。
-メインコマンドを `gl2t` とすると `gtube` を省略できます。
+`gtube` を省略できるメインコマンドはありません。
 
 Gtube をブラウザで開く
 ```sh
-gl2t open
-# or
 gl2f open gtube
+```
+
+
+### `cm` commercial movie
+
+commercial movie ( https://girls2-fc.jp/page/commercialmovie/ ) を取得します。
+`gtube` を省略できるメインコマンドはありません。
+
+commercial movie をブラウザで開く
+```sh
+gl2f ls cm
 ```
 
 
@@ -92,8 +101,10 @@ Shangri-la Photo Gallery の画像をダウンロードする
 gl2f dl shangrila
 ```
 
-> **Note**
-> 特設ページをどうまとめるかまだ迷っていて、今後変更があるかもしれません。
+
+### その他
+
+そのほか、過去のページの取得方法については[こちら](./other_boards.md)
 
 
 ## オプション
