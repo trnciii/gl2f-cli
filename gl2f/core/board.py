@@ -1,88 +1,169 @@
-def from_id(i):
+def get():
 	return {
-		'271474317252887717': 'https://girls2-fc.jp/page/blogs',
-		'436708526618837819': 'https://girls2-fc.jp/page/lovely2blogs',
-		'540071536506176315': 'https://girls2-fc.jp/page/lucky2blogs',
+		# blogs
+		'271474317252887717': {
+			'group': 'girls2',
+			'page': 'blogs',
+		},
 
-		'540067120025699131': 'https://girls2-fc.jp/page/familyNews',
-		'270441012457899173': 'https://girls2-fc.jp/page/news',
-		'415001844964656065': 'https://girls2-fc.jp/page/lovely2news',
-		'540071356465677115': 'https://girls2-fc.jp/page/lucky2news',
+		'436708526618837819': {
+			'group': 'lovely2',
+			'page': 'lovely2blogs',
+		},
 
-		'455630760846558145': 'https://girls2-fc.jp/page/girls2radio',
-		'540071136604455739': 'https://girls2-fc.jp/page/lucky2radio',
+		'540071536506176315': {
+			'group': 'lucky2',
+			'page': 'lucky2blogs',
+		},
 
-		'689409591506633568': 'https://girls2-fc.jp/page/ShangrilaPG'
-	}[i]
+		# news
+		'540067120025699131': {
+			'page': 'familyNews',
+		},
 
-def to_group(i):
+		'270441012457899173': {
+			'group': 'girls2',
+			'page': 'news',
+		},
+
+		'415001844964656065': {
+			'group': 'lovely2',
+			'page': 'lovely2news',
+		},
+		'540071356465677115': {
+			'group': 'lucky2',
+			'page': 'lucky2news',
+		},
+
+		'270810062216233612': {
+			'group': 'mirage2',
+			'page': 'mirage2news',
+		},
+
+		# radio
+		'455630760846558145': {
+			'group': 'girls2',
+			'page': 'girls2radio',
+		},
+
+		'540071136604455739': {
+			'group': 'lucky2',
+			'page': 'lucky2radio',
+		},
+
+		# gtube
+		'270809837141492901': {
+			'page': 'gtube',
+		},
+
+		# commercial movie
+		'504468501197489089':{
+			'page': 'commercialmovie',
+		},
+
+		# Shangri-la
+		'689409591506633568': {
+			'page': 'ShangrilaPG',
+		},
+
+		# Brand New World!
+		'666819802651689824':{
+			'page': 'FirstLiveCheerForL2',
+		},
+
+		'664746725843403713':{
+			'page': 'Lucky2FirstLivePG',
+		},
+
+		# daijoubu
+		'660050132594590761':{
+			'page': '3rdAnnivPG',
+		},
+
+		'653506325782725569':{
+			'page': '3rdAnnivCheerForG2',
+		},
+
+		# CL special live
+		'639636551948567355':{
+			'page': 'CLsplivepg',
+		},
+
+		# fan meeting
+		'613606146413953985':{
+			'group': 'girls2',
+			'page': 'G2fcmeetingpg',
+		},
+
+		'613607790937637825':{
+			'group': 'lucky2',
+			'page': 'L2fcmeetingpg',
+		},
+
+		# enjoy the good days
+		'558593359405384641':{
+			'group': 'girls2',
+			'page': 'EnjoyTheGoodDaysBackstage',
+		},
+
+		# famitok
+		'550521936032039739':{
+			'group': 'girls2',
+			'page': 'Girls2famitok',
+		},
+
+		'550521867736187707':{
+			'group': 'lucky2',
+			'page': 'Lucky2famitok',
+		},
+
+		# lovely2 special live
+		'527414639852520385':{
+			'page': 'lovely2Live2021Diary',
+		},
+
+		# garugaku live
+		'499846974107812667':{
+			'page': 'garugakuliveDiary',
+		},
+
+		# chuwapane
+		'357805845389509857':{
+			'page': 'chuwapaneDiary',
+		},
+
+		# onlinelive
+		'449506330521109545':{
+			'page': 'onlineliveDiary',
+		},
+
+	}
+
+
+def blogs(key):
 	return {
-		'271474317252887717': 'girls2',
-		'436708526618837819': 'lovely2',
-		'540071536506176315': 'lucky2',
+		'girls2': '271474317252887717',
+		'lovely2': '436708526618837819',
+		'lucky2': '540071536506176315'
+	}[key]
 
-		# '540067120025699131': 'family',
-		# '270441012457899173': 'girls2',
-		# '415001844964656065': 'lovely2',
-		# '540071356465677115': 'lucky2',
-
-		'455630760846558145': 'girls2',
-		'540071136604455739': 'lucky2',
-	}[i]
-
-
-def request_url(domain, group):
+def news(key):
 	return {
-		'blog':{
-			'girls2': 'https://api.fensi.plus/v1/sites/girls2-fc/texts/271474317252887717/contents',
-			'lovely2': 'https://api.fensi.plus/v1/sites/girls2-fc/texts/436708526618837819/contents',
-			'lucky2': 'https://api.fensi.plus/v1/sites/girls2-fc/texts/lucky2Blogs/contents'
-		},
-		'news': {
-			'family': 'https://api.fensi.plus/v1/sites/girls2-fc/news/familyNews/contents',
-			'girls2': 'https://api.fensi.plus/v1/sites/girls2-fc/news/270441012457899173/contents',
-			'lovely2': 'https://api.fensi.plus/v1/sites/girls2-fc/news/415001844964656065/contents',
-			'lucky2': 'https://api.fensi.plus/v1/sites/girls2-fc/news/lucky2News/contents'
-		},
-		'radio': {
-			'girls2': 'https://api.fensi.plus/v1/sites/girls2-fc/texts/girls2Radio/contents',
-			'lucky2': 'https://api.fensi.plus/v1/sites/girls2-fc/texts/lucky2Radio/contents'
-		},
-		'pg': {
-			'shangrila': 'https://api.fensi.plus/v1/sites/girls2-fc/texts/689409591506633568/contents',
-		}
-	}[domain][group]
+		'family': '540067120025699131',
+		'girls2': '270441012457899173',
+		'lovely2': '415001844964656065',
+		'lucky2': '540071356465677115',
+		'mirage2': '270810062216233612',
+	}[key]
+
+def radio(key):
+	return{
+		'girls2': '455630760846558145',
+		'lucky2': '540071136604455739'
+	}[key]
 
 
 def content_url(item):
-	return f"{from_id(item['boardId'])}/{item['contentId']}"
-
-
-if __name__ == '__main__':
-	boardId = [
-		'271474317252887717',
-		'436708526618837819',
-		'540071536506176315',
-		'540067120025699131',
-		'270441012457899173',
-		'415001844964656065',
-		'540071356465677115',
-		'455630760846558145',
-		'540071136604455739',
-	]
-
-	for i in boardId:
-		print(from_id(i))
-
-
-	print()
-	for g in ['girls2', 'lovely2', 'lucky2']:
-		print(request_url('blog', g))
-
-	print()
-	for g in ['girls2', 'lucky2']:
-		print(request_url('radio', g))
-
-	print()
-	for g in ['family', 'girls2', 'lovely2', 'lucky2']:
-		print(request_url('news', g))
+	page = get()[item['boardId']]['page']
+	content = item['contentId']
+	return f'https://girls2-fc.jp/page/{page}/{content}'

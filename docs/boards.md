@@ -1,7 +1,7 @@
 # リストの作り方
 
 サブコマンド `cat, ls, open` は、対象となるリストや表示の整形を指示する必要があります（[コマンドの説明](./commands.md)）。
-リストの指定はページの種類（ブログ、ニュース、ラジオ）とグループまたはメンバーを与えて行います、。
+リストの指定はページの種類（ブログ、ニュース、ラジオ等）と、さらに必要なグループまたはメンバーを与えて行います、。
 またメインコマンドとして `gl2b / gl2n / gl2r` を使うとページの種類を省略することができます。
 
 Girls2 のブログを開く
@@ -30,10 +30,11 @@ gl2f open news family
 
 ページの種類によって、指定できるメンバー名などは変わります。
 
-### `blogs` ブログ
+### `blogs` 日記
 
 日記のリスト ( https://girls2-fc.jp/page/blogs 等 ) を取得します。
 指定できるのはグループ名 `girls2, loveky2, lucky2`, メンバーの下の名前のアルファベット小文字 `yuzuha, momoka, misaki, ...`, また当日の更新を取得する `today` です。
+メインコマンドを `gl2b` とすると `blogs` を省略できます。
 
 今日投稿されたブログを全て開く
 ```sh
@@ -46,6 +47,7 @@ gl2f open -a blogs today
 
 ニュースのリスト ( https://girls2-fc.jp/page/familyNews 等 ) を取得します。
 指定できるのはグループ名 `girls2, loveky2, lucky2` と、Girls2 + Lucky2 の `family` です。
+メインコマンドを `gl2n` とすると `news` を省略できます。
 
 GL2 family のニュース本文を表示する。
 ```sh
@@ -58,6 +60,7 @@ gl2f cat news family
 
 ラジオのリスト ( https://girls2-fc.jp/page/lucky2radio 等 ) を取得します。
 指定できるのはグループ名 `girls2, loveky2, lucky2`, メンバーの下の名前のアルファベット小文字 `yuzuha, momoka, misaki, ...` です。
+メインコマンドを `gl2r` とすると `radio` を省略できます。
 
 比嘉優和のラジオをブラウザで開く
 ```sh
@@ -66,23 +69,42 @@ gl2r open yuwa
 gl2f open radio yuwa
 ```
 
+### `gtube` Gtube
 
-### `pg` Photo Gallery
+Gtube ( https://girls2-fc.jp/page/gtube ) を取得します。
+`gtube` を省略できるメインコマンドはありません。
 
-特設のフォトギャラリー ( https://girls2-fc.jp/page/ShangrilaPG?689409591506633568-page=1 ) を取得します。
-`pg` を省略できるメインコマンドはありません。
-
-指定できるのは以下のページです。
-
-* `shangrila` [Girls2 Live Tour 2022 Shangri-la](https://girls2-fc.jp/page/ShangrilaPG?689409591506633568-page=1)
-
-Shangri-la の画像をダウンロードする
+Gtube をブラウザで開く
 ```sh
-gl2f dl pg shangrila
+gl2f open gtube
 ```
 
-> **Note**
-> 特設ページをどうまとめるかまだ迷っていて、今後変更があるかもしれません。
+
+### `cm` commercial movie
+
+commercial movie ( https://girls2-fc.jp/page/commercialmovie/ ) を取得します。
+`gtube` を省略できるメインコマンドはありません。
+
+commercial movie をブラウザで開く
+```sh
+gl2f ls cm
+```
+
+
+### `shangrila` Girls2 Live Tour 2022 Shangri-la Photo Gallery
+
+Shangri-la のフォトギャラリー ( https://girls2-fc.jp/page/ShangrilaPG ) を取得します。
+`pg` を省略できるメインコマンドはありません。
+
+Shangri-la Photo Gallery の画像をダウンロードする
+```sh
+gl2f dl shangrila
+```
+
+
+### その他
+
+そのほか、過去のページの取得方法については[こちら](./other_boards.md)
 
 
 ## オプション
