@@ -118,6 +118,13 @@ gl2n open family
 gl2f open news family
 ```
 
+mirage2 のニュースを表示する
+```sh
+gl2n cat mirage2
+# or
+gl2f cat news mirage2
+```
+
 Gtube を開く
 ```sh
 gl2t open

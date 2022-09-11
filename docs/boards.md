@@ -46,7 +46,7 @@ gl2f open -a blogs today
 ### `news` ニュース
 
 ニュースのリスト ( https://girls2-fc.jp/page/familyNews 等 ) を取得します。
-指定できるのはグループ名 `girls2, loveky2, lucky2` と、Girls2 + Lucky2 の `family` です。
+指定できるのはグループ名 `girls2, lovely2, lucky2, mirage2` と、Girls2 + Lucky2 の `family` です。
 メインコマンドを `gl2n` とすると `news` を省略できます。
 
 GL2 family のニュース本文を表示する。
