@@ -1,7 +1,7 @@
 import requests
 from .. import auth
 from . import board, member
-from .date import is_today
+from .date import in24h
 import datetime, os, json
 
 
@@ -82,7 +82,7 @@ def blogs(args):
 
 	elif args.name == 'today':
 		return list(filter(
-			lambda i: is_today(i['openingAt']),
+			lambda i: in24h(i['openingAt']),
 			sum((fetch(board.blogs(group), size=10, page=1, dump=args.dump)['list'] for group in ['girls2', 'lucky2']), [])
 		))
 
@@ -90,7 +90,7 @@ def blogs(args):
 def news(args):
 	if args.name == 'today':
 		return list(filter(
-			lambda i: is_today(i['openingAt']),
+			lambda i: in24h(i['openingAt']),
 			fetch(board.news('family'), size=10, page=1, dump=args.dump)['list']
 		))
 
