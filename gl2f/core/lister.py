@@ -71,6 +71,10 @@ def add_args(parser):
 		help='dump response from server as ./response.json')
 
 
+def filter_today(li):
+	return list(filter(lambda i:in24h(i['openingAt']), li))
+
+
 def blogs(args):
 	if member.is_group(args.name):
 		boardId = board.blogs(args.name)
@@ -81,18 +85,13 @@ def blogs(args):
 		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 	elif args.name == 'today':
-		return list(filter(
-			lambda i: in24h(i['openingAt']),
-			sum((fetch(board.blogs(group), size=10, page=1, dump=args.dump)['list'] for group in ['girls2', 'lucky2']), [])
-		))
+		return filter_today(sum((fetch(board.blogs(group), size=10, page=1, dump=args.dump)['list'] for group in ['girls2', 'lucky2']), []))
+
 
 
 def news(args):
 	if args.name == 'today':
-		return list(filter(
-			lambda i: in24h(i['openingAt']),
-			fetch(board.news('family'), size=10, page=1, dump=args.dump)['list']
-		))
+		return filter_today(fetch(board.news('family'), size=10, page=1, dump=args.dump)['list'])
 
 	else:
 		boardId = board.news(args.name)
@@ -118,6 +117,23 @@ def make_simple_lister(page):
 		return lambda args: fetch(boardId[args.name], args.number, args.page, args.order, dump=args.dump)['list']
 
 
+def today(args):
+	boardId = [
+		board.blogs('girls2'),
+		board.blogs('lucky2'),
+		board.news('family'),
+		board.radio('girls2'),
+		board.radio('lucky2'),
+		board.from_page('gtube'),
+		board.from_page('commercialmovie'),
+		board.from_page('ShangrilaPG')
+	]
+
+	ret = sum((fetch(i, 10, 1, dump=args.dump)['list'] for i in boardId), [])
+	return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
+
+
+
 def listers():
 	return {
 		'blogs': blogs,
@@ -136,6 +152,7 @@ def listers():
 		'garugakulive': make_simple_lister('garugakuliveDiary'),
 		'chuwapane': make_simple_lister('chuwapaneDiary'),
 		'onlinelive2020': make_simple_lister('onlineliveDiary'),
+		'today': today,
 	}
 
 
