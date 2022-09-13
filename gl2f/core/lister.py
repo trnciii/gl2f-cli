@@ -109,10 +109,12 @@ def radio(args):
 		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 
-def make_simple_lister(boardId):
-	if isinstance(boardId, str):
+def make_simple_lister(page):
+	if isinstance(page, str):
+		boardId = board.from_page(page)
 		return lambda args: fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 	else:
+		boardId = {k:board.from_page(v) for k, v in page.items()}
 		return lambda args: fetch(boardId[args.name], args.number, args.page, args.order, dump=args.dump)['list']
 
 
@@ -121,19 +123,19 @@ def listers():
 		'blogs': blogs,
 		'radio': radio,
 		'news': news,
-		'gtube': make_simple_lister('270809837141492901'),
-		'cm': make_simple_lister('504468501197489089'),
-		'shangrila': make_simple_lister('689409591506633568'),
-		'brandnewworld': make_simple_lister({'photo': '664746725843403713', 'cheer': '666819802651689824'}),
-		'daijoubu': make_simple_lister({'photo': '660050132594590761', 'cheer': '653506325782725569'}),
-		'cl': make_simple_lister('639636551948567355'),
-		'fm': make_simple_lister({'girls2': '613606146413953985', 'lucky2': '613607790937637825'}),
-		'enjoythegooddays': make_simple_lister('558593359405384641'),
-		'famitok': make_simple_lister({'girls2':'550521936032039739', 'lucky2': '550521867736187707'}),
-		'lovely2live': make_simple_lister('527414639852520385'),
-		'garugakulive': make_simple_lister('499846974107812667'),
-		'chuwapane': make_simple_lister('357805845389509857'),
-		'onlinelive2020': make_simple_lister('449506330521109545'),
+		'gtube': make_simple_lister('gtube'),
+		'cm': make_simple_lister('commercialmovie'),
+		'shangrila': make_simple_lister('ShangrilaPG'),
+		'brandnewworld': make_simple_lister({'photo': 'Lucky2FirstLivePG', 'cheer': 'FirstLiveCheerForL2'}),
+		'daijoubu': make_simple_lister({'photo': '3rdAnnivPG', 'cheer': '3rdAnnivCheerForG2'}),
+		'cl': make_simple_lister('CLsplivepg'),
+		'fm': make_simple_lister({'girls2': 'G2fcmeetingpg', 'lucky2': 'L2fcmeetingpg'}),
+		'enjoythegooddays': make_simple_lister('EnjoyTheGoodDaysBackstage'),
+		'famitok': make_simple_lister({'girls2':'Girls2famitok', 'lucky2': 'Lucky2famitok'}),
+		'lovely2live': make_simple_lister('lovely2Live2021Diary'),
+		'garugakulive': make_simple_lister('garugakuliveDiary'),
+		'chuwapane': make_simple_lister('chuwapaneDiary'),
+		'onlinelive2020': make_simple_lister('onlineliveDiary'),
 	}
 
 
