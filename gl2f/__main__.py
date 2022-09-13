@@ -47,6 +47,7 @@ class partial:
 	blogs = make_partial('blogs')
 	radio = make_partial('radio')
 	news = make_partial('news')
+	today = make_partial('today')
 
 
 if __name__ == '__main__':

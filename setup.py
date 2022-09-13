@@ -17,6 +17,7 @@ setup(
 			'gl2b = gl2f.__main__:partial.blogs',
 			'gl2r = gl2f.__main__:partial.radio',
 			'gl2n = gl2f.__main__:partial.news',
+			'gl2d = gl2f.__main__:partial.today',
 		]
 	}
 )
