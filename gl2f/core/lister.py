@@ -3,6 +3,7 @@ from .. import auth
 from . import board, member
 from .date import in24h
 import datetime, os, json
+import asyncio
 
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, template='texts', dump=False):
@@ -38,6 +39,20 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 		print('saved', path)
 
 	return response.json()
+
+
+def list_multiple_boards(boardId, args):
+	# only returns the 'list' value of boards.
+	# category id and template are fixed.
+
+	loop = asyncio.get_event_loop()
+
+	async def fetch_async(boardId, dump):
+		return await loop.run_in_executor(None, fetch, boardId, args.number, args.page, args.order, None, 'texts', args.dump)
+
+	tasks = asyncio.gather(*[fetch_async(i, args.dump) for i in boardId])
+	result = loop.run_until_complete(tasks)
+	return sum((r['list'] for r in result), [])
 
 
 def get_IDs(domain, args):
@@ -85,8 +100,7 @@ def blogs(args):
 		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 	elif args.name == 'today':
-		return filter_today(sum((fetch(board.blogs(group), size=10, page=1, dump=args.dump)['list'] for group in ['girls2', 'lucky2']), []))
-
+		return filter_today(list_multiple_boards([board.blogs(i) for i in ['girls2', 'lucky2']], args))
 
 
 def news(args):
@@ -128,8 +142,7 @@ def today(args):
 		board.from_page('commercialmovie'),
 		board.from_page('ShangrilaPG')
 	]
-
-	ret = sum((fetch(i, 10, 1, dump=args.dump)['list'] for i in boardId), [])
+	ret = list_multiple_boards(boardId, args)
 	return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
 
 
