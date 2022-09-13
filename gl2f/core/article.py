@@ -119,3 +119,8 @@ def save_media(item, out, boardId, contentId,
 	if dump:
 		with open(f'media-{contentId}.json', 'w') as f:
 			json.dump(dump_data, f, indent=2)
+
+
+def media_stat(body):
+	types = [t for _, t in  ptn_media.findall(body)]
+	return {key: types.count(key) for key in ['image', 'video']}

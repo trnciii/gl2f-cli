@@ -57,6 +57,15 @@ class Formatter:
 		self.index += 1
 		return f'{self.index:{self.digits}}'
 
+	def content_id(self, item):
+		return item['contentId']
+
+	def media_stat(self, item):
+		from . import article
+		re = article.media_stat(item['values']['body'])
+		return self.sep.join([f'i{re["image"]:02}', f'v{re["video"]}'])
+
+
 	def format(self, item, end='\n'):
 		dic = {
 			'author': self.author,
@@ -66,6 +75,8 @@ class Formatter:
 			'date-c': self.date_c,
 			'index': self.inc_index,
 			'br': self.breakline,
+			'id': self.content_id,
+			'media': self.media_stat,
 		}
 
 		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
