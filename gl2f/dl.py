@@ -10,7 +10,8 @@ def save(item, args):
 	contentId = item['contentId']
 
 	if args.o:
-		out = args.o
+		out = os.path.join(args.o, contentId)
+		os.makedirs(out, exist_ok=True)
 	else:
 		out = path.ref(os.path.join('contents', contentId))
 
