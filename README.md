@@ -16,8 +16,9 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 * [gl2f ls](./docs/commands.md#gl2f-ls-記事の情報をリストする) 一覧表示する
 * [gl2f open](./docs/commands.md#gl2f-open-記事をブラウザで開く) ページを一括でブラウザで開く
 
-対象となるサイトは
+対象となるページは
 
+* [today](./docs/boards.md#today-24時間以内の更新) 24時間以内の更新
 * [blogs](./docs/boards.md#blogs-日記) 日記
 * [news](./docs/boards.md#news-ニュース) ニュース
 * [radio](./docs/boards.md#radio-ラジオ) ラジオ
@@ -60,6 +61,13 @@ pip install git+https://github.com/trnciii/gl2f-cli
 ログイン
 ```sh
 gl2f auth login
+```
+
+24時間以内の更新を全て開く
+```sh
+gl2d open -a
+# or
+gl2f open today -a
 ```
 
 Girls2 のブログを開く
