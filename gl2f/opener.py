@@ -18,7 +18,7 @@ def add_args(parser, board):
 		from .core import pretty, terminal as term
 
 		items = lister.listers()[board](args)
-		fm = pretty.Formatter(f='date-p:author:title', sep=' ')
+		fm = pretty.Formatter(f='date-p:author:title')
 
 		if args.all:
 			for i in items:
