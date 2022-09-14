@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name='gl2f',
-	version='0.1.0',
+	version='0.1.1',
 	url='https://github.com/trnciii/gl2f-cli',
 	license='MIT',
 	packages=find_packages(),
