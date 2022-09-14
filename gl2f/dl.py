@@ -4,7 +4,7 @@ def name(): return 'dl'
 
 def save(item, args):
 	import json, os
-	from .core import path, article
+	from .core import path, article, terminal as term, pretty
 
 	boardId = item['boardId']
 	contentId = item['contentId']
@@ -20,6 +20,10 @@ def save(item, args):
 
 	article.save_media(item, out, boardId, contentId,
 		skip=args.skip, stream=args.stream, force=args.force, dump=args.dump)
+
+	term.clean_row()
+	fm = pretty.Formatter(f='id:author:title')
+	print('downloaded', fm.format(item))
 
 
 def add_args(parser, board):

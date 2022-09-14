@@ -113,7 +113,6 @@ def save_media(item, out, boardId, contentId,
 
 	result = loop.run_until_complete(asyncio.gather(*[dl(i) for i, _ in li]))
 
-	term.clean_row()
 	if dump:
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
 		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w') as f:
