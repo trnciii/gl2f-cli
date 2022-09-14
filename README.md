@@ -9,12 +9,25 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 
 ## 機能
 
-ブログ・ラジオ・ニュースの記事について、以下のようなコマンドで操作ができるようになります。
+ファンクラブの様々な記事について、以下のようなコマンドで操作ができるようになります。
 
 * [gl2f cat](./docs/commands.md#gl2f-cat-ターミナルで本文を読む) ターミナル上に本文を表示する
 * [gl2f dl](./docs/commands.md#gl2f-dl-記事に含まれる画像や動画をダウンロードする) 記事に含まれる画像や動画をダウンロードする
 * [gl2f ls](./docs/commands.md#gl2f-ls-記事の情報をリストする) 一覧表示する
 * [gl2f open](./docs/commands.md#gl2f-open-記事をブラウザで開く) ページを一括でブラウザで開く
+
+対象となるページは
+
+* [today](./docs/boards.md#today-24時間以内の更新) 24時間以内の更新
+* [blogs](./docs/boards.md#blogs-日記) 日記
+* [news](./docs/boards.md#news-ニュース) ニュース
+* [radio](./docs/boards.md#radio-ラジオ) ラジオ
+* [gtube](./docs/boards.md#gtube-Gtube) Gtube
+* [cm](./docs/boards.md#cm-commercial-movie) commercial movie
+* [shangrila](./docs/boards.md#shangrila-Girls2-Live-Tour-2022-Shangri-la-Photo-Gallery) Girls2 Live Tour 2022 Shangri-la Photo Gallery
+* [その他過去のページ](./docs/other_boards.md)
+
+です。
 
 
 ## 必要なもの
@@ -48,6 +61,13 @@ pip install git+https://github.com/trnciii/gl2f-cli
 ログイン
 ```sh
 gl2f auth login
+```
+
+24時間以内の更新を全て開く
+```sh
+gl2d open -a
+# or
+gl2f open today -a
 ```
 
 Girls2 のブログを開く
@@ -104,6 +124,25 @@ Girls2 + Lucky2 両方のニュースを開く
 gl2n open family
 # or
 gl2f open news family
+```
+
+mirage2 のニュースを表示する
+```sh
+gl2n cat mirage2
+# or
+gl2f cat news mirage2
+```
+
+Gtube を開く
+```sh
+gl2t open
+# or
+gl2f open gtube
+```
+
+commercial movie をブラウザで開く
+```sh
+gl2f ls cm
 ```
 
 lovely2 のブログを20件一覧表示する
@@ -231,3 +270,9 @@ gl2f ls blogs lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 * appearance リストや記事の表示・整形について
 
 twitter [@trnciii](https://twitter.com/trnciii) [@trncix](https://twitter.com/trncix) に伝えてもらっても構いません。
+
+
+## 依存
+
+* requests
+* selenium, webdriver_manager (`gl2f auth login` で使います)

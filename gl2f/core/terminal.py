@@ -84,6 +84,7 @@ def move_cursor(n):
 	elif n>0:
 		print(f'\033[{n}B')
 
+
 if os.name == 'nt':
 	import msvcrt, sys
 
@@ -136,7 +137,6 @@ if os.name == 'nt':
 					cursor += 1
 
 			move_cursor(-n-1)
-
 
 elif os.name == 'posix':
 	import termios, sys
@@ -218,3 +218,19 @@ elif os.name == 'posix':
 
 else:
 	raise InportError('terminal working on unknown os.')
+
+
+class Bar:
+	def __init__(self, l):
+		self.i = 0
+		self.l = l
+		self.dig = len(str(l))
+
+	def inc(self):
+		self.i += 1
+
+	def bar(self):
+		return f'[{"#"*self.i}{"-"*(self.l-self.i)}]'
+
+	def count(self):
+		return f'[{self.i:{self.dig}}/{self.l}]'

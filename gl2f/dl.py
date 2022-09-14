@@ -1,17 +1,17 @@
-import argparse
-from .core import lister, pretty, article, terminal as term
+from .core import lister
 
 def name(): return 'dl'
 
 def save(item, args):
 	import json, os
-	from .core import path
+	from .core import path, article, terminal as term, pretty
 
 	boardId = item['boardId']
 	contentId = item['contentId']
 
 	if args.o:
-		out = args.o
+		out = os.path.join(args.o, contentId)
+		os.makedirs(out, exist_ok=True)
 	else:
 		out = path.ref(os.path.join('contents', contentId))
 
@@ -20,6 +20,10 @@ def save(item, args):
 
 	article.save_media(item, out, boardId, contentId,
 		skip=args.skip, stream=args.stream, force=args.force, dump=args.dump)
+
+	term.clean_row()
+	fm = pretty.Formatter(f='id:author:title')
+	print('downloaded', fm.format(item))
 
 
 def add_args(parser, board):
@@ -42,7 +46,9 @@ def add_args(parser, board):
 
 
 	def subcommand(args):
-		items = list(lister.listers()[board](args))
+		from .core import terminal as term, pretty
+
+		items = lister.listers()[board](args)
 
 		if args.all:
 			for i in items:

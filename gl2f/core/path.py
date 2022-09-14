@@ -1,4 +1,4 @@
-import os, re
+import os
 
 def return_path(path):
 	if not os.path.exists(path):
