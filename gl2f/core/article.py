@@ -1,6 +1,6 @@
 import re, html
 from . import terminal as term
-import json, os, datetime
+import json, os, datetime, asyncio
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -64,7 +64,7 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 		})
 
 	if not response.ok:
-		return 'bad response', None
+		return {'error': 'bad response at url query', 'reason': response.reason}, None
 
 	data = response.json()
 
@@ -81,41 +81,43 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 		return data, response.content
 
 	else:
-		return 'bad response', None
+		return {'error': 'bad response at media download', 'reason': response.reason}, None
 
 
 def save_media(item, out, boardId, contentId,
 	skip=False, stream=False, force=False, dump=False
 ):
+	loop = asyncio.get_event_loop()
+
 	li = ptn_media.findall(item['values']['body'])
-	l = len(li)
-	dig = len(str(l))
+	bar = term.Bar(len(li))
 
-	dump_data = []
-	for i, (mediaId, _) in enumerate(li):
-
+	async def dl(mediaId):
 		ptn = re.compile(mediaId + r'\..+')
 		if (not force) and any(map(ptn.search, os.listdir(out))):
-			continue
+			return 'skipped'
 
+		info, image = await loop.run_in_executor(None, dl_medium, boardId, contentId, mediaId, skip, stream)
+
+		bar.inc()
 		term.clean_row()
-		print(f'\rdownloading media [{"#"*i}{"-"*(l-i)}][{i:{dig}}/{l}] {mediaId}', end='', flush=True)
-
-
-		info, image = dl_medium(boardId, contentId, mediaId, skip, stream)
-		dump_data.append(info)
+		print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
 
 		if image:
 			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
 			with open(file, 'wb') as f:
 				f.write(image)
 
-	term.clean_row()
+		return info
 
+
+	result = loop.run_until_complete(asyncio.gather(*[dl(i) for i, _ in li]))
+
+	term.clean_row()
 	if dump:
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
 		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w') as f:
-			json.dump(dump_data, f, indent=2)
+			json.dump(result, f, indent=2)
 
 
 def media_stat(body):
