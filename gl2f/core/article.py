@@ -1,5 +1,6 @@
 import re, html
 from . import terminal as term
+import json, os, datetime
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -86,11 +87,6 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 def save_media(item, out, boardId, contentId,
 	skip=False, stream=False, force=False, dump=False
 ):
-	import json
-	import os
-	from . import path
-
-
 	li = ptn_media.findall(item['values']['body'])
 	l = len(li)
 	dig = len(str(l))
@@ -117,7 +113,8 @@ def save_media(item, out, boardId, contentId,
 	term.clean_row()
 
 	if dump:
-		with open(f'media-{contentId}.json', 'w') as f:
+		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
+		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w') as f:
 			json.dump(dump_data, f, indent=2)
 
 
