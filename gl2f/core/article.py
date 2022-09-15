@@ -87,8 +87,10 @@ class MediaRep:
 			return None
 
 
-def compose_line(p, media_rep):
-	p = media_rep.rep(p)
+async def compose_line(p, media_rep):
+	loop = asyncio.get_event_loop()
+
+	p = await loop.run_in_executor(None, media_rep.rep, p)
 	p = ptn_strong.sub(term.mod('\\1', [term.color('white', 'fl'), term.bold(), term.underline()]), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
@@ -106,21 +108,23 @@ def to_text_options(): return {'full', 'compact', 'compressed'}
 def to_text(item, key):
 	body = item['values']['body']
 
+	loop = asyncio.get_event_loop()
+
+	def lines(mediarep):
+		jobs = [compose_line(p, mediarep) for p in paragraphs(body)]
+		return loop.run_until_complete(asyncio.gather(*jobs))
+
 	if key == 'full':
 		mediarep = MediaRep(item, 'sixel')
-		return '{}\n'.format(
-			'\n'.join([compose_line(p, mediarep) for p in paragraphs(body)])
-		), mediarep
+		return '{}\n'.format('\n'.join(lines(mediarep))), mediarep
 
 	elif key == 'compact':
 		mediarep = MediaRep(item, 'sixel')
-		return '{}\n'.format(re.sub(r'\n+', '\n',
-			'\n'.join([compose_line(p, mediarep) for p in paragraphs(body)])
-		)), mediarep
+		return '{}\n'.format(re.sub(r'\n+', '\n', '\n'.join(lines(mediarep)))), mediarep
 
 	elif key == 'compressed':
 		mediarep = MediaRep(item, 'type')
-		return '{}\n'.format(''.join([compose_line(p, mediarep) for p in paragraphs(body)])), mediarep
+		return '{}\n'.format(''.join(lines(mediarep))), mediarep
 
 
 
