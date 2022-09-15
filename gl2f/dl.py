@@ -21,6 +21,10 @@ def save(item, args):
 	article.save_media(item, out, boardId, contentId,
 		skip=args.skip, stream=args.stream, force=args.force, dump=args.dump)
 
+	term.clean_row()
+	fm = pretty.Formatter(f='id:author:title')
+	print('downloaded', fm.format(item))
+
 
 def add_args(parser, board):
 	lister.add_args(parser)
@@ -46,20 +50,14 @@ def add_args(parser, board):
 
 		items = lister.listers()[board](args)
 
-		fm_complete = pretty.Formatter(f='id:author:title')
-
 		if args.all:
 			for i in items:
 				save(i, args)
-				term.clean_row()
-				print('downloaded', fm_complete.format(item))
 		else:
 			fm_list = pretty.Formatter(f='date-p:author:title', sep=' ')
 			selected = term.select([fm_list.format(i) for i in items])
 			for i in [i for s, i in zip(selected, items) if s]:
 				save(i, args)
-				term.clean_row()
-				print('downloaded', fm_complete.format(item))
 
 
 	parser.set_defaults(handler=subcommand)

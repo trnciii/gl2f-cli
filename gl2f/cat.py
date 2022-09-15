@@ -4,11 +4,9 @@ def name(): return 'cat'
 
 def cat(i, args):
 	from .dl import save
-	from .core import terminal as term
 
 	if args.dl:
 		save(i, args)
-		term.clean_row()
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
 	print(article.to_text(i, args.option))
