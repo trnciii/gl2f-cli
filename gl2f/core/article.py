@@ -55,7 +55,7 @@ class MediaRep:
 					f.write(data)
 			image = Image.open(BytesIO(data))
 
-		sixel.limit(image, (1000, 1000))
+		image = sixel.limit(image, (1000, 1000))
 		return sixel.to_sixel(image)
 
 

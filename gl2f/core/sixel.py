@@ -42,9 +42,7 @@ def fit(image, size):
 def limit(image, size):
 	w, h = image.size
 	r = min(size[0]/w, size[1]/h)
-	if r < 1:
-		w, h = int(r*w), int(r*h)
-	return image.resize((w, h))
+	return image.resize((int(r*w), int(r*h))) if r<1 else image
 
 
 def to_sixel(image):
