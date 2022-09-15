@@ -28,6 +28,8 @@ class MediaRep:
 		else:
 			self.rep = self.media_rep_type_id
 
+		self.time = []
+
 
 	def media_rep_type(self, p):
 		return ptn_media.sub(term.mod('[\\2]', [term.dim()]), p)
@@ -38,6 +40,7 @@ class MediaRep:
 	def media_rep_sixel(self, p):
 		from io import BytesIO
 		from PIL import Image
+		import time
 
 		match = ptn_media.search(p)
 		if not match:
@@ -46,17 +49,24 @@ class MediaRep:
 		if t != 'image':
 			return self.media_rep_type_id(p)
 
+		t0 = time.time()
 		if file:=self.search_local(i):
 			image = Image.open(file)
+			cachehit = True
 		else:
 			_, data = dl_medium(self.boardId, self.contentId, i, False, False)
 			if data:
 				with open(os.path.join(path.ref('cache'), i), 'wb') as f:
 					f.write(data)
 			image = Image.open(BytesIO(data))
+			cachehit = False
+		t1 = time.time()
 
 		image = sixel.limit(image, (1000, 1000))
-		return sixel.to_sixel(image)
+		ret = sixel.to_sixel(image)
+		t2 = time.time()
+		self.time.append({'cache-hit': cachehit, 'open': t1-t0, 'sixelize': t2-t1})
+		return ret
 
 
 	def search_local(self, mediaId):
@@ -100,17 +110,17 @@ def to_text(item, key):
 		mediarep = MediaRep(item, 'sixel')
 		return '{}\n'.format(
 			'\n'.join([compose_line(p, mediarep) for p in paragraphs(body)])
-		)
+		), mediarep
 
 	elif key == 'compact':
 		mediarep = MediaRep(item, 'sixel')
 		return '{}\n'.format(re.sub(r'\n+', '\n',
 			'\n'.join([compose_line(p, mediarep) for p in paragraphs(body)])
-		))
+		)), mediarep
 
 	elif key == 'compressed':
 		mediarep = MediaRep(item, 'type')
-		return '{}\n'.format(''.join([compose_line(p, mediarep) for p in paragraphs(body)]))
+		return '{}\n'.format(''.join([compose_line(p, mediarep) for p in paragraphs(body)])), mediarep
 
 
 
