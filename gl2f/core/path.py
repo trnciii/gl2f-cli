@@ -12,3 +12,7 @@ def home():
 
 def refdir(path):
 	return return_dir(os.path.join(home(), path))
+
+def refdir_untouch(path):
+	p = os.path.join(home(), path)
+	return p if os.path.exists(p) else False
