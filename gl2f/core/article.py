@@ -24,6 +24,7 @@ class MediaRep:
 		if rep == 'type':
 			self.rep = self.media_rep_type
 		elif rep == 'sixel' and sixel.supported():
+			path.ref('cache')
 			self.rep = self.media_rep_sixel
 		else:
 			self.rep = self.media_rep_type_id
