@@ -70,7 +70,7 @@ class MediaRep:
 
 
 	def search_local(self, mediaId):
-		cache = os.path.join(path.ref('cache'), mediaId)
+		cache = path.ref_untouch(f'cache/{mediaId}')
 		if os.path.exists(cache):
 			return cache
 
