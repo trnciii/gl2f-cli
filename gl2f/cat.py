@@ -52,7 +52,7 @@ def add_args(parser, board):
 			for i in items:
 				cat(i, args)
 		else:
-			fm_list = pretty.Formatter(f='date-p:author:title', sep=' ')
+			fm_list = pretty.Formatter(f='date-p:author:title')
 			selected = term.select([fm_list.format(i) for i in items])
 			for i in [i for s, i in zip(selected, items) if s]:
 				cat(i, args)

@@ -24,7 +24,7 @@ class MediaRep:
 		if rep == 'type':
 			self.rep = self.media_rep_type
 		elif rep == 'sixel' and sixel.supported():
-			path.ref('cache')
+			path.refdir('cache')
 			self.rep = self.media_rep_sixel
 		else:
 			self.rep = self.media_rep_type_id
@@ -57,7 +57,7 @@ class MediaRep:
 		else:
 			_, data = dl_medium(self.boardId, self.contentId, i, False, False)
 			if data:
-				with open(os.path.join(path.ref('cache'), i), 'wb') as f:
+				with open(os.path.join(path.refdir('cache'), i), 'wb') as f:
 					f.write(data)
 			image = Image.open(BytesIO(data))
 			cachehit = False
@@ -71,12 +71,15 @@ class MediaRep:
 
 
 	def search_local(self, mediaId):
-		cache = path.ref_untouch(f'cache/{mediaId}')
-		if os.path.exists(cache):
+		cache = os.path.join(path.refdir_untouch('cache'), mediaId)
+		if os.path.isfile(cache):
+			print('cache hit in cache')
 			return cache
 
-		directory = path.ref_untouch(f'contents/{self.contentId}')
-		if not os.path.exists(directory):
+
+		directory = path.refdir_untouch(f'contents/{self.contentId}')
+		if not directory:
+			print('content directory not exist')
 			return None
 
 		pattern = re.compile(rf'{mediaId}.*')

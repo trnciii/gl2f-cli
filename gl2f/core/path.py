@@ -1,6 +1,6 @@
 import os
 
-def return_path(path):
+def return_dir(path):
 	if not os.path.exists(path):
 		os.makedirs(path)
 	return path
@@ -8,13 +8,11 @@ def return_path(path):
 
 def home():
 	path = os.path.join(os.path.expanduser('~'), 'gl2f')
-	return return_path(path)
+	return return_dir(path)
 
-def ref(path):
-	return return_path(os.path.join(home(), path))
+def refdir(path):
+	return return_dir(os.path.join(home(), path))
 
-def ref_untouch(path):
-	return os.path.join(home(), path)
-
-if __name__ == '__main__':
-	print(home())
+def refdir_untouch(path):
+	p = os.path.join(home(), path)
+	return p if os.path.exists(p) else False

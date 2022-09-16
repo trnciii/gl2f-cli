@@ -13,7 +13,7 @@ def save(item, args):
 		out = os.path.join(args.o, contentId)
 		os.makedirs(out, exist_ok=True)
 	else:
-		out = path.ref(os.path.join('contents', contentId))
+		out = path.refdir(os.path.join('contents', contentId))
 
 	with open(os.path.join(out, f'{contentId}.json'), 'w') as f:
 		f.write(json.dumps(item, indent=2))
@@ -54,7 +54,7 @@ def add_args(parser, board):
 			for i in items:
 				save(i, args)
 		else:
-			fm_list = pretty.Formatter(f='date-p:author:title', sep=' ')
+			fm_list = pretty.Formatter(f='date-p:author:media:title')
 			selected = term.select([fm_list.format(i) for i in items])
 			for i in [i for s, i in zip(selected, items) if s]:
 				save(i, args)
