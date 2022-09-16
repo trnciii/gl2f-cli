@@ -1,6 +1,6 @@
 import re, html
 from . import terminal as term
-import json, os, datetime, asyncio
+import json, os, datetime
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -87,21 +87,24 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 def save_media(item, out, boardId, contentId,
 	skip=False, stream=False, force=False, dump=False
 ):
-	loop = asyncio.get_event_loop()
+	from threading import Lock
+	from concurrent.futures import ThreadPoolExecutor
 
 	li = ptn_media.findall(item['values']['body'])
 	bar = term.Bar(len(li))
 
-	async def dl(mediaId):
+	def dl(mediaId, lock):
 		ptn = re.compile(mediaId + r'\..+')
 		if (not force) and any(map(ptn.search, os.listdir(out))):
 			return 'skipped'
 
-		info, image = await loop.run_in_executor(None, dl_medium, boardId, contentId, mediaId, skip, stream)
+		info, image = dl_medium(boardId, contentId, mediaId, skip, stream)
 
+		lock.acquire()
 		bar.inc()
 		term.clean_row()
 		print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
+		lock.release()
 
 		if image:
 			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
@@ -111,12 +114,14 @@ def save_media(item, out, boardId, contentId,
 		return info
 
 
-	result = loop.run_until_complete(asyncio.gather(*[dl(i) for i, _ in li]))
+	lock = Lock()
+	with ThreadPoolExecutor() as executor:
+		futures = [executor.submit(dl, i, lock) for i, _ in li]
 
 	if dump:
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
 		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w') as f:
-			json.dump(result, f, indent=2)
+			json.dump([f.result() for f in futures], f, indent=2)
 
 
 def media_stat(body):
