@@ -27,8 +27,7 @@ def main():
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)
 
-	p = subparsers.add_parser('local')
-	inspect.add_args(p)
+	inspect.add_args(subparsers.add_parser('local'))
 
 
 	for c, p in board_subcommand_parsers(subparsers):

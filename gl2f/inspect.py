@@ -46,6 +46,9 @@ def add_args(parser):
 		help='sort order')
 	p.set_defaults(handler=ls)
 
+	p = sub.add_parser('dir')
+	p.set_defaults(handler=lambda _:print(path.home()))
+
 
 if __name__ == '__main__':
 	import sys
