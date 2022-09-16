@@ -3,7 +3,6 @@ from .. import auth
 from . import board, member
 from .date import in24h
 import datetime, os, json
-import asyncio
 
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, template='texts', dump=False):
@@ -44,15 +43,12 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 def list_multiple_boards(boardId, args):
 	# only returns the 'list' value of boards.
 	# category id and template are fixed.
+	from concurrent.futures import ThreadPoolExecutor
 
-	loop = asyncio.get_event_loop()
+	with ThreadPoolExecutor() as executor:
+		futures = [executor.submit(fetch, i, 10, 1, dump=args.dump) for i in boardId]
 
-	async def fetch_async(boardId, dump):
-		return await loop.run_in_executor(None, fetch, boardId, args.number, args.page, args.order, None, 'texts', args.dump)
-
-	tasks = asyncio.gather(*[fetch_async(i, args.dump) for i in boardId])
-	result = loop.run_until_complete(tasks)
-	return sum((r['list'] for r in result), [])
+	return sum((f.result()['list'] for f in futures), [])
 
 
 def get_IDs(domain, args):
