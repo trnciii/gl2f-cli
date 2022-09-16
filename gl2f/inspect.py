@@ -4,13 +4,13 @@ from gl2f.core import path
 
 
 def load_content(i):
-	with open(os.path.join(path.ref('contents'), i, f'{i}.json')) as f:
+	with open(os.path.join(path.refdir('contents'), i, f'{i}.json')) as f:
 		return json.load(f)
 
 def ls(args):
 	from gl2f.core import pretty
 
-	items = [load_content(i) for i in os.listdir(path.ref('contents'))]
+	items = [load_content(i) for i in os.listdir(path.refdir('contents'))]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))

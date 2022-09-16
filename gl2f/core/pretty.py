@@ -1,5 +1,4 @@
-from . import board, article, member, terminal as term, date
-import os
+from . import board, member, terminal as term, date
 
 class Formatter:
 	def __init__(self, f='author:title:url', fd='%m/%d', sep=' '):
@@ -16,17 +15,13 @@ class Formatter:
 
 
 	def author(self, item):
-		try:
-			_, v = member.from_id(item['categoryId'])
-			if v:
-				fullname = v['fullname']
-				group = board.get()[item['boardId']]['group']
-				colf, colb = v['color'][group].values()
-			else:
-				fullname = item['category']['name']
-				colf, colb = [255, 255, 255], [157, 157, 157]
-		except KeyError:
-			fullname = '---'
+		_, v = member.from_id(item.get('categoryId'))
+		if v:
+			fullname = v['fullname']
+			group = board.get()[item['boardId']]['group']
+			colf, colb = v['color'][group].values()
+		else:
+			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
 		mods = [
@@ -58,6 +53,15 @@ class Formatter:
 		self.index += 1
 		return f'{self.index:{self.digits}}'
 
+	def content_id(self, item):
+		return item['contentId']
+
+	def media_stat(self, item):
+		from . import article
+		re = article.media_stat(item['values']['body'])
+		return self.sep.join([f'i{re["image"]:02}', f'v{re["video"]}'])
+
+
 	def format(self, item, end='\n'):
 		dic = {
 			'author': self.author,
@@ -67,6 +71,8 @@ class Formatter:
 			'date-c': self.date_c,
 			'index': self.inc_index,
 			'br': self.breakline,
+			'id': self.content_id,
+			'media': self.media_stat,
 		}
 
 		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))

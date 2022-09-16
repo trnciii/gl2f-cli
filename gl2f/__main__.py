@@ -1,6 +1,5 @@
 import argparse
-from . import auth, opener, ls, cat, dl, inspect
-from .core import lister
+from . import opener, ls, cat, dl
 
 
 def board_subcommand_parsers(subparsers):
@@ -19,6 +18,9 @@ def ex(parser):
 
 
 def main():
+	from . import auth, inspect
+	from .core import lister
+
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers()
 
@@ -49,6 +51,7 @@ class partial:
 	blogs = make_partial('blogs')
 	radio = make_partial('radio')
 	news = make_partial('news')
+	today = make_partial('today')
 
 
 if __name__ == '__main__':

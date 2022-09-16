@@ -1,8 +1,9 @@
 # リストの作り方
 
 サブコマンド `cat, ls, open` は、対象となるリストや表示の整形を指示する必要があります（[コマンドの説明](./commands.md)）。
-リストの指定はページの種類（ブログ、ニュース、ラジオ等）と、さらに必要なグループまたはメンバーを与えて行います、。
-またメインコマンドとして `gl2b / gl2n / gl2r` を使うとページの種類を省略することができます。
+リストの指定はページの種類（ブログ、ニュース、ラジオ等）と、さらに必要なグループまたはメンバーを与えて行います。
+またページとは別に、 `today` とすると全てのページの24時間以内の更新をリストします。
+またメインコマンドとして `gl2b / gl2n  / gl2r / gl2d` を使うと、それぞれ `blogs, news, radio, today` を省略することができます。
 
 Girls2 のブログを開く
 ```sh
@@ -25,10 +26,30 @@ gl2n open family
 gl2f open news family
 ```
 
+24時間以内の更新を開く
+```sh
+gl2d open
+# or
+gl2f open today
+```
+
 
 ## 引数
 
 ページの種類によって、指定できるメンバー名などは変わります。
+
+
+### `today` 24時間以内の更新
+
+日記、ニュース、ラジオ、Gtube、commercial movie、またライブ期間中は特設ページをチェックし、24時間以内の更新を返します。
+メインコマンドを `gl2d` とすると `today` を省略できます。
+
+24時間以内の更新を全てリストとして表示する
+```sh
+gl2d ls
+# or
+gl2f ls today
+```
 
 ### `blogs` 日記
 
@@ -46,7 +67,7 @@ gl2f open -a blogs today
 ### `news` ニュース
 
 ニュースのリスト ( https://girls2-fc.jp/page/familyNews 等 ) を取得します。
-指定できるのはグループ名 `girls2, loveky2, lucky2` と、Girls2 + Lucky2 の `family` です。
+指定できるのはグループ名 `girls2, lovely2, lucky2, mirage2` と、Girls2 + Lucky2 の `family` です。
 メインコマンドを `gl2n` とすると `news` を省略できます。
 
 GL2 family のニュース本文を表示する。
@@ -148,13 +169,15 @@ gl2f ls blogs toa --order name:desc -n 30
 また、表示方法を制御するために以下のオプションがあります。
 
 * `-f, --format` リストのフォーマット指定。以下の要素を `:` で区切って与えます。デフォルトは `author:title:url` です。
-	* `author` 著者名
-	* `title` 記事タイトル
-	* `url` URL
-	* `date-p` 記事が公開された日時
-	* `date-c` 記事がアップロードされた日時
-	* `index` リスト上での番号を振ります
+	* `author` 著者名。
+	* `title` 記事タイトル。
+	* `url` URL。
+	* `date-p` 記事が公開された日時。
+	* `date-c` 記事がアップロードされた日時。
+	* `index` リスト上での番号を振ります。
 	* `br` 改行。
+	* `id` 記事のID。ダウンロードするフォルダ名などに使っているので、調べたいときに使えます。
+	* `media` 記事に含まれる画像と動画の数。画像が5、動画が1あるときは`i05 v1` のように出力されます。
 * `-d, --date` フォーマット指定を指定して記事の公開日時を左側に表示します。デフォルトは月/日(`%m/%d`)。書式については[こちら](https://docs.python.org/ja/3/library/datetime.html#strftime-strptime-behavior)
 * `--break-urls` URLを改行して表示します。 `-f` で `url -> br:url` と置き換えることと同じです。
 * `--enum` リストに番号を振ります。 `-f` に `index` を含めることと同じです。

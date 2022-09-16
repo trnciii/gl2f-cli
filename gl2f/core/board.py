@@ -140,26 +140,30 @@ def get():
 	}
 
 
+def from_page(p):
+	return {v['page']:k for k, v in get().items()}[p]
+
+
 def blogs(key):
 	return {
-		'girls2': '271474317252887717',
-		'lovely2': '436708526618837819',
-		'lucky2': '540071536506176315'
+		'girls2': from_page('blogs'),
+		'lovely2': from_page('lovely2blogs'),
+		'lucky2': from_page('lucky2blogs')
 	}[key]
 
 def news(key):
 	return {
-		'family': '540067120025699131',
-		'girls2': '270441012457899173',
-		'lovely2': '415001844964656065',
-		'lucky2': '540071356465677115',
-		'mirage2': '270810062216233612',
+		'family': from_page('familyNews'),
+		'girls2': from_page('news'),
+		'lovely2': from_page('lovely2news'),
+		'lucky2': from_page('lucky2news'),
+		'mirage2': from_page('mirage2news'),
 	}[key]
 
 def radio(key):
 	return{
-		'girls2': '455630760846558145',
-		'lucky2': '540071136604455739'
+		'girls2': from_page('girls2radio'),
+		'lucky2': from_page('lucky2radio'),
 	}[key]
 
 

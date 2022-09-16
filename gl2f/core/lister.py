@@ -1,10 +1,9 @@
 import requests
-import json
-import argparse
-import os
 from .. import auth
 from . import board, member
-from .date import is_today
+from .date import in24h
+import datetime, os, json
+import asyncio
 
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, template='texts', dump=False):
@@ -27,8 +26,6 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 		return
 
 	if dump:
-		import datetime
-
 		filename = board.get()[boardId]['page']
 		if categoryId:
 			name, _ = member.from_id(categoryId)
@@ -42,6 +39,20 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 		print('saved', path)
 
 	return response.json()
+
+
+def list_multiple_boards(boardId, args):
+	# only returns the 'list' value of boards.
+	# category id and template are fixed.
+
+	loop = asyncio.get_event_loop()
+
+	async def fetch_async(boardId, dump):
+		return await loop.run_in_executor(None, fetch, boardId, args.number, args.page, args.order, None, 'texts', args.dump)
+
+	tasks = asyncio.gather(*[fetch_async(i, args.dump) for i in boardId])
+	result = loop.run_until_complete(tasks)
+	return sum((r['list'] for r in result), [])
 
 
 def get_IDs(domain, args):
@@ -75,6 +86,10 @@ def add_args(parser):
 		help='dump response from server as ./response.json')
 
 
+def filter_today(li):
+	return list(filter(lambda i:in24h(i['openingAt']), li))
+
+
 def blogs(args):
 	if member.is_group(args.name):
 		boardId = board.blogs(args.name)
@@ -85,18 +100,12 @@ def blogs(args):
 		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 	elif args.name == 'today':
-		return list(filter(
-			lambda i: is_today(i['openingAt']),
-			sum((fetch(board.blogs(group), size=10, page=1, dump=args.dump)['list'] for group in ['girls2', 'lucky2']), [])
-		))
+		return filter_today(list_multiple_boards([board.blogs(i) for i in ['girls2', 'lucky2']], args))
 
 
 def news(args):
 	if args.name == 'today':
-		return list(filter(
-			lambda i: is_today(i['openingAt']),
-			fetch(board.news('family'), size=10, page=1, dump=args.dump)['list']
-		))
+		return filter_today(fetch(board.news('family'), size=10, page=1, dump=args.dump)['list'])
 
 	else:
 		boardId = board.news(args.name)
@@ -113,11 +122,29 @@ def radio(args):
 		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 
-def make_simple_lister(boardId):
-	if isinstance(boardId, str):
+def make_simple_lister(page):
+	if isinstance(page, str):
+		boardId = board.from_page(page)
 		return lambda args: fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 	else:
+		boardId = {k:board.from_page(v) for k, v in page.items()}
 		return lambda args: fetch(boardId[args.name], args.number, args.page, args.order, dump=args.dump)['list']
+
+
+def today(args):
+	boardId = [
+		board.blogs('girls2'),
+		board.blogs('lucky2'),
+		board.news('family'),
+		board.radio('girls2'),
+		board.radio('lucky2'),
+		board.from_page('gtube'),
+		board.from_page('commercialmovie'),
+		board.from_page('ShangrilaPG')
+	]
+	ret = list_multiple_boards(boardId, args)
+	return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
+
 
 
 def listers():
@@ -125,19 +152,20 @@ def listers():
 		'blogs': blogs,
 		'radio': radio,
 		'news': news,
-		'gtube': make_simple_lister('270809837141492901'),
-		'cm': make_simple_lister('504468501197489089'),
-		'shangrila': make_simple_lister('689409591506633568'),
-		'brandnewworld': make_simple_lister({'photo': '664746725843403713', 'cheer': '666819802651689824'}),
-		'daijoubu': make_simple_lister({'photo': '660050132594590761', 'cheer': '653506325782725569'}),
-		'cl': make_simple_lister('639636551948567355'),
-		'fm': make_simple_lister({'girls2': '613606146413953985', 'lucky2': '613607790937637825'}),
-		'enjoythegooddays': make_simple_lister('558593359405384641'),
-		'famitok': make_simple_lister({'girls2':'550521936032039739', 'lucky2': '550521867736187707'}),
-		'lovely2live': make_simple_lister('527414639852520385'),
-		'garugakulive': make_simple_lister('499846974107812667'),
-		'chuwapane': make_simple_lister('357805845389509857'),
-		'onlinelive2020': make_simple_lister('449506330521109545'),
+		'gtube': make_simple_lister('gtube'),
+		'cm': make_simple_lister('commercialmovie'),
+		'shangrila': make_simple_lister('ShangrilaPG'),
+		'brandnewworld': make_simple_lister({'photo': 'Lucky2FirstLivePG', 'cheer': 'FirstLiveCheerForL2'}),
+		'daijoubu': make_simple_lister({'photo': '3rdAnnivPG', 'cheer': '3rdAnnivCheerForG2'}),
+		'cl': make_simple_lister('CLsplivepg'),
+		'fm': make_simple_lister({'girls2': 'G2fcmeetingpg', 'lucky2': 'L2fcmeetingpg'}),
+		'enjoythegooddays': make_simple_lister('EnjoyTheGoodDaysBackstage'),
+		'famitok': make_simple_lister({'girls2':'Girls2famitok', 'lucky2': 'Lucky2famitok'}),
+		'lovely2live': make_simple_lister('lovely2Live2021Diary'),
+		'garugakulive': make_simple_lister('garugakuliveDiary'),
+		'chuwapane': make_simple_lister('chuwapaneDiary'),
+		'onlinelive2020': make_simple_lister('onlineliveDiary'),
+		'today': today,
 	}
 
 

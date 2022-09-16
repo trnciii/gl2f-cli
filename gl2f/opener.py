@@ -1,11 +1,10 @@
-import webbrowser
-import argparse
-import os
-from .core import board, lister, pretty, terminal as term
+from .core import lister
 
 def name(): return 'open'
 
 def open_url(i):
+	import webbrowser
+	from .core import board
 	webbrowser.open(board.content_url(i), new=0, autoraise=True)
 
 
@@ -16,8 +15,10 @@ def add_args(parser, board):
 
 
 	def subcommand(args):
+		from .core import pretty, terminal as term
+
 		items = lister.listers()[board](args)
-		fm = pretty.Formatter(f='date-p:author:title', sep=' ')
+		fm = pretty.Formatter(f='date-p:author:title')
 
 		if args.all:
 			for i in items:

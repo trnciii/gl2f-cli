@@ -1,5 +1,4 @@
-import argparse
-from .core import lister, pretty, article
+from .core import lister, pretty
 
 def name(): return 'ls'
 
