@@ -59,7 +59,7 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 		f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
 		headers={
 			'origin': 'https://girls2-fc.jp',
-			'x-authorization': auth.update(auth.load()),
+			'x-authorization': auth.load(),
 			'x-from': 'https://girls2-fc.jp',
 		})
 
