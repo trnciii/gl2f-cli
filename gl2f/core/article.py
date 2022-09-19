@@ -92,19 +92,19 @@ def save_media(item, out, boardId, contentId,
 
 	li = ptn_media.findall(item['values']['body'])
 	bar = term.Bar(len(li))
+	lock = Lock()
 
-	def dl(mediaId, lock):
+	def dl(mediaId):
 		ptn = re.compile(mediaId + r'\..+')
 		if (not force) and any(map(ptn.search, os.listdir(out))):
 			return 'skipped'
 
 		info, image = dl_medium(boardId, contentId, mediaId, skip, stream)
 
-		lock.acquire()
-		bar.inc()
-		term.clean_row()
-		print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
-		lock.release()
+		with lock:
+			bar.inc()
+			term.clean_row()
+			print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
 
 		if image:
 			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
@@ -114,9 +114,8 @@ def save_media(item, out, boardId, contentId,
 		return info
 
 
-	lock = Lock()
 	with ThreadPoolExecutor() as executor:
-		futures = [executor.submit(dl, i, lock) for i, _ in li]
+		futures = [executor.submit(dl, i) for i, _ in li]
 
 	if dump:
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
