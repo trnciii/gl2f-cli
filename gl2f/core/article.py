@@ -1,7 +1,7 @@
 import re, html
 from . import terminal as term
-import json, os, datetime, asyncio
-
+import json, os, datetime
+from .. import auth
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
@@ -51,15 +51,14 @@ def to_text(item, key):
 		)
 
 
-def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
+def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None):
 	import requests
-	from gl2f import auth
 
 	response = requests.get(
 		f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
 		headers={
 			'origin': 'https://girls2-fc.jp',
-			'x-authorization': auth.update(auth.load()),
+			'x-authorization': xauth if xauth else auth.update(auth.load()),
 			'x-from': 'https://girls2-fc.jp',
 		})
 
@@ -87,21 +86,25 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 def save_media(item, out, boardId, contentId,
 	skip=False, stream=False, force=False, dump=False
 ):
-	loop = asyncio.get_event_loop()
+	from threading import Lock
+	from concurrent.futures import ThreadPoolExecutor
 
 	li = ptn_media.findall(item['values']['body'])
 	bar = term.Bar(len(li))
+	lock = Lock()
+	xauth = auth.update(auth.load())
 
-	async def dl(mediaId):
+	def dl(mediaId):
 		ptn = re.compile(mediaId + r'\..+')
 		if (not force) and any(map(ptn.search, os.listdir(out))):
 			return 'skipped'
 
-		info, image = await loop.run_in_executor(None, dl_medium, boardId, contentId, mediaId, skip, stream)
+		info, image = dl_medium(boardId, contentId, mediaId, skip, stream, xauth=xauth)
 
-		bar.inc()
-		term.clean_row()
-		print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
+		with lock:
+			bar.inc()
+			term.clean_row()
+			print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
 
 		if image:
 			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
@@ -111,12 +114,13 @@ def save_media(item, out, boardId, contentId,
 		return info
 
 
-	result = loop.run_until_complete(asyncio.gather(*[dl(i) for i, _ in li]))
+	with ThreadPoolExecutor() as executor:
+		futures = [executor.submit(dl, i) for i, _ in li]
 
 	if dump:
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
 		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w') as f:
-			json.dump(result, f, indent=2)
+			json.dump([f.result() for f in futures], f, indent=2)
 
 
 def media_stat(body):
