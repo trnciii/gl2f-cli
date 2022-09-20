@@ -1,6 +1,7 @@
 import re, html
-import json, os, datetime, asyncio
 from . import terminal as term, sixel, path
+import json, os, datetime
+from .. import auth
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -91,10 +92,8 @@ class MediaRep:
 			return None
 
 
-async def compose_line(p, media_rep):
-	loop = asyncio.get_event_loop()
-
-	p = await loop.run_in_executor(None, media_rep.rep, p)
+def compose_line(p, media_rep):
+	p = media_rep.rep(p)
 	p = ptn_strong.sub(term.mod('\\1', [term.color('white', 'fl'), term.bold(), term.underline()]), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
@@ -110,13 +109,14 @@ async def compose_line(p, media_rep):
 def to_text_options(): return {'full', 'compact', 'compressed'}
 
 def to_text(item, key):
+	from concurrent.futures import ThreadPoolExecutor
+
 	body = item['values']['body']
 
-	loop = asyncio.get_event_loop()
-
 	def lines(mediarep):
-		jobs = [compose_line(p, mediarep) for p in paragraphs(body)]
-		return loop.run_until_complete(asyncio.gather(*jobs))
+		with ThreadPoolExecutor() as executor:
+			futures = [executor.submit(compose_line, p, mediarep) for p in paragraphs(body)]
+		return [f.result() for f in futures]
 
 	if key == 'full':
 		mediarep = MediaRep(item, 'sixel')
@@ -132,15 +132,14 @@ def to_text(item, key):
 
 
 
-def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
+def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None):
 	import requests
-	from gl2f import auth
 
 	response = requests.get(
 		f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
 		headers={
 			'origin': 'https://girls2-fc.jp',
-			'x-authorization': auth.update(auth.load()),
+			'x-authorization': xauth if xauth else auth.update(auth.load()),
 			'x-from': 'https://girls2-fc.jp',
 		})
 
@@ -168,21 +167,25 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 def save_media(item, out, boardId, contentId,
 	skip=False, stream=False, force=False, dump=False
 ):
-	loop = asyncio.get_event_loop()
+	from threading import Lock
+	from concurrent.futures import ThreadPoolExecutor
 
 	li = ptn_media.findall(item['values']['body'])
 	bar = term.Bar(len(li))
+	lock = Lock()
+	xauth = auth.update(auth.load())
 
-	async def dl(mediaId):
+	def dl(mediaId):
 		ptn = re.compile(mediaId + r'\..+')
 		if (not force) and any(map(ptn.search, os.listdir(out))):
 			return 'skipped'
 
-		info, image = await loop.run_in_executor(None, dl_medium, boardId, contentId, mediaId, skip, stream)
+		info, image = dl_medium(boardId, contentId, mediaId, skip, stream, xauth=xauth)
 
-		bar.inc()
-		term.clean_row()
-		print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
+		with lock:
+			bar.inc()
+			term.clean_row()
+			print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
 
 		if image:
 			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
@@ -192,12 +195,13 @@ def save_media(item, out, boardId, contentId,
 		return info
 
 
-	result = loop.run_until_complete(asyncio.gather(*[dl(i) for i, _ in li]))
+	with ThreadPoolExecutor() as executor:
+		futures = [executor.submit(dl, i) for i, _ in li]
 
 	if dump:
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
 		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w') as f:
-			json.dump(result, f, indent=2)
+			json.dump([f.result() for f in futures], f, indent=2)
 
 
 def media_stat(body):
