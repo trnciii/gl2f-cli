@@ -30,9 +30,6 @@ class MediaRep:
 		else:
 			self.rep = self.media_rep_type_id
 
-		self.time = []
-
-
 	def media_rep_type(self, p):
 		return ptn_media.sub(term.mod('[\\2]', [term.dim()]), p)
 
@@ -43,6 +40,7 @@ class MediaRep:
 		from io import BytesIO
 		from PIL import Image
 		import time
+		from . import log
 
 		match = ptn_media.search(p)
 		if not match:
@@ -67,20 +65,18 @@ class MediaRep:
 		image = sixel.limit(image, (1000, 1000))
 		ret = sixel.to_sixel(image)
 		t2 = time.time()
-		self.time.append({'cache-hit': cachehit, 'open': t1-t0, 'sixelize': t2-t1})
+		log({'cache-hit': cachehit, 'open': t1-t0, 'sixelize': t2-t1})
 		return ret
 
 
 	def search_local(self, mediaId):
 		cache = os.path.join(path.refdir_untouch('cache'), mediaId)
 		if os.path.isfile(cache):
-			print('cache hit in cache')
 			return cache
 
 
 		directory = path.refdir_untouch(f'contents/{self.contentId}')
 		if not directory:
-			print('content directory not exist')
 			return None
 
 		pattern = re.compile(rf'{mediaId}.*')
@@ -120,15 +116,15 @@ def to_text(item, key):
 
 	if key == 'full':
 		mediarep = MediaRep(item, 'sixel')
-		return '{}\n'.format('\n'.join(lines(mediarep))), mediarep
+		return '{}\n'.format('\n'.join(lines(mediarep)))
 
 	elif key == 'compact':
 		mediarep = MediaRep(item, 'sixel')
-		return '{}\n'.format(re.sub(r'\n+', '\n', '\n'.join(lines(mediarep)))), mediarep
+		return '{}\n'.format(re.sub(r'\n+', '\n', '\n'.join(lines(mediarep))))
 
 	elif key == 'compressed':
 		mediarep = MediaRep(item, 'type')
-		return '{}\n'.format(''.join(lines(mediarep))), mediarep
+		return '{}\n'.format(''.join(lines(mediarep)))
 
 
 

@@ -5,20 +5,18 @@ def name(): return 'cat'
 def cat(i, args):
 	from .dl import save
 	import time
+	from .core import log
 
 	if args.dl:
 		save(i, args)
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
 	t0 = time.time()
-	text, mediarep = article.to_text(i, args.option)
+	text = article.to_text(i, args.option)
 	t1 = time.time()
 	print(text)
 	t2 = time.time()
-	print('time')
-	print('cat', 'to_text', t1-t0, 'print', t2-t1)
-	print('sixel', *mediarep.time, sep='\n')
-	print('sixel total', 'open', sum(i['open'] for i in mediarep.time), 'sixelize', sum(i['sixelize'] for i in mediarep.time))
+	log(f'compose {t1-t0}, print {t2-t1}')
 
 
 def add_args(parser, board):
