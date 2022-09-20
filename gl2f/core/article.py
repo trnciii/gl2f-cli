@@ -104,7 +104,7 @@ def compose_line(p, media_rep):
 
 def style_options(): return {'full', 'compact', 'compressed'}
 
-def to_text(item, key):
+def to_text(item, key, use_sixel=True):
 	from concurrent.futures import ThreadPoolExecutor
 
 	body = item['values']['body']
@@ -115,11 +115,11 @@ def to_text(item, key):
 		return [f.result() for f in futures]
 
 	if key == 'full':
-		mediarep = MediaRep(item, 'sixel')
+		mediarep = MediaRep(item, 'sixel' if use_sixel else 'type_id')
 		return '\n'.join(lines(mediarep))
 
 	elif key == 'compact':
-		mediarep = MediaRep(item, 'sixel')
+		mediarep = MediaRep(item, 'sixel' if use_sixel else 'type_id')
 		return '\n'.join(filter(len, lines(mediarep)))
 
 	elif key == 'compressed':

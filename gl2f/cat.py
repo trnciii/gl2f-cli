@@ -12,7 +12,7 @@ def cat(i, args):
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
 	t0 = time.time()
-	text = article.to_text(i, args.style)
+	text = article.to_text(i, args.style, args.sixel)
 	t1 = time.time()
 	print(text)
 	print()
@@ -24,6 +24,8 @@ def add_args(parser, board):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.add_argument('--style', type=str, choices=article.style_options(), default='compact')
+	parser.add_argument('--no-image', dest='sixel', action='store_false',
+		help='not use sixel image')
 	parser.add_argument('-a', '--all', action='store_true',
 		help='preview all items')
 	parser.add_argument('--dl', action='store_true',
