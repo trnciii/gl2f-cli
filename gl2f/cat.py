@@ -9,13 +9,13 @@ def cat(i, args):
 
 	if args.dl:
 		save(i, args)
+	print()
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
 	t0 = time.time()
 	text = article.to_text(i, args.style, args.sixel)
 	t1 = time.time()
 	print(text)
-	print()
 	t2 = time.time()
 	log(f'compose {t1-t0}, print {t2-t1}')
 
