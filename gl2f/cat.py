@@ -15,6 +15,7 @@ def cat(i, args):
 	text = article.to_text(i, args.option)
 	t1 = time.time()
 	print(text)
+	print()
 	t2 = time.time()
 	log(f'compose {t1-t0}, print {t2-t1}')
 
