@@ -1,7 +1,11 @@
+import os, subprocess
+repo = os.path.abspath(os.path.join(os.path.split(__file__)[0], '../../.git'))
+git = subprocess.run(f'git --git-dir {repo} log  -n1 --pretty=%h'.split(),
+	stdout=subprocess.PIPE, text=True, stderr=subprocess.DEVNULL)
+commit = git.stdout.rstrip('\n') if git.returncode == 0 else '-'*7
+
 def log(message):
 	from . import path
 	from datetime import datetime
-	import os
-	commit = os.popen('git log -n1 --pretty=%h').read().rstrip('\n')
 	with open(os.path.join(path.home(), 'log'), 'a') as f:
 		f.write(f'{datetime.now()} {commit} {message}\n')
