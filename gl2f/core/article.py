@@ -1,7 +1,7 @@
 import re, html
 from . import terminal as term
 import json, os, datetime
-
+from .. import auth
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
@@ -51,15 +51,14 @@ def to_text(item, key):
 		)
 
 
-def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
+def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None):
 	import requests
-	from gl2f import auth
 
 	response = requests.get(
 		f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
 		headers={
 			'origin': 'https://girls2-fc.jp',
-			'x-authorization': auth.load(),
+			'x-authorization': xauth if xauth else auth.update(auth.load()),
 			'x-from': 'https://girls2-fc.jp',
 		})
 
@@ -93,13 +92,14 @@ def save_media(item, out, boardId, contentId,
 	li = ptn_media.findall(item['values']['body'])
 	bar = term.Bar(len(li))
 	lock = Lock()
+	xauth = auth.update(auth.load())
 
 	def dl(mediaId):
 		ptn = re.compile(mediaId + r'\..+')
 		if (not force) and any(map(ptn.search, os.listdir(out))):
 			return 'skipped'
 
-		info, image = dl_medium(boardId, contentId, mediaId, skip, stream)
+		info, image = dl_medium(boardId, contentId, mediaId, skip, stream, xauth=xauth)
 
 		with lock:
 			bar.inc()
