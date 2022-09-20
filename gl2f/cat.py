@@ -12,7 +12,7 @@ def cat(i, args):
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
 	t0 = time.time()
-	text = article.to_text(i, args.option)
+	text = article.to_text(i, args.style)
 	t1 = time.time()
 	print(text)
 	print()
@@ -23,7 +23,7 @@ def cat(i, args):
 def add_args(parser, board):
 	lister.add_args(parser)
 	pretty.add_args(parser)
-	parser.add_argument('--option', type=str, choices=article.to_text_options(), default='compact')
+	parser.add_argument('--style', type=str, choices=article.style_options(), default='compact')
 	parser.add_argument('-a', '--all', action='store_true',
 		help='preview all items')
 	parser.add_argument('--dl', action='store_true',

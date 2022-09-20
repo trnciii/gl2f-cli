@@ -102,7 +102,7 @@ def compose_line(p, media_rep):
 	return p
 
 
-def to_text_options(): return {'full', 'compact', 'compressed'}
+def style_options(): return {'full', 'compact', 'compressed'}
 
 def to_text(item, key):
 	from concurrent.futures import ThreadPoolExecutor
