@@ -120,7 +120,7 @@ def to_text(item, key):
 
 	elif key == 'compact':
 		mediarep = MediaRep(item, 'sixel')
-		return '{}\n'.format(re.sub(r'\n+', '\n', '\n'.join(lines(mediarep))))
+		return '{}\n'.format('\n'.join(filter(len, lines(mediarep))))
 
 	elif key == 'compressed':
 		mediarep = MediaRep(item, 'type')
