@@ -24,7 +24,7 @@ def ex(parser):
 
 
 def main():
-	from . import auth, inspect
+	from . import auth, local
 	from .core import lister
 
 	parser = argparse.ArgumentParser()
@@ -33,7 +33,7 @@ def main():
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)
 
-	inspect.add_args(subparsers.add_parser('local'))
+	local.add_args(subparsers.add_parser('local'))
 
 
 	for c, p in board_subcommand_parsers(subparsers):

@@ -1,6 +1,6 @@
 import re
 import os, json
-from gl2f.core import path
+from .core import path
 
 
 def load_content(i):
@@ -8,7 +8,7 @@ def load_content(i):
 		return json.load(f)
 
 def ls(args):
-	from gl2f.core import pretty
+	from .core import pretty
 
 	items = [load_content(i) for i in os.listdir(path.refdir('contents'))]
 	if args.order:
@@ -64,17 +64,3 @@ def add_args(parser):
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
-
-
-if __name__ == '__main__':
-	import sys
-
-	functions = {
-		'body': extract_bodies,
-	}
-
-	for k, v in functions.items():
-		args = sys.argv[1:]
-		if k in args:
-			loc = args.index(k)
-			v(*args[loc+1:])
