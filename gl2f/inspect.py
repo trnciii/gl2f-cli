@@ -25,6 +25,12 @@ def clear_cache():
 		for i in os.listdir(d):
 			os.remove(os.path.join(d, i))
 
+def stat():
+	for _par in ['contents', 'cache']:
+		if par:=path.refdir_untouch(_par):
+			size = sum(sum( os.path.getsize(os.path.join(p,_f)) for _f in f ) for p,_,f in os.walk(par))
+			print(f'{_par+"/":10} items: {len(os.listdir(par))} size: {size/(1024**3):,.2f} GB')
+
 
 def extract_bodies(filename):
 	with open(filename) as f:
@@ -56,6 +62,8 @@ def add_args(parser):
 	p.set_defaults(handler=lambda _:print(path.home()))
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
+
+	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
 
 
 if __name__ == '__main__':
