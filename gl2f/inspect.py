@@ -20,6 +20,12 @@ def ls(args):
 		fm.print(i)
 
 
+def clear_cache():
+	if d:=path.refdir_untouch('cache'):
+		for i in os.listdir(d):
+			os.remove(os.path.join(d, i))
+
+
 def extract_bodies(filename):
 	with open(filename) as f:
 		log = json.load(f)
@@ -48,6 +54,8 @@ def add_args(parser):
 
 	p = sub.add_parser('dir')
 	p.set_defaults(handler=lambda _:print(path.home()))
+
+	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 
 
 if __name__ == '__main__':
