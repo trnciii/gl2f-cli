@@ -25,13 +25,15 @@ def ex(parser):
 
 def main():
 	from . import auth
-	from .core import lister
+	from .core import lister, sixel
 
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers()
 
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)
+
+	subparsers.add_parser('sixel').set_defaults(handler=lambda args:print(sixel.status))
 
 	for c, p in board_subcommand_parsers(subparsers):
 		lister.add_args_boardwise(p, c)

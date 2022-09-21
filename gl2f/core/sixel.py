@@ -15,14 +15,15 @@ def supported_terminal():
 try:
 	assert supported_terminal()
 	import libsixel
+	status = 'supported'
 
 except Exception as e:
 	libsixel = None
 
 	if type(e) == AssertionError:
-		print('terminal does not support sixel')
+		status = 'terminal does not support sixel'
 	elif type(e) == ImportError:
-		print('failed to import libsixel')
+		status = 'failed to import libsixel'
 	else:
 		import traceback, sys
 		traceback.print_exc(file=sys.stdout)
