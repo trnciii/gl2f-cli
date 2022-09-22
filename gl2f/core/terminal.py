@@ -87,6 +87,20 @@ def move_cursor(n):
 
 if os.name == 'nt':
 	import msvcrt, sys
+
+	def query(q, end):
+		sys.stdout.write(q)
+		sys.stdout.flush()
+
+		s = ''
+		while True:
+			c = msvcrt.getch().decode('ascii')
+			s += c
+			if c == end:
+				break
+		return s
+
+
 	def select(items):
 		print(mod(" { space: toggle, 'a': all, 'c': clear }", [color('yellow', 'fl')]))
 		n = len(items)
@@ -126,6 +140,32 @@ if os.name == 'nt':
 
 elif os.name == 'posix':
 	import termios, sys
+
+	def query(q, end):
+		fd = sys.stdout.fileno()
+
+		old = termios.tcgetattr(fd)
+		tc = termios.tcgetattr(fd)
+		tc[3] &= ~(termios.ICANON | termios.ECHO)
+
+		try:
+			termios.tcsetattr(fd, termios.TCSANOW, tc)
+
+			sys.stdout.write(q)
+			sys.stdout.flush()
+
+			s = ''
+			while True:
+				c = sys.stdin.read(1)
+				s += c
+				if c == end:
+					break
+
+		finally:
+			termios.tcsetattr(fd, termios.TCSANOW, old)
+
+		return s
+
 
 	def select(items):
 		fd = sys.stdout.fileno()
@@ -175,6 +215,10 @@ elif os.name == 'posix':
 
 		finally:
 			termios.tcsetattr(fd, termios.TCSANOW, old)
+
+else:
+	raise InportError('terminal working on unknown os.')
+
 
 class Bar:
 	def __init__(self, l):

@@ -8,6 +8,8 @@ setup(
 	packages=find_packages(),
 	install_requires=[
 		'requests',
+		'libsixel-python',
+		'Pillow',
 		'webdriver_manager',
 		'selenium'
 	],

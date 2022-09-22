@@ -4,18 +4,28 @@ def name(): return 'cat'
 
 def cat(i, args):
 	from .dl import save
+	import time
+	from .core import log
 
 	if args.dl:
 		save(i, args)
+	print()
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
-	print(article.to_text(i, args.option))
+	t0 = time.time()
+	text = article.to_text(i, args.style, args.sixel)
+	t1 = time.time()
+	print(text)
+	t2 = time.time()
+	log(f'compose {t1-t0}, print {t2-t1}')
 
 
 def add_args(parser, board):
 	lister.add_args(parser)
 	pretty.add_args(parser)
-	parser.add_argument('--option', type=str, choices=article.to_text_options(), default='compact')
+	parser.add_argument('--style', type=str, choices=article.style_options(), default='compact')
+	parser.add_argument('--no-image', dest='sixel', action='store_false',
+		help='not use sixel image')
 	parser.add_argument('-a', '--all', action='store_true',
 		help='preview all items')
 	parser.add_argument('--dl', action='store_true',

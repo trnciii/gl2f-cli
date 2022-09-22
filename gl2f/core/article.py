@@ -1,6 +1,7 @@
 import re, html
-from . import terminal as term
-import json, os, datetime, asyncio
+from . import terminal as term, sixel, local
+import json, os, datetime
+from .. import auth
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -16,8 +17,79 @@ def paragraphs(body):
 	return [ptn_paragraph.sub(r'\1', line) for line in ptn_paragraph.findall(body)]
 
 
-def compose_line(p):
-	p = ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
+class MediaRep:
+	def __init__(self, item, rep):
+		self.boardId = item['boardId']
+		self.contentId = item['contentId']
+
+		if rep == 'type':
+			self.rep = self.media_rep_type
+		elif rep == 'sixel' and sixel.supported():
+			local.refdir('cache')
+			self.rep = self.media_rep_sixel
+		else:
+			self.rep = self.media_rep_type_id
+
+	def media_rep_type(self, p):
+		return ptn_media.sub(term.mod('[\\2]', [term.dim()]), p)
+
+	def media_rep_type_id(self, p):
+		return ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
+
+	def media_rep_sixel(self, p):
+		from io import BytesIO
+		from PIL import Image
+		import time
+		from . import log
+
+		match = ptn_media.search(p)
+		if not match:
+			return p
+		i, t = match.group(1, 2)
+		if t != 'image':
+			return self.media_rep_type_id(p)
+
+		t0 = time.time()
+		if file:=self.search_local(i):
+			image = Image.open(file)
+			cachehit = True
+		else:
+			_, data = dl_medium(self.boardId, self.contentId, i, False, False)
+			if data:
+				with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
+					f.write(data)
+			image = Image.open(BytesIO(data))
+			cachehit = False
+		t1 = time.time()
+
+		image = sixel.limit(image, (1000, 1000))
+		ret = sixel.to_sixel(image)
+		t2 = time.time()
+		log({'cache-hit': cachehit, 'open': t1-t0, 'sixelize': t2-t1})
+		return ret
+
+
+	def search_local(self, mediaId):
+		cache = os.path.join(local.refdir_untouch('cache'), mediaId)
+		if os.path.isfile(cache):
+			return cache
+
+
+		directory = local.refdir_untouch(f'contents/{self.contentId}')
+		if not directory:
+			return None
+
+		pattern = re.compile(rf'{mediaId}.*')
+		li = filter(pattern.match, os.listdir(directory))
+
+		try:
+			return os.path.join(directory, next(li))
+		except:
+			return None
+
+
+def compose_line(p, media_rep):
+	p = media_rep.rep(p)
 	p = ptn_strong.sub(term.mod('\\1', [term.color('white', 'fl'), term.bold(), term.underline()]), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
@@ -30,36 +102,40 @@ def compose_line(p):
 	return p
 
 
-def to_text_options(): return {'full', 'compact', 'compressed'}
+def style_options(): return {'full', 'compact', 'compressed'}
 
-def to_text(item, key):
+def to_text(item, key, use_sixel=True):
+	from concurrent.futures import ThreadPoolExecutor
+
 	body = item['values']['body']
 
+	def lines(mediarep):
+		with ThreadPoolExecutor() as executor:
+			futures = [executor.submit(compose_line, p, mediarep) for p in paragraphs(body)]
+		return [f.result() for f in futures]
+
 	if key == 'full':
-		return '{}\n'.format(
-			'\n'.join(map(compose_line, paragraphs(body))).rstrip('\n')
-		)
+		mediarep = MediaRep(item, 'sixel' if use_sixel else 'type_id')
+		return '\n'.join(lines(mediarep))
 
 	elif key == 'compact':
-		return '{}\n'.format(
-			re.sub(r'\n+', '\n', '\n'.join(map(compose_line, paragraphs(body))).rstrip('\n'))
-		)
+		mediarep = MediaRep(item, 'sixel' if use_sixel else 'type_id')
+		return '\n'.join(filter(len, lines(mediarep)))
 
 	elif key == 'compressed':
-		return '{}\n'.format(
-			''.join(map(compose_line, paragraphs(body)))
-		)
+		mediarep = MediaRep(item, 'type')
+		return ''.join(lines(mediarep))
 
 
-def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
+
+def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None):
 	import requests
-	from gl2f import auth
 
 	response = requests.get(
 		f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
 		headers={
 			'origin': 'https://girls2-fc.jp',
-			'x-authorization': auth.update(auth.load()),
+			'x-authorization': xauth if xauth else auth.update(auth.load()),
 			'x-from': 'https://girls2-fc.jp',
 		})
 
@@ -87,21 +163,25 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False):
 def save_media(item, out, boardId, contentId,
 	skip=False, stream=False, force=False, dump=False
 ):
-	loop = asyncio.get_event_loop()
+	from threading import Lock
+	from concurrent.futures import ThreadPoolExecutor
 
 	li = ptn_media.findall(item['values']['body'])
 	bar = term.Bar(len(li))
+	lock = Lock()
+	xauth = auth.update(auth.load())
 
-	async def dl(mediaId):
+	def dl(mediaId):
 		ptn = re.compile(mediaId + r'\..+')
 		if (not force) and any(map(ptn.search, os.listdir(out))):
 			return 'skipped'
 
-		info, image = await loop.run_in_executor(None, dl_medium, boardId, contentId, mediaId, skip, stream)
+		info, image = dl_medium(boardId, contentId, mediaId, skip, stream, xauth=xauth)
 
-		bar.inc()
-		term.clean_row()
-		print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
+		with lock:
+			bar.inc()
+			term.clean_row()
+			print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
 
 		if image:
 			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
@@ -111,12 +191,13 @@ def save_media(item, out, boardId, contentId,
 		return info
 
 
-	result = loop.run_until_complete(asyncio.gather(*[dl(i) for i, _ in li]))
+	with ThreadPoolExecutor() as executor:
+		futures = [executor.submit(dl, i) for i, _ in li]
 
 	if dump:
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
 		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w') as f:
-			json.dump(result, f, indent=2)
+			json.dump([f.result() for f in futures], f, indent=2)
 
 
 def media_stat(body):

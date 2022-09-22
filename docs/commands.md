@@ -37,13 +37,14 @@ gl2n cat family
 オプションは以下のものがあります。
 
 * `-a, --all` チェックボックスを使った選択を行わず、リストされた全ての記事本文を出力します。
-* `--option { full, compact, compressed }` 本文の改行をどれくらい詰めるかを決めます。 `full` は全ての改行を維持します。 `compact` は空行をなくします（デフォルト）。 `compressed` は全く改行しません。
+* `--style { full, compact, compressed }` 本文の改行をどれくらい詰めるかを決めます。 `full` は全ての改行を維持し、可能であれば画像も表示します。 `compact` （デフォルト）は空行をなくし、可能であれば画像を表示します。 `compressed` は全く改行せず、画像も表示しません。
+* `--no-image` このフラグを立てると、どのスタイルにおいても画像を表示しないようになります。
 
-GL2 family のニュース本文を、すべての改行を維持して表示する。
+GL2 family のニュース本文を、まったく改行せずに表示する。
 ```sh
-gl2n cat --option full family
+gl2n cat --style compressed family
 # or
-gl2f cat --option full news family
+gl2f cat --style compressed news family
 ```
 
 
