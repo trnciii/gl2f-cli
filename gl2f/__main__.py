@@ -1,6 +1,5 @@
 import argparse
 from . import opener, ls, cat, dl
-from .core import log
 import sys, time
 
 def board_subcommand_parsers(subparsers):
@@ -11,6 +10,7 @@ def board_subcommand_parsers(subparsers):
 
 
 def ex(parser):
+	from .core.local import log
 	log(sys.argv)
 
 	args = parser.parse_args()

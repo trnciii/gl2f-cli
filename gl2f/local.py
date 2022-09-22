@@ -3,14 +3,10 @@ import os, json
 from .core import local
 
 
-def load_content(i):
-	with open(os.path.join(local.refdir('contents'), i, f'{i}.json')) as f:
-		return json.load(f)
-
 def ls(args):
 	from .core import pretty
 
-	items = [load_content(i) for i in os.listdir(local.refdir('contents'))]
+	items = [local.load_content(i) for i in os.listdir(local.refdir('contents'))]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))

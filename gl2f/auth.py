@@ -44,7 +44,7 @@ def verify(au):
 
 
 def update(au):
-	from .core import log
+	from .core.local import log
 	import sys
 	log('verifying token')
 
