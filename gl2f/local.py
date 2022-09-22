@@ -1,16 +1,16 @@
 import re
 import os, json
-from .core import path
+from .core import local
 
 
 def load_content(i):
-	with open(os.path.join(path.refdir('contents'), i, f'{i}.json')) as f:
+	with open(os.path.join(local.refdir('contents'), i, f'{i}.json')) as f:
 		return json.load(f)
 
 def ls(args):
 	from .core import pretty
 
-	items = [load_content(i) for i in os.listdir(path.refdir('contents'))]
+	items = [load_content(i) for i in os.listdir(local.refdir('contents'))]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
@@ -21,13 +21,13 @@ def ls(args):
 
 
 def clear_cache():
-	if d:=path.refdir_untouch('cache'):
+	if d:=local.refdir_untouch('cache'):
 		for i in os.listdir(d):
 			os.remove(os.path.join(d, i))
 
 def stat():
 	for _par in ['contents', 'cache']:
-		if par:=path.refdir_untouch(_par):
+		if par:=local.refdir_untouch(_par):
 			size = sum(sum( os.path.getsize(os.path.join(p,_f)) for _f in f ) for p,_,f in os.walk(par))
 			print(f'{_par+"/":10} items: {len(os.listdir(par))} size: {size/(1024**3):,.2f} GB')
 
@@ -59,7 +59,7 @@ def add_args(parser):
 	p.set_defaults(handler=ls)
 
 	p = sub.add_parser('dir')
-	p.set_defaults(handler=lambda _:print(path.home()))
+	p.set_defaults(handler=lambda _:print(local.home()))
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 

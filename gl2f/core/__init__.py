@@ -5,7 +5,7 @@ git = subprocess.run(f'git --git-dir {repo} log  -n1 --pretty=%h'.split(),
 commit = git.stdout.rstrip('\n') if git.returncode == 0 else '-'*7
 
 def log(message):
-	from . import path
+	from . import local
 	from datetime import datetime
-	with open(os.path.join(path.home(), 'log'), 'a') as f:
+	with open(os.path.join(local.home(), 'log'), 'a') as f:
 		f.write(f'{datetime.now()} {commit} {message}\n')

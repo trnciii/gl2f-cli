@@ -1,8 +1,8 @@
 import os
 
 def filepath():
-	from .core import path
-	return os.path.join(path.home(), 'auth')
+	from .core import local
+	return os.path.join(local.home(), 'auth')
 
 def file():
 	path = filepath()
