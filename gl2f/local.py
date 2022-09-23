@@ -28,6 +28,23 @@ def stat():
 			print(f'{_par+"/":10} items: {len(os.listdir(par))} size: {size/(1024**3):,.2f} GB')
 
 
+def index():
+	out = os.path.join(local.home(), 'index.html')
+	with open(out, 'w', encoding='utf-8') as f:
+		print('<body>', file=f)
+
+		print('<table>', file=f)
+		print('<tr><th>Title</th><tr>', file=f)
+		for i in os.listdir(local.refdir('contents')):
+			item = local.load_content(i)
+			print(f'<tr><td><a href=contents/{item["contentId"]}>{item["values"]["title"]}</a></td><tr>', file=f)
+		print('</table>', file=f)
+
+		print('</body>', file=f)
+
+	print(f'saved {out}')
+
+
 def extract_bodies(filename):
 	with open(filename) as f:
 		log = json.load(f)
@@ -54,9 +71,7 @@ def add_args(parser):
 		help='sort order')
 	p.set_defaults(handler=ls)
 
-	p = sub.add_parser('dir')
-	p.set_defaults(handler=lambda _:print(local.home()))
-
+	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
-
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
+	sub.add_parser('index').set_defaults(handler=lambda _:index())
