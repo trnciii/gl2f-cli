@@ -51,7 +51,7 @@ class MediaRep:
 		t0 = time.time()
 		if file:=local.search_media(i, self.contentId):
 			image = Image.open(file)
-			cachehit = True
+			cachehit = file
 		else:
 			_, data = dl_medium(self.boardId, self.contentId, i, False, False)
 			if data:
