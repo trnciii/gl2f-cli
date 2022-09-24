@@ -17,6 +17,15 @@ def refdir_untouch(path):
 	p = os.path.join(home(), path)
 	return p if os.path.exists(p) else False
 
+def listdir(path):
+	p = refdir_untouch(path)
+	if p:
+		li = os.listdir(p)
+		li.remove('.DS_Store')
+		return li
+	else:
+		return []
+
 
 def load_content(i):
 	with open(os.path.join(refdir('contents'), i, f'{i}.json')) as f:

@@ -6,7 +6,7 @@ from .core import pretty, local
 def ls(args):
 	pretty.post_argparse(args)
 
-	items = [local.load_content(i) for i in os.listdir(local.refdir('contents'))]
+	items = [local.load_content(i) for i in local.listdir('contents')]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
@@ -35,7 +35,7 @@ def index():
 
 		print('<table>', file=f)
 		print('<tr><th>Title</th><tr>', file=f)
-		for i in os.listdir(local.refdir('contents')):
+		for i in local.listdir('contents'):
 			item = local.load_content(i)
 			print(f'<tr><td><a href=contents/{item["contentId"]}>{item["values"]["title"]}</a></td><tr>', file=f)
 		print('</table>', file=f)
