@@ -21,7 +21,8 @@ def listdir(path):
 	p = refdir_untouch(path)
 	if p:
 		li = os.listdir(p)
-		li.remove('.DS_Store')
+		if '.DS_Store' in li:
+			li.remove('.DS_Store')
 		return li
 	else:
 		return []
