@@ -31,10 +31,21 @@ def load_content(i):
 	with open(os.path.join(refdir('contents'), i, f'{i}.json')) as f:
 		return json.load(f)
 
-def search_media(contentId, mediaId):
-	cache = os.path.join(refdir_untouch('cache'), mediaId)
-	if os.path.isfile(cache):
-		return cache
+def search_media(mediaId, contentId=None):
+	directory = refdir_untouch('cache')
+	if directory:
+		cache = os.path.join(directory, mediaId)
+		if os.path.isfile(cache):
+			return cache
+
+
+	if not contentId:
+		import glob
+		cand = glob.iglob(f'contents/*/{mediaId}*', root_dir=home())
+		try:
+			return os.path.join(home(), next(cand))
+		except:
+			return None
 
 
 	directory = refdir_untouch(f'contents/{contentId}')

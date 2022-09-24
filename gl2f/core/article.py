@@ -49,7 +49,7 @@ class MediaRep:
 			return self.media_rep_type_id(p)
 
 		t0 = time.time()
-		if file:=local.search_media(self.contentId, i):
+		if file:=local.search_media(i, self.contentId):
 			image = Image.open(file)
 			cachehit = True
 		else:
