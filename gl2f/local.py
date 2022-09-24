@@ -1,17 +1,17 @@
 import re
 import os, json
-from .core import local
+from .core import pretty, local
 
 
 def ls(args):
-	from .core import pretty
+	pretty.post_argparse(args)
 
 	items = [local.load_content(i) for i in os.listdir(local.refdir('contents'))]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
 
-	fm = pretty.Formatter(f='date-p:author:title')
+	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	for i in items:
 		fm.print(i)
 
@@ -66,12 +66,14 @@ def extract_bodies(filename):
 def add_args(parser):
 	sub = parser.add_subparsers()
 
+	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
+	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
+	sub.add_parser('index').set_defaults(handler=lambda _:index())
+
 	p = sub.add_parser('ls')
 	p.add_argument('--order', type=str,
 		help='sort order')
-	p.set_defaults(handler=ls)
+	pretty.add_args(p)
+	p.set_defaults(handler=ls, format='date-p:author:title')
 
-	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
-	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
-	sub.add_parser('index').set_defaults(handler=lambda _:index())
