@@ -1,8 +1,6 @@
-import glob
 from PIL import Image
 from io import BytesIO
-from . import path, terminal
-import os
+from . import terminal
 import re
 
 

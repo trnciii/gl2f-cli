@@ -4,7 +4,7 @@ def name(): return 'dl'
 
 def save(item, args):
 	import json, os
-	from .core import path, article, terminal as term, pretty
+	from .core import local, article, terminal as term, pretty
 
 	boardId = item['boardId']
 	contentId = item['contentId']
@@ -13,7 +13,7 @@ def save(item, args):
 		out = os.path.join(args.o, contentId)
 		os.makedirs(out, exist_ok=True)
 	else:
-		out = path.refdir(os.path.join('contents', contentId))
+		out = local.refdir(os.path.join('contents', contentId))
 
 	with open(os.path.join(out, f'{contentId}.json'), 'w') as f:
 		f.write(json.dumps(item, indent=2))

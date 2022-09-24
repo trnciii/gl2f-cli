@@ -5,7 +5,7 @@ def name(): return 'cat'
 def cat(i, args):
 	from .dl import save
 	import time
-	from .core import log
+	from .core.local import log
 
 	if args.dl:
 		save(i, args)

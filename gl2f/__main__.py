@@ -1,6 +1,5 @@
 import argparse
 from . import opener, ls, cat, dl
-from .core import log
 import sys, time
 
 def board_subcommand_parsers(subparsers):
@@ -11,6 +10,7 @@ def board_subcommand_parsers(subparsers):
 
 
 def ex(parser):
+	from .core.local import log
 	log(sys.argv)
 
 	args = parser.parse_args()
@@ -24,7 +24,7 @@ def ex(parser):
 
 
 def main():
-	from . import auth
+	from . import auth, local
 	from .core import lister, sixel
 
 	parser = argparse.ArgumentParser()
@@ -32,6 +32,8 @@ def main():
 
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)
+
+	local.add_args(subparsers.add_parser('local'))
 
 	subparsers.add_parser('sixel').set_defaults(handler=lambda args:print(sixel.status))
 

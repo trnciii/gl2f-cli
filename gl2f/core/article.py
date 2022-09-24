@@ -1,5 +1,5 @@
 import re, html
-from . import terminal as term, sixel, path
+from . import terminal as term, sixel, local
 import json, os, datetime
 from .. import auth
 
@@ -25,7 +25,7 @@ class MediaRep:
 		if rep == 'type':
 			self.rep = self.media_rep_type
 		elif rep == 'sixel' and sixel.supported():
-			path.refdir('cache')
+			local.refdir('cache')
 			self.rep = self.media_rep_sixel
 		else:
 			self.rep = self.media_rep_type_id
@@ -40,7 +40,6 @@ class MediaRep:
 		from io import BytesIO
 		from PIL import Image
 		import time
-		from . import log
 
 		match = ptn_media.search(p)
 		if not match:
@@ -50,13 +49,13 @@ class MediaRep:
 			return self.media_rep_type_id(p)
 
 		t0 = time.time()
-		if file:=self.search_local(i):
+		if file:=local.search_media(self.contentId, i):
 			image = Image.open(file)
 			cachehit = True
 		else:
 			_, data = dl_medium(self.boardId, self.contentId, i, False, False)
 			if data:
-				with open(os.path.join(path.refdir('cache'), i), 'wb') as f:
+				with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
 					f.write(data)
 			image = Image.open(BytesIO(data))
 			cachehit = False
@@ -65,27 +64,8 @@ class MediaRep:
 		image = sixel.limit(image, (1000, 1000))
 		ret = sixel.to_sixel(image)
 		t2 = time.time()
-		log({'cache-hit': cachehit, 'open': t1-t0, 'sixelize': t2-t1})
+		local.log({'cache-hit': cachehit, 'open': t1-t0, 'sixelize': t2-t1})
 		return ret
-
-
-	def search_local(self, mediaId):
-		cache = os.path.join(path.refdir_untouch('cache'), mediaId)
-		if os.path.isfile(cache):
-			return cache
-
-
-		directory = path.refdir_untouch(f'contents/{self.contentId}')
-		if not directory:
-			return None
-
-		pattern = re.compile(rf'{mediaId}.*')
-		li = filter(pattern.match, os.listdir(directory))
-
-		try:
-			return os.path.join(directory, next(li))
-		except:
-			return None
 
 
 def compose_line(p, media_rep):
