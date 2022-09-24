@@ -165,6 +165,7 @@ gl2b ls toa --order name:desc -n 30
 gl2f ls blogs toa --order name:desc -n 30
 ```
 
+### リストの整形
 
 また、表示方法を制御するために以下のオプションがあります。
 
