@@ -19,14 +19,17 @@ def paragraphs(body):
 
 class MediaRep:
 	def __init__(self, item, rep):
-		self.boardId = item['boardId']
-		self.contentId = item['contentId']
-
 		if rep == 'type':
 			self.rep = self.media_rep_type
+
 		elif rep == 'sixel' and sixel.supported():
+			from functools import partial
+
 			local.refdir('cache')
+			self.contentId = item['contentId']
+			self.dl = partial(dl_medium, item['boardId'], self.contentId, xauth=auth.update(auth.load()))
 			self.rep = self.media_rep_sixel
+
 		else:
 			self.rep = self.media_rep_type_id
 
@@ -53,7 +56,7 @@ class MediaRep:
 			image = Image.open(file)
 			cachehit = file
 		else:
-			_, data = dl_medium(self.boardId, self.contentId, i, False, False)
+			_, data = self.dl(mediaId=i)
 			if data:
 				with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
 					f.write(data)
