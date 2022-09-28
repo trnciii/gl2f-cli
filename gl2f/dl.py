@@ -22,7 +22,7 @@ def save(item, args):
 		skip=args.skip, stream=args.stream, force=args.force, dump=args.dump)
 
 	term.clean_row()
-	fm = pretty.Formatter(f='id:author:title')
+	fm = pretty.Formatter(f='id:media:author:title')
 	print('downloaded', fm.format(item))
 
 
