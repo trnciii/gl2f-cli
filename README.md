@@ -53,6 +53,15 @@ pip でこのリポジトリから直接インストール
 pip install git+https://github.com/trnciii/gl2f-cli
 ```
 
+Windows と MacOS には、ダウンロードしてすぐ使えるアプリケーションもリリースしています。
+https://github.com/trnciii/gl2f-cli/releases
+
+>> **Note**
+>> システムのセキュリティによってマルウェアの判定を食らいやすいようです。
+>> スキャン項目からアプリを除外する等で実行できると思います。
+>> また、Mac では `chmod 755 <ファイル>` で実行できました。
+>> いずれも自信の責任で設定の変更を行ってください。
+
 
 ## 使い方
 
