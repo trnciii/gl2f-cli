@@ -33,10 +33,15 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 ## 必要なもの
 
 * 以下の機能に対応したターミナル
-	* 全角文字・絵文字の表示（なかなか完全には難しいようです）
+	* 全角文字や絵文字の表示
 	* 256 color
 	* url を開いてくれるものが便利です
 * python3 & pip
+* Chrome ブラウザ (ログインのため)
+* [libsixel](https://github.com/saitoha/libsixel) (ターミナル上に画像を表示するため)
+
+括弧書きは必要な場面が限られている場合で、それ以外の機能は問題なく使えるはずです。
+[依存](#依存) の節も見てください。
 
 
 ## インストール
@@ -276,3 +281,4 @@ twitter [@trnciii](https://twitter.com/trnciii) [@trncix](https://twitter.com/tr
 
 * requests
 * selenium, webdriver_manager (`gl2f auth login` で使います)
+* libsixel, libsixel-python, Pillow (画像をターミナル上に表示するため)
