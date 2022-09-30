@@ -2,7 +2,8 @@ name: build
 
 on:
   push:
-    branch: bin
+    tag:
+      - 'v*'
 
 jobs:
   build:
@@ -52,10 +53,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.run_id }}
-          release_name: ${{ github.run_id }}
-          draft: true
-          prerelease: true
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
 
       - run: echo '${{ steps.create_release.outputs.upload_url }}' > release_upload_url
 
