@@ -26,7 +26,7 @@ def save(item, args):
 	print('downloaded', fm.format(item))
 
 
-def add_args(parser, board):
+def add_args(parser, list_board):
 	lister.add_args(parser)
 
 	parser.add_argument('-a', '--all', action='store_true',
@@ -48,7 +48,7 @@ def add_args(parser, board):
 	def subcommand(args):
 		from .core import terminal as term, pretty
 
-		items = lister.listers()[board](args)
+		items = list_board(args)
 
 		if args.all:
 			for i in items:

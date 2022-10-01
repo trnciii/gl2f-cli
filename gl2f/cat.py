@@ -13,7 +13,7 @@ def cat(i, args):
 	print(article.to_text(i, args.style, args.sixel))
 
 
-def add_args(parser, board):
+def add_args(parser, list_board):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.add_argument('--style', type=str, choices=article.style_options(), default='compact')
@@ -40,7 +40,7 @@ def add_args(parser, board):
 
 		pretty.post_argparse(args)
 
-		items = lister.listers()[board](args)
+		items = list_board(args)
 
 		if args.all:
 			for i in items:

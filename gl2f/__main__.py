@@ -36,9 +36,11 @@ def main():
 
 
 
-def make_partial(board):
+def make_partial(key):
 	def f():
+		from .core import lister
 		parser = argparse.ArgumentParser()
+		board = lister.listers()[key]
 		for c, p in board_subcommand_parsers(parser.add_subparsers()):
 			c.add_args(p, board)
 		ex(parser)
