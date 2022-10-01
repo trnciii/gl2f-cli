@@ -51,23 +51,17 @@ class MediaRep:
 		if t != 'image':
 			return self.media_rep_type_id(p)
 
-		t0 = time.time()
 		if file:=local.search_media(i, self.contentId):
 			image = Image.open(file)
-			cachehit = file
 		else:
 			_, data = self.dl(mediaId=i)
 			if data:
 				with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
 					f.write(data)
 			image = Image.open(BytesIO(data))
-			cachehit = False
-		t1 = time.time()
 
 		image = sixel.limit(image, (1000, 1000))
 		ret = sixel.to_sixel(image)
-		t2 = time.time()
-		local.log({'cache-hit': cachehit, 'open': t1-t0, 'sixelize': t2-t1})
 		return ret
 
 

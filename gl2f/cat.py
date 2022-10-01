@@ -4,20 +4,13 @@ def name(): return 'cat'
 
 def cat(i, args):
 	from .dl import save
-	import time
-	from .core.local import log
 
 	if args.dl:
 		save(i, args)
 	print()
 	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 	fm.print(i)
-	t0 = time.time()
-	text = article.to_text(i, args.style, args.sixel)
-	t1 = time.time()
-	print(text)
-	t2 = time.time()
-	log(f'compose {t1-t0}, print {t2-t1}')
+	print(article.to_text(i, args.style, args.sixel))
 
 
 def add_args(parser, board):

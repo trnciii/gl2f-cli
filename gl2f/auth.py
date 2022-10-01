@@ -44,10 +44,6 @@ def verify(au):
 
 
 def update(au):
-	from .core.local import log
-	import sys
-	log('verifying token')
-
 	res = verify(au)
 	if not res['success']:
 		print('unauthorized')
@@ -55,7 +51,6 @@ def update(au):
 
 	token = res['token']
 	if token != au:
-		log('token updated')
 		save(token)
 	return token
 
