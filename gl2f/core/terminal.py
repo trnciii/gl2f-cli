@@ -1,8 +1,13 @@
 import re
 import os
 
+ptn_escape = re.compile(r'\033\[.*?m')
+
+def declip(s):
+	return ptn_escape.sub('', s)
+
 def justzen(s, w):
-	len_displayed = len(re.sub(r'\033\[.*?m', '', s))
+	len_displayed = len(declip(s))
 	if w>len_displayed:
 		return s + '　'*(w-len_displayed)
 	else:
