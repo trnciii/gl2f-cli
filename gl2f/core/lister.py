@@ -151,6 +151,7 @@ def listers():
 		'news': news,
 		'gtube': make_simple_lister('gtube'),
 		'cm': make_simple_lister('commercialmovie'),
+		'others': make_simple_lister('others'),
 		'shangrila': make_simple_lister('ShangrilaPG'),
 		'brandnewworld': make_simple_lister({'photo': 'Lucky2FirstLivePG', 'cheer': 'FirstLiveCheerForL2'}),
 		'daijoubu': make_simple_lister({'photo': '3rdAnnivPG', 'cheer': '3rdAnnivCheerForG2'}),

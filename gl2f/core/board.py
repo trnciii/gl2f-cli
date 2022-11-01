@@ -61,6 +61,11 @@ def get():
 			'page': 'commercialmovie',
 		},
 
+
+		'297314731440473169':{
+			'page': 'others',
+		},
+
 		# Shangri-la
 		'689409591506633568': {
 			'page': 'ShangrilaPG',
