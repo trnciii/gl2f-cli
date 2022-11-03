@@ -101,7 +101,7 @@ def to_text(item, key, use_sixel=True):
 
 	elif key == 'compressed':
 		mediarep = MediaRep(item, 'type')
-		return ''.join(lines(mediarep))
+		return ' '.join(filter(len, lines(mediarep)))
 
 
 
