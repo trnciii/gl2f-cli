@@ -12,6 +12,7 @@ ptn_strong = re.compile(r'<strong.*?>(.*?)</strong>')
 ptn_span = re.compile(r'<span.*?>(.*?)</span>')
 ptn_http = re.compile(r'(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
 ptn_tag = re.compile(r'(?P<tag>#.+?( |\n|$))')
+ptn_obj = re.compile('￼')
 
 
 def paragraphs(body):
@@ -72,6 +73,7 @@ def compose_line(p, media_rep):
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
 	p = ptn_break.sub('', p)
+	p = ptn_obj.sub('', p)
 
 	# after processing tags
 	p = html.unescape(p)
