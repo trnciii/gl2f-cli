@@ -1,0 +1,46 @@
+<style>
+header{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  padding: 10px;
+  background: linear-gradient(to right, #F486BA, #FFCE5D);
+  color: black;
+  font-size: 18px;
+}
+body{
+  padding: 50px 0px 50px 0px; /* bodyの内側余白を指定する(上:右:下:左) */
+}
+</style>
+
+
+<body>
+<script src="index.js"></script>
+<script>
+const contentId = location.search.split("?")[1]
+
+document.write([
+  '<header>',
+  `<a href=./index.html>home</a> / <a href=./contents/${contentId}>folder</a>`,
+  '</header>'
+].join(''));
+
+media = table[contentId].map(function(e){
+  const src = `./contents/${contentId}/${e}`;
+  const ext = e.slice(e.lastIndexOf("."))
+
+  const width = 600
+
+  if([".jpeg", ".png"].indexOf(ext) > -1){
+    return `<img src="${src}" width=${width}></img>`;
+  }
+  else if([".mp4", ".mov"].indexOf(ext) > -1){
+    return `<video controls src="${src}" width=${width}></video>`;
+  }
+}).join('');
+
+document.write(`<center>${media}</center>`);
+</script>
+</body>

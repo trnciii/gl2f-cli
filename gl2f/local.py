@@ -1,6 +1,7 @@
 import re
 import os, json
 from .core import pretty, local
+import shutil
 
 
 def ls(args):
@@ -28,7 +29,28 @@ def stat():
 			print(f'{_par+"/":10} items: {len(os.listdir(par))} size: {size/(1024**3):,.2f} GB')
 
 
+def init_sites(force=False):
+	src = os.path.join(os.path.dirname(__file__), 'data', 'album.html')
+	dst = os.path.join(local.home(), 'album.html')
+	if force or not os.path.exists(dst):
+		shutil.copyfile(src, dst)
+		print(f'copied file into {dst}')
+
+
+def media_index():
+	table = {
+		i: list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
+		for i in local.listdir('contents')
+	}
+
+	with open(os.path.join(local.home(), 'index.js'), 'w') as f:
+		print(f'const table={json.dumps(table, separators=(",", ":"))}', file=f)
+
+
 def index():
+	init_sites()
+	media_index()
+
 	out = os.path.join(local.home(), 'index.html')
 	with open(out, 'w', encoding='utf-8') as f:
 		print('<body>', file=f)
@@ -37,7 +59,7 @@ def index():
 		print('<tr><th>Title</th><tr>', file=f)
 		for i in local.listdir('contents'):
 			item = local.load_content(i)
-			print(f'<tr><td><a href=contents/{item["contentId"]}>{item["values"]["title"]}</a></td><tr>', file=f)
+			print(f'<tr><td><a href=album.html?{item["contentId"]}>{item["values"]["title"]}</a></td><tr>', file=f)
 		print('</table>', file=f)
 
 		print('</body>', file=f)
