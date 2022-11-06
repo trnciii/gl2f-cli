@@ -6,7 +6,7 @@ setup(
 	url='https://github.com/trnciii/gl2f-cli',
 	license='MIT',
 	packages=find_packages(),
-	package_data={'gl2f':['data/*']},
+	package_data={'gl2f':['data/site/*', 'data/site/asset/*']},
 	install_requires=[
 		'requests',
 		'libsixel-python',
