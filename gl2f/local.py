@@ -30,34 +30,43 @@ def stat():
 
 
 def install():
-	for file in ['album.html', 'asset']:
-		src = os.path.join(os.path.dirname(__file__), 'data', file)
-		dst = os.path.join(local.home(), file)
+	file = 'site'
+	src = os.path.join(os.path.dirname(__file__), 'data', file)
+	dst = os.path.join(local.home(), file)
 
-		if os.path.exists(dst):
-			print(f'reinstalling {dst} that already exits')
-			rm = shutil.rmtree if os.path.isdir(dst) else os.remove
-			rm(dst)
+	if os.path.exists(dst):
+		print(f'reinstalling {dst} that already exits')
+		rm = shutil.rmtree if os.path.isdir(dst) else os.remove
+		rm(dst)
 
-		cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
-		cp(src, dst)
-		print(f'copied file into {dst}')
+	cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
+	cp(src, dst)
+	print(f'copied site into {dst}')
+
+	index()
 
 
-def media_index():
+def index():
+	site = local.refdir_untouch('site')
+	if not site:
+		print('site is not installed. try "gl2f local install"')
+		return
+
+	# js
 	table = {
 		i: list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
 		for i in local.listdir('contents')
 	}
 
-	with open(os.path.join(local.home(), 'index.js'), 'w') as f:
+	out = os.path.join(site, 'index.js')
+	with open(out, 'w') as f:
 		print(f'const table={json.dumps(table, separators=(",", ":"))}', file=f)
 
+	print(f'saved {out}')
 
-def index():
-	media_index()
 
-	out = os.path.join(local.home(), 'index.html')
+	# html
+	out = os.path.join(site, 'index.html')
 	with open(out, 'w', encoding='utf-8') as f:
 		print('<body>', file=f)
 

@@ -47,6 +47,7 @@ def add_args(parser, list_board):
 
 	def subcommand(args):
 		from .core import terminal as term, pretty
+		from .core.local import refdir_untouch
 		from .local import index
 
 		items = list_board(args)
@@ -60,6 +61,7 @@ def add_args(parser, list_board):
 			for i in [i for s, i in zip(selected, items) if s]:
 				save(i, args)
 
-		index()
+		if refdir_untouch('site'):
+			index()
 
 	parser.set_defaults(handler=subcommand)

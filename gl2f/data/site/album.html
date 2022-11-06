@@ -48,13 +48,14 @@ body{
 <script src="index.js"></script>
 <script>
 const contentId = location.search.split("?")[1];
+const dir = `../contents/${contentId}`
 
-document.getElementById('folder').setAttribute('href', `./contents/${contentId}`);
+document.getElementById('folder').setAttribute('href', dir);
 
 const media = document.getElementById('media');
 function draw(r){
   media.innerHTML = table[contentId].map(function(e){
-    const src = `./contents/${contentId}/${e}`;
+    const src = `${dir}/${e}`;
     const ext = src.slice(src.lastIndexOf('.'));
     const size = 400*r/100;
     if([".jpeg", ".png"].indexOf(ext) > -1){
