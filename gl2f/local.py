@@ -29,14 +29,19 @@ def stat():
 			print(f'{_par+"/":10} items: {len(os.listdir(par))} size: {size/(1024**3):,.2f} GB')
 
 
-def init_sites(force=False):
-	for obj in ['album.html', 'asset']:
-		src = os.path.join(os.path.dirname(__file__), 'data', obj)
-		dst = os.path.join(local.home(), obj)
-		if force or not os.path.exists(dst):
-			cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
-			cp(src, dst)
-			print(f'copied file into {dst}')
+def install():
+	for file in ['album.html', 'asset']:
+		src = os.path.join(os.path.dirname(__file__), 'data', file)
+		dst = os.path.join(local.home(), file)
+
+		if os.path.exists(dst):
+			print(f'reinstalling {dst} that already exits')
+			rm = shutil.rmtree if os.path.isdir(dst) else os.remove
+			rm(dst)
+
+		cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
+		cp(src, dst)
+		print(f'copied file into {dst}')
 
 
 def media_index():
@@ -50,7 +55,6 @@ def media_index():
 
 
 def index():
-	init_sites()
 	media_index()
 
 	out = os.path.join(local.home(), 'index.html')
@@ -93,6 +97,7 @@ def add_args(parser):
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
 	sub.add_parser('index').set_defaults(handler=lambda _:index())
+	sub.add_parser('install').set_defaults(handler=lambda _:install())
 
 	p = sub.add_parser('ls')
 	p.add_argument('--order', type=str,
