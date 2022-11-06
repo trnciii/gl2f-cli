@@ -30,11 +30,13 @@ def stat():
 
 
 def init_sites(force=False):
-	src = os.path.join(os.path.dirname(__file__), 'data', 'album.html')
-	dst = os.path.join(local.home(), 'album.html')
-	if force or not os.path.exists(dst):
-		shutil.copyfile(src, dst)
-		print(f'copied file into {dst}')
+	for obj in ['album.html', 'asset']:
+		src = os.path.join(os.path.dirname(__file__), 'data', obj)
+		dst = os.path.join(local.home(), obj)
+		if force or not os.path.exists(dst):
+			cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
+			cp(src, dst)
+			print(f'copied file into {dst}')
 
 
 def media_index():

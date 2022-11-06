@@ -11,14 +11,22 @@ header{
   color: black;
   font-size: 18px;
 }
+
 body{
   padding: 50px 10px 20px 10px; /* bodyの内側余白を指定する(上:右:下:左) */
 }
-div.delimiter{
+
+.delimiter{
   margin-left: 4px;
   margin-right: 4px;
 }
 </style>
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="asset/modaal.js"></script>
+  <link href="asset/modaal.css" rel="stylesheet" type="text/css">
+</head>
 
 
 <body>
@@ -27,7 +35,11 @@ div.delimiter{
   <a href=./index.html>home</a>
   <div class='delimiter'>/</div>
   <a id='folder' href='_'>folder</a>
-  <div style="margin-right: 20px; margin-left: auto;">scale<input type="range" id="scale" min="20" max="200" step="4"></div>
+
+  <div style="margin-right: 20px; margin-left: auto;">
+    scale
+    <input type="range" id="scale" min="20" max="200" step="4">
+  </div>
 </header>
 
 <center><span id='media'></span></center>
@@ -35,32 +47,39 @@ div.delimiter{
 
 <script src="index.js"></script>
 <script>
-const contentId = location.search.split("?")[1]
+const contentId = location.search.split("?")[1];
 
-document.getElementById('folder').setAttribute('href', `./contents/${contentId}`)
+document.getElementById('folder').setAttribute('href', `./contents/${contentId}`);
 
 const media = document.getElementById('media');
 function draw(r){
   media.innerHTML = table[contentId].map(function(e){
     const src = `./contents/${contentId}/${e}`;
-    const ext = e.slice(e.lastIndexOf("."))
-
-    const width = 600*r/100;
-
+    const ext = src.slice(src.lastIndexOf('.'));
+    const size = 400*r/100;
     if([".jpeg", ".png"].indexOf(ext) > -1){
-      return `<img src="${src}" width=${width}></img>`;
+      return `<a class="image" data-group="gallery" href=${src}>`
+        + `<img src="${src}" width=${size}></img>`
+        + `</a>`;
     }
     else if([".mp4", ".mov"].indexOf(ext) > -1){
-      return `<video controls src="${src}" width=${width}></video>`;
+      return `<a class="iframe" href=${src}>`
+        + `<video controls src="${src}" width=${size}></video>`
+        + `</a>`;
     }
   }).join('');
+
+  $('.image').modaal({
+    type: 'image',
+  });
+  $('.iframe').modaal({
+    type: 'iframe',
+  });
 }
 
-
-const scale = document.getElementById('scale');
-
 window.onload = ()=>{
-  scale.addEventListener('input', (e)=>{draw(e.target.value);});
+  document.getElementById('scale')
+  .addEventListener('input', (e)=>{draw(e.target.value);});
   draw(100);
 }
 </script>
