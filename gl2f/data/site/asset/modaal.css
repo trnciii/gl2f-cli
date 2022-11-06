@@ -94,7 +94,7 @@
 	position: relative;
 	vertical-align: middle;
 	text-align: center;
-	padding: 80px 25px;
+	padding: 10px 25px;
 }
 
 .modaal-fullscreen .modaal-inner-wrapper {
@@ -292,6 +292,7 @@
 
 .modaal-gallery-item img {
 	display: block;
+	max-height: calc(100vh - 20px);
 }
 
 .modaal-gallery-item.is_active {
@@ -687,11 +688,6 @@
 }
 
 @media screen and (max-height: 1000px) {
-
-.modaal-inner-wrapper {
-	padding-top: 60px;
-	padding-bottom: 60px;
-}
 
 .modaal-instagram iframe {
 	width: 600px !important;

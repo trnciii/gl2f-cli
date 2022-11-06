@@ -13,7 +13,7 @@ header{
 }
 
 body{
-  padding: 50px 10px 20px 10px; /* bodyの内側余白を指定する(上:右:下:左) */
+  padding: 50px 10px 10px 10px; /* bodyの内側余白を指定する(上:右:下:左) */
 }
 
 .delimiter{
@@ -59,20 +59,20 @@ function draw(r){
     const ext = src.slice(src.lastIndexOf('.'));
     const size = 400*r/100;
     if([".jpeg", ".png"].indexOf(ext) > -1){
-      return `<a class="image" data-group="gallery" href=${src}>`
+      return `<a class="image tile" href=${src}>`
         + `<img src="${src}" width=${size}></img>`
         + `</a>`;
     }
     else if([".mp4", ".mov"].indexOf(ext) > -1){
-      return `<a class="iframe" href=${src}>`
-        + `<video controls src="${src}" width=${size}></video>`
+      return `<a class="iframe tile" href=${src}>`
+        + `<video controls autoplay muted loop src="${src}" width=${size}></video>`
         + `</a>`;
     }
   }).join('');
 
   $('.image').modaal({
     type: 'image',
-  });
+  })
   $('.iframe').modaal({
     type: 'iframe',
   });
