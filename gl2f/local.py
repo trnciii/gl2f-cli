@@ -49,7 +49,8 @@ def install():
 def index():
 	site = local.refdir_untouch('site')
 	if not site:
-		print('site is not installed. try "gl2f local install"')
+		if 'n' != input('site not found. install now? (Y/n)').lower():
+			install()
 		return
 
 	# js
