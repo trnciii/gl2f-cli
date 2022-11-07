@@ -68,10 +68,13 @@ function draw(r){
         + `<img src="${src}" width=${size}></img>`
         + `</a>`;
     }
-    else if([".mp4", ".mov"].indexOf(ext) > -1){
+    else if([".mp4"].indexOf(ext) > -1){
       return `<a class="iframe tile" href=${src}>`
         + `<video autoplay muted loop src="${src}" width=${size}></video>`
         + `</a>`;
+    }
+    else if([".mov"].indexOf(ext) > -1){
+      return `<video controls autoplay muted loop src="${src}" class="tile" width=${size}></video>`;
     }
   }).join('');
 
