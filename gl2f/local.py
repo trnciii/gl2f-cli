@@ -83,6 +83,15 @@ def index():
 	print(f'saved {out}')
 
 
+def view():
+	import webbrowser
+	html = os.path.join(local.home(), 'site', 'index.html')
+	if os.path.exists(html):
+		webbrowser.open(html)
+	else:
+		print('site is not installed')
+
+
 def extract_bodies(filename):
 	with open(filename) as f:
 		log = json.load(f)
@@ -116,3 +125,4 @@ def add_args(parser):
 	p.set_defaults(handler=ls, format='date-p:author:title')
 
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
+	sub.add_parser('view').set_defaults(handler=lambda _:view())
