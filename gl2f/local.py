@@ -28,8 +28,47 @@ def stat():
 			print(f'{_par+"/":10} items: {len(os.listdir(par))} size: {size/(1024**3):,.2f} GB')
 
 
+def install():
+	import shutil
+
+	file = 'site'
+	src = os.path.join(os.path.dirname(__file__), 'data', file)
+	dst = os.path.join(local.home(), file)
+
+	if os.path.exists(dst):
+		print(f'reinstalling {dst} that already exits')
+		rm = shutil.rmtree if os.path.isdir(dst) else os.remove
+		rm(dst)
+
+	cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
+	cp(src, dst)
+	print(f'copied site into {dst}')
+
+	index()
+
+
 def index():
-	out = os.path.join(local.home(), 'index.html')
+	site = local.refdir_untouch('site')
+	if not site:
+		if 'n' != input('site not found. install now? (Y/n)').lower():
+			install()
+		return
+
+	# js
+	table = {
+		i: list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
+		for i in local.listdir('contents')
+	}
+
+	out = os.path.join(site, 'index.js')
+	with open(out, 'w') as f:
+		print(f'const table={json.dumps(table, separators=(",", ":"))}', file=f)
+
+	print(f'saved {out}')
+
+
+	# html
+	out = os.path.join(site, 'index.html')
 	with open(out, 'w', encoding='utf-8') as f:
 		print('<body>', file=f)
 
@@ -37,12 +76,21 @@ def index():
 		print('<tr><th>Title</th><tr>', file=f)
 		for i in local.listdir('contents'):
 			item = local.load_content(i)
-			print(f'<tr><td><a href=contents/{item["contentId"]}>{item["values"]["title"]}</a></td><tr>', file=f)
+			print(f'<tr><td><a href=album.html?{item["contentId"]}>{item["values"]["title"]}</a></td><tr>', file=f)
 		print('</table>', file=f)
 
 		print('</body>', file=f)
 
 	print(f'saved {out}')
+
+
+def view():
+	import webbrowser
+	html = os.path.join(local.home(), 'site', 'index.html')
+	if os.path.exists(html):
+		webbrowser.open(html)
+	else:
+		print('site is not installed')
 
 
 def extract_bodies(filename):
@@ -69,6 +117,7 @@ def add_args(parser):
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
 	sub.add_parser('index').set_defaults(handler=lambda _:index())
+	sub.add_parser('install').set_defaults(handler=lambda _:install())
 
 	p = sub.add_parser('ls')
 	p.add_argument('--order', type=str,
@@ -77,3 +126,4 @@ def add_args(parser):
 	p.set_defaults(handler=ls, format='date-p:author:title')
 
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
+	sub.add_parser('view').set_defaults(handler=lambda _:view())
