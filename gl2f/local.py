@@ -1,7 +1,6 @@
 import re
 import os, json
 from .core import pretty, local
-import shutil
 
 
 def ls(args):
@@ -30,6 +29,8 @@ def stat():
 
 
 def install():
+	import shutil
+
 	file = 'site'
 	src = os.path.join(os.path.dirname(__file__), 'data', file)
 	dst = os.path.join(local.home(), file)
