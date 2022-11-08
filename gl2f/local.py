@@ -64,29 +64,11 @@ def index():
 			'media': list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
 		}
 
-	# js
 	table = {i: value(i) for i in local.listdir('contents')}
 
 	out = os.path.join(site, 'index.js')
 	with open(out, 'w') as f:
 		print(f'const table={json.dumps(table, separators=(",", ":"))}', file=f)
-
-	print(f'saved {out}')
-
-
-	# html
-	out = os.path.join(site, 'index.html')
-	with open(out, 'w', encoding='utf-8') as f:
-		print('<body>', file=f)
-
-		print('<table>', file=f)
-		print('<tr><th>Title</th><tr>', file=f)
-		for i in local.listdir('contents'):
-			item = local.load_content(i)
-			print(f'<tr><td><a href=album.html?{item["contentId"]}>{item["values"]["title"]}</a></td><tr>', file=f)
-		print('</table>', file=f)
-
-		print('</body>', file=f)
 
 	print(f'saved {out}')
 
