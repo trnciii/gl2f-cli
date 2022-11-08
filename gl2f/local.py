@@ -48,17 +48,24 @@ def install():
 
 
 def index():
+	from .core import board
+
 	site = local.refdir_untouch('site')
 	if not site:
 		if 'n' != input('site not found. install now? (Y/n)').lower():
 			install()
 		return
 
+	def value(i):
+		item = local.load_content(i)
+		return {
+			'title': item['values']['title'],
+			'board': board.get()[item['boardId']]['page'],
+			'media': list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
+		}
+
 	# js
-	table = {
-		i: list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
-		for i in local.listdir('contents')
-	}
+	table = {i: value(i) for i in local.listdir('contents')}
 
 	out = os.path.join(site, 'index.js')
 	with open(out, 'w') as f:

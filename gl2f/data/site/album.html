@@ -37,9 +37,15 @@ body{
 <body>
 
 <header>
-  <a href=./index.html>home</a>
-  <div class='delimiter'>/</div>
-  <a id='folder' href='_'>folder</a>
+  <div style="display: flex;margin-right: auto;">
+    <a href=./index.html>home</a>
+    <div class='delimiter'>/</div>
+    <a id='folder' href='_'>folder</a>
+  </div>
+
+  <div style="margin: auto;">
+    <span id='title'></span>
+  </div>
 
   <div style="margin-right: 20px; margin-left: auto;">
     <input type="range" id="cols" min="1" max="7" step="1">
@@ -53,12 +59,16 @@ body{
 <script>
 const contentId = location.search.split("?")[1];
 const dir = `../contents/${contentId}`
+const media_table = table[contentId]['media'];
+
+document.title = `Album ${table[contentId]['title']}`
 
 document.getElementById('folder').setAttribute('href', dir);
+document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page/${table[contentId]['board']}/${contentId}'>${table[contentId]['title']}</a>`;
 
 const media = document.getElementById('media');
 function draw(r){
-  media.innerHTML = table[contentId].map(function(e){
+  media.innerHTML = media_table.map(function(e){
     const src = `${dir}/${e}`;
     const ext = src.slice(src.lastIndexOf('.'));
     const size = (window.innerWidth-100)/r;
@@ -90,7 +100,7 @@ function draw(r){
 
 window.onload = ()=>{
   const cols = document.getElementById('cols');
-  cols.value = Math.sqrt(table[contentId].length) * (window.innerWidth/window.innerHeight);
+  cols.value = Math.sqrt(media_table.length) * (window.innerWidth/window.innerHeight);
   cols.addEventListener('input', (e)=>{draw(e.target.value);});
   draw(cols.value);
 }
