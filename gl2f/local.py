@@ -73,7 +73,7 @@ def index():
 	print(f'saved {out}')
 
 
-def view():
+def open_site():
 	import webbrowser
 	html = os.path.join(local.home(), 'site', 'index.html')
 	if os.path.exists(html):
@@ -115,4 +115,4 @@ def add_args(parser):
 	p.set_defaults(handler=ls, format='date-p:author:title')
 
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
-	sub.add_parser('view').set_defaults(handler=lambda _:view())
+	sub.add_parser('open').set_defaults(handler=lambda _:open_site())
