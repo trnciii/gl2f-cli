@@ -80,7 +80,7 @@ jobs:
           name: url
 
       - id: upload_url
-        run: echo "::set-output name=url::$(cat url/release_upload_url)"
+        run: echo "url=$(cat url/release_upload_url)" >> $GITHUB_OUTPUT
 
       - uses: actions/download-artifact@v1
         with:
