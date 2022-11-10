@@ -3,16 +3,43 @@
 </head>
 
 <body>
+
+<span id='columns'></span>
+
 <span id="table"></span>
 
 <script src="index.js"></script>
 <script type="text/javascript">
-head = "<tr><th>Date</th><th>Board</th><th>Author</th><th>Title</th></tr>";
-data = Object.entries(table).map(([k, v])=>{
-	return `<tr><td>${new Date(v['date']).toLocaleDateString()}</td><td><a href='https://girls2-fc.jp/page/${v['board']}' target='_blank'>${v['board']}</a></td><td>${v['author']}</td><td><a href=album.html?${k}>${v['title']}</a></td><tr>`
-}).join('');
+const f = {
+	Date: (k, v)=>`${new Date(v['date']).toLocaleDateString()}`,
+	Board: (k, v)=>`<a href='https://girls2-fc.jp/page/${v['board']}' target='_blank'>${v['board']}</a>`,
+	Author : (k, v)=>`${v['author']}`,
+	Title: (k, v)=>`<a href=album.html?${k}>${v['title']}</a>`,
+};
 
-document.getElementById("table").innerHTML = `<table>${head}${data}</table>`;
+function draw(){
+	const columns = keys.filter(k=>document.getElementById(`col_${k}`).checked);
+	document.getElementById("table").innerHTML = '<table>'
+		+ '<tr>' +  columns.map(s=>`<th>${s}</th>`).join('') + '</tr>'
+		+ Object.entries(table).map(
+			([k, v])=>'<tr>'
+				+ columns.map((c)=>`<td>${f[c](k, v)}</td>`).join('')
+				+ '</tr>'
+		).join('')
+		+ '</table>';
+};
+
+
+const keys = Object.keys(f);
+
+document.getElementById('columns').innerHTML = keys.map(
+	k=>`<input id=col_${k} type='checkbox' checked>${k}</input>`
+).join('');
+
+keys.map(k=>document.getElementById(`col_${k}`))
+.forEach(b=>b.addEventListener('change', draw));
+
+draw();
 </script>
 
 </body>
