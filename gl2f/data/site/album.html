@@ -4,32 +4,12 @@
 <script src="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/js/modaal.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/css/modaal.min.css">
 
-<style>
-header{
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: calc(100vw - 20px);
-  height: 20px;
-  padding: 10px;
-  display: flex;
-  background: linear-gradient(to right, #F486BA, #FFCE5D);
-  color: black;
-  font-size: 18px;
-  z-index: 9;
-}
+<link rel="stylesheet" href="style.css">
 
-body{
-  padding: 50px 10px 10px 10px;
-}
+<style>
 
 .tile{
   vertical-align: middle;
-}
-
-.delimiter{
-  margin-left: 4px;
-  margin-right: 4px;
 }
 
 .modaal-inner-wrapper {
@@ -56,9 +36,9 @@ body{
 
 <header>
   <div style="display: flex;margin-right: auto;">
-    <a href=./index.html>home</a>
-    <div class='delimiter'>/</div>
-    <a id='folder' href='_'>folder</a>
+    <a class="item" href=./index.html>home</a>
+    /
+    <a class="item" id='folder' href='_'>folder</a>
   </div>
 
   <div style="margin: auto;">

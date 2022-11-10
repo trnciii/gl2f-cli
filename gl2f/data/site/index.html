@@ -1,16 +1,19 @@
 <head>
 <title>gl2f local files</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 
 <body>
 
-<div>
-	<span id='columns'></span>
-	<span id='filter_board'></span>
-	<span id='filter_author'></span>
-</div>
+<header>
+	<span class='item' id='columns'></span>
+	<span class='item' id='filter_board'></span>
+	<span class='item' id='filter_author'></span>
+</header>
 
 <span id="table"></span>
+
 
 <script src="index.js"></script>
 <script type="text/javascript">
@@ -45,22 +48,22 @@ function draw(){
 const keys = Object.keys(f);
 
 document.getElementById('columns').innerHTML = keys.map(
-	k=>`<input id=col_${k} type='checkbox' checked>${k}</input>`
+	k=>`<input class='item' id=col_${k} type='checkbox' checked>${k}</input>`
 ).join('');
 
 keys.map(k=>document.getElementById(`col_${k}`))
 .forEach(b=>b.addEventListener('change', draw));
 
 
-document.getElementById('filter_board').innerHTML = 'board <select id=flt_board>'
-	+ '<option value=all>all</option>'
+document.getElementById('filter_board').innerHTML = '<select id=flt_board>'
+	+ '<option value=all>page / all</option>'
 	+	[...new Set(Object.values(table).map(v=>v['board']))].sort().map(b=>`<option value=${b}>${b}</option>`).join('')
 	+ '</select>'
 document.getElementById('flt_board').onchange = draw;
 
 
-document.getElementById('filter_author').innerHTML = 'author <select id=flt_author>'
-	+ '<option value=all>all</option>'
+document.getElementById('filter_author').innerHTML = '<select id=flt_author>'
+	+ '<option value=all>author / all</option>'
 	+ [...new Set(Object.values(table).map(v=>v['author']))].sort().map(a=>`<option value=${a}>${a}</option>`).join('')
 	+ '</select>'
 document.getElementById('flt_author').onchange = draw;

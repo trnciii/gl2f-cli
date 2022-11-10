@@ -1,0 +1,22 @@
+header{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100vw - 20px);
+  height: 20px;
+  padding: 10px;
+  display: flex;
+  background: linear-gradient(to right, #F486BA, #FFCE5D);
+  color: black;
+  font-size: 18px;
+  z-index: 9;
+}
+
+body{
+  padding: 50px 10px 10px 10px;
+}
+
+.item{
+  margin-left: 4px;
+  margin-right: 4px;
+}
