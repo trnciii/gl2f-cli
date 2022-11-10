@@ -4,7 +4,11 @@
 
 <body>
 
-<span id='columns'></span>
+<div>
+	<span id='columns'></span>
+	<span id='filter_board'></span>
+	<span id='filter_author'></span>
+</div>
 
 <span id="table"></span>
 
@@ -17,11 +21,19 @@ const f = {
 	Title: (k, v)=>`<a href=album.html?${k}>${v['title']}</a>`,
 };
 
+function filter(table, key){
+	const b = document.getElementById(`flt_${key}`).value;
+	console.log(b);
+	if(b == 'all') return table;
+	else return Object.fromEntries(Object.entries(table).filter(([k, v])=>v[key]==b));
+}
+
 function draw(){
 	const columns = keys.filter(k=>document.getElementById(`col_${k}`).checked);
+	const _table = filter(filter(table, 'author'), 'board');
 	document.getElementById("table").innerHTML = '<table>'
 		+ '<tr>' +  columns.map(s=>`<th>${s}</th>`).join('') + '</tr>'
-		+ Object.entries(table).map(
+		+ Object.entries(_table).map(
 			([k, v])=>'<tr>'
 				+ columns.map((c)=>`<td>${f[c](k, v)}</td>`).join('')
 				+ '</tr>'
@@ -38,6 +50,21 @@ document.getElementById('columns').innerHTML = keys.map(
 
 keys.map(k=>document.getElementById(`col_${k}`))
 .forEach(b=>b.addEventListener('change', draw));
+
+
+document.getElementById('filter_board').innerHTML = 'board <select id=flt_board>'
+	+ '<option value=all>all</option>'
+	+	[...new Set(Object.values(table).map(v=>v['board']))].sort().map(b=>`<option value=${b}>${b}</option>`).join('')
+	+ '</select>'
+document.getElementById('flt_board').onchange = draw;
+
+
+document.getElementById('filter_author').innerHTML = 'author <select id=flt_author>'
+	+ '<option value=all>all</option>'
+	+ [...new Set(Object.values(table).map(v=>v['author']))].sort().map(a=>`<option value=${a}>${a}</option>`).join('')
+	+ '</select>'
+document.getElementById('flt_author').onchange = draw;
+
 
 draw();
 </script>
