@@ -61,6 +61,8 @@ def index():
 		return {
 			'title': item['values']['title'],
 			'board': board.get()[item['boardId']]['page'],
+			'author': item.get('category', {'name':''})['name'],
+			'date': item['openingAt'],
 			'media': list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
 		}
 

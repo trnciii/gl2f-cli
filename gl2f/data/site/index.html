@@ -3,15 +3,13 @@
 </head>
 
 <body>
-
 <span id="table"></span>
 
 <script src="index.js"></script>
 <script type="text/javascript">
-
-head = "<tr><th>Title</th></tr>";
+head = "<tr><th>Date</th><th>Board</th><th>Author</th><th>Title</th></tr>";
 data = Object.entries(table).map(([k, v])=>{
-	return `<tr><td><a href=album.html?${k}>${v['title']}</a></td><tr>`
+	return `<tr><td>${new Date(v['date']).toLocaleDateString()}</td><td><a href='https://girls2-fc.jp/page/${v['board']}' target='_blank'>${v['board']}</a></td><td>${v['author']}</td><td><a href=album.html?${k}>${v['title']}</a></td><tr>`
 }).join('');
 
 document.getElementById("table").innerHTML = `<table>${head}${data}</table>`;
