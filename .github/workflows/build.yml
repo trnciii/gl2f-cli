@@ -26,7 +26,7 @@ jobs:
           python-version: 3.x
       - run: pip install . pyinstaller
 
-      - run: pyinstaller bin/_gl2f.py --onefile --name gl2f
+      - run: pyinstaller bin/_gl2f.py --onefile --name gl2f --collect-data gl2f
       - run: pyinstaller bin/_gl2b.py --onefile --name gl2b
       - run: pyinstaller bin/_gl2r.py --onefile --name gl2r
       - run: pyinstaller bin/_gl2n.py --onefile --name gl2n
