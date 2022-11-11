@@ -12,40 +12,82 @@
 	<span class='item' id='filter_author'></span>
 </header>
 
-<span id="table"></span>
+<table>
+	<thead id='thead'></thead>
+	<tbody id='tbody'></tbody>
+</table>
 
 
 <script src="index.js"></script>
 <script type="text/javascript">
 const f = {
-	Date: (k, v)=>`${new Date(v['date']).toLocaleDateString()}`,
-	Board: (k, v)=>`<a href='https://girls2-fc.jp/page/${v['board']}' target='_blank'>${v['board']}</a>`,
-	Author : (k, v)=>`${v['author']}`,
-	Title: (k, v)=>`<a href=album.html?${k}>${v['title']}</a>`,
+	Date:{
+		key:'date',
+		head:()=>'Date',
+		data:(k, v)=>`${new Date(v['date']).toLocaleDateString('ja-JP')}`,
+	},
+	Page:{
+		key:'board',
+		data:(k, v)=>`<a href='https://girls2-fc.jp/page/${v['board']}' target='_blank'>${v['board']}</a>`,
+	},
+	Author:{
+		key:'author',
+		data:(k, v)=>`<center class='nowrap'>${v['author']}`,
+	},
+	Title:{
+		key:'title',
+		data:(k, v)=>`<a href=album.html?${k}>${v['title']}</a>`,
+	},
 };
+
+const keys = Object.keys(f);
+
+var sort_state = {
+	key:'date',
+	order:-1
+};
+
 
 function filter(table, key){
 	const b = document.getElementById(`flt_${key}`).value;
-	console.log(b);
 	if(b == 'all') return table;
 	else return Object.fromEntries(Object.entries(table).filter(([k, v])=>v[key]==b));
 }
 
+function sort(table, key, order){
+	const lower = (s)=>String(s).toLowerCase();
+	const entries = Object.entries(table)
+		.sort(([kl, vl], [kr, vr])=>lower(vl[key])<lower(vr[key])?-order:order);
+	return Object.fromEntries(entries);
+}
+
+
 function draw(){
 	const columns = keys.filter(k=>document.getElementById(`col_${k}`).checked);
-	const _table = filter(filter(table, 'author'), 'board');
-	document.getElementById("table").innerHTML = '<table>'
-		+ '<tr>' +  columns.map(s=>`<th>${s}</th>`).join('') + '</tr>'
-		+ Object.entries(_table).map(
-			([k, v])=>'<tr>'
-				+ columns.map((c)=>`<td>${f[c](k, v)}</td>`).join('')
-				+ '</tr>'
-		).join('')
-		+ '</table>';
+	document.getElementById('thead')
+	.innerHTML = '<tr>'
+		+ columns.map(c=>`<th><div class="nowrap" id=thead_${c}>${c}&thinsp;${f[c].key==sort_state.key?(sort_state.order==1?'↑':'↓')+'&ensp;':'↑↓'}</div></th>`).join('')
+		+ '</tr>';
+	columns.forEach((c)=>{
+		document.getElementById(`thead_${c}`).onclick = ()=>{
+			if (sort_state.key == f[c].key)
+				sort_state.order *= -1;
+			else{
+				sort_state.key = f[c].key;
+				sort_state.order = 1;
+			}
+			draw();
+		};
+	});
+
+	document.getElementById('tbody').innerHTML = Object.entries(
+		sort(filter(filter(table, 'board'), 'author'), sort_state.key, sort_state.order)
+	).map(([k, v])=>'<tr>'
+		+ columns.map((c)=>`<td>${f[c].data(k, v)}</td>`).join('')
+		+ '</tr>'
+	).join('');
 };
 
-
-const keys = Object.keys(f);
 
 document.getElementById('columns').innerHTML = keys.map(
 	k=>`<input class='item' id=col_${k} type='checkbox' checked>${k}</input>`
