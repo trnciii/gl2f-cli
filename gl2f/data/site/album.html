@@ -41,7 +41,7 @@
     <a class="item" id='folder' href='_'>folder</a>
   </div>
 
-  <div style="margin: auto;">
+  <div style="margin: auto; padding: 0px 40px;">
     <span id='title'></span>
   </div>
 
@@ -98,7 +98,7 @@ function draw(r){
 
 window.onload = ()=>{
   const cols = document.getElementById('cols');
-  cols.value = Math.sqrt(media_table.length) * (window.innerWidth/window.innerHeight);
+  cols.value = Math.min(Math.sqrt(media_table.length) * (window.innerWidth/window.innerHeight), media_table.length);
   cols.addEventListener('input', (e)=>{draw(e.target.value);});
   draw(cols.value);
 }

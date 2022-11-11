@@ -1,9 +1,13 @@
+html{
+  font-family: arial;
+}
+
 header{
   position: fixed;
   top: 0;
   left: 0;
   width: calc(100vw - 20px);
-  height: 20px;
+  height: auto;
   padding: 10px;
   display: flex;
   background: linear-gradient(to right, #F486BA, #FFCE5D);
