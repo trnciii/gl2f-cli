@@ -38,8 +38,8 @@ label, .nowrap{
 
 <header>
 	<span class='item' id='columns'></span>
-	<span class='item' id='filter_board'></span>
-	<span class='item' id='filter_author'></span>
+	<select class=item id=filter_board onchange="draw()"></select>
+	<select class=item id=filter_author onchange="draw()"></select>
 </header>
 
 <div style="overflow: scroll; height: 100%; overflow-x: auto; overflow-y: auto;">
@@ -81,7 +81,7 @@ var sort_state = {
 
 
 function filter(table, key){
-	const b = document.getElementById(`flt_${key}`).value;
+	const b = document.getElementById(`filter_${key}`).value;
 	if(b == 'all') return table;
 	else return Object.fromEntries(Object.entries(table).filter(([k, v])=>v[key]==b));
 }
@@ -129,18 +129,13 @@ keys.map(k=>document.getElementById(`col_${k}`))
 .forEach(b=>b.addEventListener('change', draw));
 
 
-document.getElementById('filter_board').innerHTML = '<select id=flt_board>'
-	+ '<option value=all>page / all</option>'
-	+	[...new Set(Object.values(table).map(v=>v['board']))].sort().map(b=>`<option value=${b}>${b}</option>`).join('')
-	+ '</select>'
-document.getElementById('flt_board').onchange = draw;
+document.getElementById('filter_board').innerHTML = '<option value=all>page / all</option>'
+	+	[...new Set(Object.values(table).map(v=>v['board']))].sort()
+	.map(b=>`<option value=${b}>${b}</option>`).join('');
 
-
-document.getElementById('filter_author').innerHTML = '<select id=flt_author>'
-	+ '<option value=all>author / all</option>'
-	+ [...new Set(Object.values(table).map(v=>v['author']))].sort().map(a=>`<option value=${a}>${a}</option>`).join('')
-	+ '</select>'
-document.getElementById('flt_author').onchange = draw;
+document.getElementById('filter_author').innerHTML = '<option value=all>author / all</option>'
+	+ [...new Set(Object.values(table).map(v=>v['author']))]
+	.sort().map(a=>`<option value=${a}>${a}</option>`).join('');
 
 
 draw();
