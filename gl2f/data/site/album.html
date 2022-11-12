@@ -98,7 +98,7 @@ function draw(){
           + `<img src="${src}" width=${size}></img>`
           + `</a>`;
       }
-      else if([".mp4", '.mov'].indexOf(ext) > -1){
+      else if([".mp4"].indexOf(ext) > -1){
         return `<a class="iframe tile" href=${src}>`
           + `<video controls autoplay muted loop src="${src}" width=${size}></video>`
           + `</a>`;
