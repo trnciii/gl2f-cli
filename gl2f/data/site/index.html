@@ -1,0 +1,144 @@
+<head>
+<title>gl2f local files</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+table{
+	border-collapse:collapse;
+}
+
+th{
+	padding-top:8px;
+	padding-bottom:8px;
+	position: sticky;
+	top:0;
+	background: lightcoral;
+}
+
+td{
+	padding: 4px 4px;
+	background: lavenderblush;
+}
+
+tr:nth-child(odd) td{
+	background: white;
+}
+
+label, .nowrap{
+	white-space: nowrap;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<header>
+	<span class='item' id='columns'></span>
+	<select class=item id=filter_board onchange="draw()"></select>
+	<select class=item id=filter_author onchange="draw()"></select>
+</header>
+
+<div style="overflow: scroll; height: 100%; overflow-x: auto; overflow-y: auto;">
+	<table>
+		<thead id='thead'></thead>
+		<tbody id='tbody'></tbody>
+	</table>
+</div>
+
+
+<script src="index.js"></script>
+<script type="text/javascript">
+const f = {
+	Date:{
+		key:'date',
+		head:()=>'Date',
+		data:(k, v)=>`${new Date(v['date']).toLocaleDateString('ja-JP')}`,
+	},
+	Page:{
+		key:'board',
+		data:(k, v)=>`<a href='https://girls2-fc.jp/page/${v['board']}' target='_blank'>${v['board']}</a>`,
+	},
+	Author:{
+		key:'author',
+		data:(k, v)=>`<center class='nowrap'>${v['author']}`,
+	},
+	Title:{
+		key:'title',
+		data:(k, v)=>`<a href=album.html?${k}>${v['title']}</a>`,
+	},
+};
+
+const keys = Object.keys(f);
+
+var sort_state = {
+	key:'date',
+	order:-1
+};
+
+
+function filter(table, key){
+	const b = document.getElementById(`filter_${key}`).value;
+	if(b == 'all') return table;
+	else return Object.fromEntries(Object.entries(table).filter(([k, v])=>v[key]==b));
+}
+
+function sort(table, key, order){
+	const lower = (s)=>String(s).toLowerCase();
+	const entries = Object.entries(table)
+		.sort(([kl, vl], [kr, vr])=>lower(vl[key])<lower(vr[key])?-order:order);
+	return Object.fromEntries(entries);
+}
+
+
+function draw(){
+	const columns = keys.filter(k=>document.getElementById(`col_${k}`).checked);
+	document.getElementById('thead')
+	.innerHTML = '<tr>'
+		+ columns.map(c=>`<th><div class="buttonlike nowrap" id=thead_${c}>${c}&thinsp;${f[c].key==sort_state.key?(sort_state.order==1?'↑':'↓')+'&ensp;':'↑↓'}</div></th>`).join('')
+		+ '</tr>';
+	columns.forEach((c)=>{
+		document.getElementById(`thead_${c}`).onclick = ()=>{
+			if (sort_state.key == f[c].key)
+				sort_state.order *= -1;
+			else{
+				sort_state.key = f[c].key;
+				sort_state.order = 1;
+			}
+			draw();
+		};
+	});
+
+	document.getElementById('tbody').innerHTML = Object.entries(
+		sort(filter(filter(table, 'board'), 'author'), sort_state.key, sort_state.order)
+	).map(([k, v])=>'<tr>'
+		+ columns.map((c)=>`<td>${f[c].data(k, v)}</td>`).join('')
+		+ '</tr>'
+	).join('');
+};
+
+
+document.getElementById('columns').innerHTML = keys.map(
+	k=>`<label class=buttonlike><input class=buttonlike id=col_${k} type='checkbox' checked>${k}</label>`
+).join('');
+
+keys.map(k=>document.getElementById(`col_${k}`))
+.forEach(b=>b.addEventListener('change', draw));
+
+
+document.getElementById('filter_board').innerHTML = '<option value=all>page / all</option>'
+	+	[...new Set(Object.values(table).map(v=>v['board']))].sort()
+	.map(b=>`<option value=${b}>${b}</option>`).join('');
+
+document.getElementById('filter_author').innerHTML = '<option value=all>author / all</option>'
+	+ [...new Set(Object.values(table).map(v=>v['author']))]
+	.sort().map(a=>`<option value=${a}>${a}</option>`).join('');
+
+
+draw();
+</script>
+
+</body>

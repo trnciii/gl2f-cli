@@ -48,17 +48,25 @@ def install():
 
 
 def index():
+	from .core import board
+
 	site = local.refdir_untouch('site')
 	if not site:
 		if 'n' != input('site not found. install now? (Y/n)').lower():
 			install()
 		return
 
-	# js
-	table = {
-		i: list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
-		for i in local.listdir('contents')
-	}
+	def value(i):
+		item = local.load_content(i)
+		return {
+			'title': item['values']['title'],
+			'board': board.get()[item['boardId']]['page'],
+			'author': item.get('category', {'name':''})['name'],
+			'date': item['openingAt'],
+			'media': list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
+		}
+
+	table = {i: value(i) for i in local.listdir('contents')}
 
 	out = os.path.join(site, 'index.js')
 	with open(out, 'w') as f:
@@ -67,24 +75,7 @@ def index():
 	print(f'saved {out}')
 
 
-	# html
-	out = os.path.join(site, 'index.html')
-	with open(out, 'w', encoding='utf-8') as f:
-		print('<body>', file=f)
-
-		print('<table>', file=f)
-		print('<tr><th>Title</th><tr>', file=f)
-		for i in local.listdir('contents'):
-			item = local.load_content(i)
-			print(f'<tr><td><a href=album.html?{item["contentId"]}>{item["values"]["title"]}</a></td><tr>', file=f)
-		print('</table>', file=f)
-
-		print('</body>', file=f)
-
-	print(f'saved {out}')
-
-
-def view():
+def open_site():
 	import webbrowser
 	html = os.path.join(local.home(), 'site', 'index.html')
 	if os.path.exists(html):
@@ -126,4 +117,4 @@ def add_args(parser):
 	p.set_defaults(handler=ls, format='date-p:author:title')
 
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
-	sub.add_parser('view').set_defaults(handler=lambda _:view())
+	sub.add_parser('open').set_defaults(handler=lambda _:open_site())

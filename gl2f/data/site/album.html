@@ -1,48 +1,59 @@
-<style>
-header{
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: calc(100vw - 20px);
-  height: 20px;
-  padding: 10px;
-  display: flex;
-  background: linear-gradient(to right, #F486BA, #FFCE5D);
-  color: black;
-  font-size: 18px;
-  z-index: 9;
-}
+<head>
 
-body{
-  padding: 50px 10px 10px 10px; /* bodyの内側余白を指定する(上:右:下:左) */
-}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/js/modaal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/css/modaal.min.css">
+
+<link rel="stylesheet" href="style.css">
+
+<style>
 
 .tile{
+  display: inline-block;
   vertical-align: middle;
 }
 
-.delimiter{
-  margin-left: 4px;
-  margin-right: 4px;
+.modaal-container{
+  max-width: 100%;
 }
+
+.modaal-inner-wrapper {
+  display: table-cell;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  vertical-align: middle;
+  text-align: center;
+  padding: 25px 25px;
+}
+
+.modaal-gallery-item img {
+  display: block;
+  max-height: calc(100vh - 60px);
+}
+
 </style>
 
-<head>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="asset/modaal.js"></script>
-  <link href="asset/modaal.css" rel="stylesheet" type="text/css">
 </head>
 
 
 <body>
 
 <header>
-  <a href=./index.html>home</a>
-  <div class='delimiter'>/</div>
-  <a id='folder' href='_'>folder</a>
+  <div style="display: flex;margin-right: auto;">
+    <a class="buttonlike" href=./index.html>home</a>
+    /
+    <a class="buttonlike" id='folder' href='_'>folder</a>
+    /
+    <label class='buttonlike'><input id='list' type='checkbox' onchange='draw()'>list</label>
+  </div>
+
+  <div style="margin: auto; padding: 0px 40px;">
+    <span id='title'></span>
+  </div>
 
   <div style="margin-right: 20px; margin-left: auto;">
-    <input type="range" id="cols" min="1" max="7" step="1">
+    <input type="range" id="cols" min="1" max="7" step="1" oninput="draw()">
   </div>
 </header>
 
@@ -53,30 +64,49 @@ body{
 <script>
 const contentId = location.search.split("?")[1];
 const dir = `../contents/${contentId}`
+const media_table = table[contentId]['media'];
+
+document.title = `Album ${table[contentId]['title']}`
 
 document.getElementById('folder').setAttribute('href', dir);
+document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page/${table[contentId]['board']}/${contentId}'>${table[contentId]['title']}</a>`;
+
+
+const cols = document.getElementById('cols');
+cols.value = Math.min(Math.sqrt(media_table.length) * (window.innerWidth/window.innerHeight), media_table.length);
+
+
+function list(size){
+  return `<div class="tile" style="width:${size}; margin-top:20px; margin-bottom:20px;">`
+  + '<div style="width:fit-content; padding:20px; background: pink;">'
+  + media_table.map(i=>`<div style='font-size: 16; width:fit-content;'>${i}</div>`).join('')
+  + '</div></div>'
+  + ((size<250)?'<br>':'');
+}
 
 const media = document.getElementById('media');
-function draw(r){
-  media.innerHTML = table[contentId].map(function(e){
-    const src = `${dir}/${e}`;
-    const ext = src.slice(src.lastIndexOf('.'));
-    const size = (window.innerWidth-100)/r;
+function draw(){
+  const size = (window.innerWidth-100)/cols.value;
 
-    if([".jpeg", ".png"].indexOf(ext) > -1){
-      return `<a class="image tile" data-group="gallery" href=${src}>`
-        + `<img src="${src}" width=${size}></img>`
-        + `</a>`;
-    }
-    else if([".mp4"].indexOf(ext) > -1){
-      return `<a class="iframe tile" href=${src}>`
-        + `<video autoplay muted loop src="${src}" width=${size}></video>`
-        + `</a>`;
-    }
-    else if([".mov"].indexOf(ext) > -1){
-      return `<video controls autoplay muted loop src="${src}" class="tile" width=${size}></video>`;
-    }
-  }).join('');
+  media.innerHTML = (document.getElementById('list').checked?list(size):'')
+    + media_table.map(function(e){
+      const src = `${dir}/${e}`;
+      const ext = src.slice(src.lastIndexOf('.'));
+
+      if([".jpeg", ".png"].indexOf(ext) > -1){
+        return `<a class="image tile" data-group="gallery" href=${src}>`
+          + `<img src="${src}" width=${size}></img>`
+          + `</a>`;
+      }
+      else if([".mp4", '.mov'].indexOf(ext) > -1){
+        return `<a class="iframe tile" href=${src}>`
+          + `<video controls autoplay muted loop src="${src}" width=${size}></video>`
+          + `</a>`;
+      }
+      else if([".mov"].indexOf(ext) > -1){
+        return `<video controls autoplay muted loop src="${src}" class="tile" width=${size}></video>`;
+      }
+    }).join('');
 
   $('.image').modaal({
     type: 'image',
@@ -88,12 +118,8 @@ function draw(r){
   });
 }
 
-window.onload = ()=>{
-  const cols = document.getElementById('cols');
-  cols.value = Math.sqrt(table[contentId].length) * (window.innerWidth/window.innerHeight);
-  cols.addEventListener('input', (e)=>{draw(e.target.value);});
-  draw(cols.value);
-}
+draw();
+
 </script>
 
 </body>
