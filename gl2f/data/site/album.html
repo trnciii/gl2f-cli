@@ -9,6 +9,7 @@
 <style>
 
 .tile{
+  display: inline-block;
   vertical-align: middle;
 }
 
@@ -43,6 +44,8 @@
     <a class="item" href=./index.html>home</a>
     /
     <a class="item" id='folder' href='_'>folder</a>
+    /
+    <label class='buttonlike'><input id='list' type='checkbox' onchange='draw(document.getElementById("cols").value)'>list</label>
   </div>
 
   <div style="margin: auto; padding: 0px 40px;">
@@ -68,27 +71,38 @@ document.title = `Album ${table[contentId]['title']}`
 document.getElementById('folder').setAttribute('href', dir);
 document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page/${table[contentId]['board']}/${contentId}'>${table[contentId]['title']}</a>`;
 
+
+function list(size){
+  return `<div class="tile" style="width:${size}; margin-top:20px; margin-bottom:20px;">`
+  + '<div style="width:fit-content; padding:20px; background: pink;">'
+  + media_table.map(i=>`<div style='font-size: 16; width:fit-content;'>${i}</div>`).join('')
+  + '</div></div>'
+  + ((size<250)?'<br>':'');
+}
+
 const media = document.getElementById('media');
 function draw(r){
-  media.innerHTML = media_table.map(function(e){
-    const src = `${dir}/${e}`;
-    const ext = src.slice(src.lastIndexOf('.'));
-    const size = (window.innerWidth-100)/r;
+  const size = (window.innerWidth-100)/r;
 
-    if([".jpeg", ".png"].indexOf(ext) > -1){
-      return `<a class="image tile" data-group="gallery" href=${src}>`
-        + `<img src="${src}" width=${size}></img>`
-        + `</a>`;
-    }
-    else if([".mp4", '.mov'].indexOf(ext) > -1){
-      return `<a class="iframe tile" href=${src}>`
-        + `<video controls autoplay muted loop src="${src}" width=${size}></video>`
-        + `</a>`;
-    }
-    else if([".mov"].indexOf(ext) > -1){
-      return `<video controls autoplay muted loop src="${src}" class="tile" width=${size}></video>`;
-    }
-  }).join('');
+  media.innerHTML = (document.getElementById('list').checked?list(size):'')
+    + media_table.map(function(e){
+      const src = `${dir}/${e}`;
+      const ext = src.slice(src.lastIndexOf('.'));
+
+      if([".jpeg", ".png"].indexOf(ext) > -1){
+        return `<a class="image tile" data-group="gallery" href=${src}>`
+          + `<img src="${src}" width=${size}></img>`
+          + `</a>`;
+      }
+      else if([".mp4", '.mov'].indexOf(ext) > -1){
+        return `<a class="iframe tile" href=${src}>`
+          + `<video controls autoplay muted loop src="${src}" width=${size}></video>`
+          + `</a>`;
+      }
+      else if([".mov"].indexOf(ext) > -1){
+        return `<video controls autoplay muted loop src="${src}" class="tile" width=${size}></video>`;
+      }
+    }).join('');
 
   $('.image').modaal({
     type: 'image',
