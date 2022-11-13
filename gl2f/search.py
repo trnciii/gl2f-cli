@@ -19,6 +19,8 @@ def add_args(parser, list_board):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 
+	parser.set_defaults(date='%m/%d')
+
 	parser.add_argument('keywords', nargs='+')
 
 	def subcommand(args):
