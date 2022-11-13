@@ -1,11 +1,11 @@
 import argparse
-from . import opener, ls, cat, dl
+from . import opener, ls, cat, dl, search
 import sys, time
 
 def board_subcommand_parsers(subparsers):
 	return [
 		( cmd, subparsers.add_parser(cmd.name()) )
-		for cmd in [opener, ls, cat, dl]
+		for cmd in [opener, ls, cat, dl, search]
 	]
 
 
