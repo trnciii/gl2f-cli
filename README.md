@@ -15,6 +15,7 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 * [gl2f dl](./docs/commands.md#gl2f-dl-記事に含まれる画像や動画をダウンロードする) 記事に含まれる画像や動画をダウンロードする
 * [gl2f ls](./docs/commands.md#gl2f-ls-記事の情報をリストする) 一覧表示する
 * [gl2f open](./docs/commands.md#gl2f-open-記事をブラウザで開く) ページを一括でブラウザで開く
+* [gl2f search](./docs/commands.md#gl2f-search-記事の内容を検索する) 記事内容を検索する
 
 対象となるページは
 
@@ -97,6 +98,13 @@ gl2f open blogs girls2
 gl2b open miyu
 # or
 gl2f open blogs miyu
+```
+
+佐藤栞奈の直近99件のブログから"金魚", "弟"を含むものを検索する
+```sh
+gl2b search -n99 kanna 金魚 弟
+# or
+gl2f search blogs -n99 kanna 金魚 弟
 ```
 
 今日投稿されたブログを開く
