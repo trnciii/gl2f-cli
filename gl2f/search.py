@@ -17,11 +17,14 @@ def add_args(parser, list_board):
 
 		hi = re.compile( fr"(?P<match>{'|'.join(args.keywords)})" )
 
-		for i in list_board(args):
-			text = article.to_text(i, 'compressed', False)
-			if all(k in text for k in args.keywords):
-				fm.print(i)
-				text = hi.sub(term.mod(r'\g<match>', [term.color('yellow'), term.inv()]), text)
-				print(f'{text}\n')
+		items = list_board(args)
+		texts = [article.to_text(i, 'compressed', False) for i in items]
+		counts = [[k in t for k in args.keywords].count(True) for t in texts]
+
+		for c, t, i in sorted(zip(counts, texts, items), reverse=True, key=lambda x:x[0]):
+			if c == 0: break
+			fm.print(i)
+			print(hi.sub(term.mod(r'\g<match>', [term.color('yellow'), term.inv()]), t) + '\n')
+
 
 	parser.set_defaults(handler=subcommand)
