@@ -33,17 +33,19 @@ tr:nth-child(odd) td{
 <body>
 
 <header>
-	<span class='item' id='columns'></span>
-	<select class=item id=filter_board onchange="draw()"></select>
-	<select class=item id=filter_author onchange="draw()"></select>
+	<span id='columns'></span>
+	<div style='margin-left:8px;'>
+		<select id=filter_board onchange="draw()"></select>
+		<select id=filter_author onchange="draw()"></select>
+	</div>
 </header>
 
-<div style="overflow: scroll; height: 100%; overflow-x: auto; overflow-y: auto;">
+<main>
 	<table>
 		<thead id='thead'></thead>
 		<tbody id='tbody'></tbody>
 	</table>
-</div>
+</main>
 
 
 <script src="index.js"></script>
@@ -118,7 +120,7 @@ function draw(){
 
 
 document.getElementById('columns').innerHTML = keys.map(
-	k=>`<label class=buttonlike><input id=col_${k} type='checkbox' checked>${k}</label>`
+	k=>`<label class=buttonlike><input id=col_${k} class=buttonlike type='checkbox' checked>${k}</label>`
 ).join('');
 
 keys.map(k=>document.getElementById(`col_${k}`))

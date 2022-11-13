@@ -31,11 +31,11 @@
 
 <header>
   <div style="display: flex;margin-right: auto;">
-    <a class="buttonlike" href=./index.html>home</a>
-    /
-    <a class="buttonlike" id='folder' href='_'>folder</a>
-    /
-    <label class='buttonlike'><input id='list' type='checkbox' onchange='draw()'>list</label>
+    <a class="buttonlike item" href=./index.html>home</a>
+    &nbsp;/&nbsp;
+    <a class="buttonlike item" id='folder' href='_'>folder</a>
+    &nbsp;/
+    <label class='buttonlike'><input id='list' class=buttonlike type='checkbox' onchange='draw()'>list</label>
   </div>
 
   <div style="margin: auto; padding: 0px 40px;">
@@ -47,8 +47,9 @@
   </div>
 </header>
 
-<center><span id='media'></span></center>
-
+<main>
+  <center><span id='media'></span></center>
+</main>
 
 <script src="index.js"></script>
 <script>
@@ -67,11 +68,12 @@ cols.value = Math.min(Math.sqrt(media_table.length) * (window.innerWidth/window.
 
 
 function list(size){
-  return `<div class="tile" style="width:${size}; margin-top:20px; margin-bottom:20px;">`
+  const min = 250;
+  return `<div class="tile" style="width:${Math.max(min, size)}; margin-top:20px; margin-bottom:20px;">`
   + '<div style="width:fit-content; padding:20px; background: pink;">'
   + media_table.map(i=>`<div style='font-size: 16; width:fit-content;'>${i}</div>`).join('')
   + '</div></div>'
-  + ((size<250)?'<br>':'');
+  + ((size<min)?'<br>':'');
 }
 
 const media = document.getElementById('media');
