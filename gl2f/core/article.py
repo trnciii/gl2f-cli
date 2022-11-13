@@ -30,8 +30,14 @@ class MediaRep:
 			self.dl = partial(dl_medium, item['boardId'], self.contentId, xauth=auth.update(auth.load()))
 			self.rep = self.media_rep_sixel
 
+		elif rep == 'none':
+			self.rep = self.media_rep_none
+
 		else:
 			self.rep = self.media_rep_type_id
+
+	def media_rep_none(self, p):
+		return ptn_media.sub('', p)
 
 	def media_rep_type(self, p):
 		return ptn_media.sub(term.mod('[\\2]', [term.dim()]), p)
@@ -102,6 +108,9 @@ def to_text(item, key, use_sixel=True):
 	elif key == 'compressed':
 		mediarep = MediaRep(item, 'type')
 		return ''.join(lines(mediarep))
+
+	elif key == 'plain':
+		return ''.join(lines(MediaRep(item, 'none')))
 
 
 

@@ -33,7 +33,7 @@ def add_args(parser, list_board):
 		hi = re.compile( fr"(?P<match>{'|'.join(args.keywords)})" )
 
 		items = list_board(args)
-		texts = [article.to_text(i, 'compressed', False) for i in items]
+		texts = [article.to_text(i, 'plain', False) for i in items]
 		counts = [[k in t for k in args.keywords].count(True) for t in texts]
 
 		for c, t, i in sorted(zip(counts, texts, items), reverse=True, key=lambda x:x[0]):
