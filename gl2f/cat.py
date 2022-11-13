@@ -16,6 +16,8 @@ def cat(i, args):
 def add_args(parser, list_board):
 	lister.add_args(parser)
 	pretty.add_args(parser)
+	parser.set_defaults(format='author:title')
+
 	parser.add_argument('--style', type=str, choices=article.style_options(), default='compact')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',
 		help='not use sixel image')
@@ -46,8 +48,8 @@ def add_args(parser, list_board):
 			for i in items:
 				cat(i, args)
 		else:
-			fm_list = pretty.Formatter(f='date-p:author:title')
-			selected = term.select([fm_list.format(i) for i in items])
+			fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
+			selected = term.select([fm.format(i) for i in items])
 			for i in [i for s, i in zip(selected, items) if s]:
 				cat(i, args)
 

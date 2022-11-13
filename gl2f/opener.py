@@ -1,4 +1,4 @@
-from .core import lister
+from .core import lister, pretty
 
 def name(): return 'open'
 
@@ -10,15 +10,19 @@ def open_url(i):
 
 def add_args(parser, list_board):
 	lister.add_args(parser)
+	pretty.add_args(parser)
+	parser.set_defaults(format='author:title')
 	parser.add_argument('-a', '--all', action='store_true',
 		help='open all items')
 
 
 	def subcommand(args):
-		from .core import pretty, terminal as term
+		from .core import terminal as term
+
+		pretty.post_argparse(args)
 
 		items = list_board(args)
-		fm = pretty.Formatter(f='date-p:author:title')
+		fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
 
 		if args.all:
 			for i in items:

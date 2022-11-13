@@ -1,10 +1,10 @@
-from .core import lister
+from .core import lister, pretty
 
 def name(): return 'dl'
 
 def save(item, args):
 	import json, os
-	from .core import local, article, terminal as term, pretty
+	from .core import local, article, terminal as term
 
 	boardId = item['boardId']
 	contentId = item['contentId']
@@ -29,6 +29,9 @@ def save(item, args):
 def add_args(parser, list_board):
 	lister.add_args(parser)
 
+	pretty.add_args(parser)
+	parser.set_defaults(format='author:media:title')
+
 	parser.add_argument('-a', '--all', action='store_true',
 		help='preview all items')
 
@@ -46,7 +49,7 @@ def add_args(parser, list_board):
 
 
 	def subcommand(args):
-		from .core import terminal as term, pretty
+		from .core import terminal as term
 		from .core.local import refdir_untouch
 		from .local import index
 
@@ -56,8 +59,9 @@ def add_args(parser, list_board):
 			for i in items:
 				save(i, args)
 		else:
-			fm_list = pretty.Formatter(f='date-p:author:media:title')
-			selected = term.select([fm_list.format(i) for i in items])
+			pretty.post_argparse(args)
+			fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
+			selected = term.select([fm.format(i) for i in items])
 			for i in [i for s, i in zip(selected, items) if s]:
 				save(i, args)
 

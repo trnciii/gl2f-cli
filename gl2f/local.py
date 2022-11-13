@@ -114,7 +114,7 @@ def add_args(parser):
 	p.add_argument('--order', type=str,
 		help='sort order')
 	pretty.add_args(p)
-	p.set_defaults(handler=ls, format='date-p:author:title')
+	p.set_defaults(handler=ls, format='author:title')
 
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
 	sub.add_parser('open').set_defaults(handler=lambda _:open_site())
