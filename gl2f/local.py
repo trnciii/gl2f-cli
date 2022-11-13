@@ -79,7 +79,7 @@ def open_site():
 	import webbrowser
 	html = os.path.join(local.home(), 'site', 'index.html')
 	if os.path.exists(html):
-		webbrowser.open(html)
+		webbrowser.open(f'file://{html}')
 	else:
 		print('site is not installed')
 
