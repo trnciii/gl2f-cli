@@ -18,34 +18,34 @@ def paragraphs(body):
 
 
 class MediaRep:
-	def __init__(self, item, rep):
-		if rep == 'type':
-			self.rep = self.media_rep_type
+	def __init__(self, style, contentId, boardId):
+		if style == 'type':
+			self.rep = self.rep_type
 
-		elif rep == 'sixel' and sixel.supported():
+		elif style == 'sixel' and sixel.supported():
 			from functools import partial
 
 			local.refdir('cache')
-			self.contentId = item['contentId']
-			self.dl = partial(dl_medium, item['boardId'], self.contentId, xauth=auth.update(auth.load()))
-			self.rep = self.media_rep_sixel
+			self.contentId = contentId
+			self.dl = partial(dl_medium, boardId, self.contentId, xauth=auth.update(auth.load()))
+			self.rep = self.rep_sixel
 
-		elif rep == 'none':
-			self.rep = self.media_rep_none
+		elif style == 'none':
+			self.rep = self.rep_none
 
 		else:
-			self.rep = self.media_rep_type_id
+			self.rep = self.rep_type_id
 
-	def media_rep_none(self, p):
+	def rep_none(self, p):
 		return ptn_media.sub('', p)
 
-	def media_rep_type(self, p):
+	def rep_type(self, p):
 		return ptn_media.sub(term.mod('[\\2]', [term.dim()]), p)
 
-	def media_rep_type_id(self, p):
+	def rep_type_id(self, p):
 		return ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
 
-	def media_rep_sixel(self, p):
+	def rep_sixel(self, p):
 		from io import BytesIO
 		from PIL import Image
 		import time
@@ -55,7 +55,7 @@ class MediaRep:
 			return p
 		i, t = match.group(1, 2)
 		if t != 'image':
-			return self.media_rep_type_id(p)
+			return self.rep_type_id(p)
 
 		if file:=local.search_media(i, self.contentId):
 			image = Image.open(file)
@@ -71,8 +71,8 @@ class MediaRep:
 		return ret
 
 
-def compose_line(p, media_rep):
-	p = media_rep.rep(p)
+def compose_line(p, mediarep):
+	p = mediarep.rep(p)
 	p = ptn_strong.sub(term.mod('\\1', [term.color('white', 'fl'), term.bold(), term.underline()]), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
@@ -85,32 +85,31 @@ def compose_line(p, media_rep):
 	return p
 
 
-def style_options(): return {'full', 'compact', 'compressed'}
-
-def to_text(item, key, use_sixel=True):
+def lines(item, mediarepstyle):
 	from concurrent.futures import ThreadPoolExecutor
 
 	body = item['values']['body']
+	m = MediaRep(mediarepstyle, item['contentId'], item['boardId'])
 
-	def lines(mediarep):
-		with ThreadPoolExecutor() as executor:
-			futures = [executor.submit(compose_line, p, mediarep) for p in paragraphs(body)]
-		return [f.result() for f in futures]
+	with ThreadPoolExecutor() as executor:
+		futures = [executor.submit(compose_line, p, m) for p in paragraphs(body)]
+	return [f.result() for f in futures]
 
+
+def style_options(): return {'full', 'compact', 'compressed', 'plain'}
+
+def to_text(item, key, use_sixel=True):
 	if key == 'full':
-		mediarep = MediaRep(item, 'sixel' if use_sixel else 'type_id')
-		return '\n'.join(lines(mediarep))
+		return '\n'.join(lines(item, 'sixel' if use_sixel else 'type_id'))
 
 	elif key == 'compact':
-		mediarep = MediaRep(item, 'sixel' if use_sixel else 'type_id')
-		return '\n'.join(filter(len, lines(mediarep)))
+		return '\n'.join(filter(len, lines(item, 'sixel' if use_sixel else 'type_id')))
 
 	elif key == 'compressed':
-		mediarep = MediaRep(item, 'type')
-		return ' '.join(filter(len, lines(mediarep)))
+		return ' '.join(filter( len, lines(item, 'type') ))
 
 	elif key == 'plain':
-		return ''.join(lines(MediaRep(item, 'none')))
+		return ''.join(lines(item, 'none'))
 
 
 
