@@ -31,4 +31,5 @@ body{
   user-select: none;
   padding-left: 4px;
   padding-right: 4px;
+  white-space: nowrap;
 }
