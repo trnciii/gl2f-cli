@@ -49,6 +49,8 @@ def add_args(parser, list_board):
 
 			ranges = [(i.start()-20, i.end()+20) for i in hi.finditer(t)]
 			merged = merge(ranges)
+			if len(merged)>5:
+				merged = merged[:5]
 
 			for begin, end in merged:
 				print('> ' + hi.sub(
