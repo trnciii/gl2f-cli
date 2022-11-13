@@ -34,19 +34,25 @@ def add_args(parser, list_board):
 
 		items = list_board(args)
 		texts = [article.to_text(i, 'plain', False) for i in items]
-		counts = [[k in t for k in args.keywords].count(True) for t in texts]
+		counts = [
+			sum(int(k in te) + int(k in ti) for k in args.keywords)
+			for te, ti in zip(texts, [i['values']['title'] for i in items])
+		]
 
 		for c, t, i in sorted(zip(counts, texts, items), reverse=True, key=lambda x:x[0]):
 			if c == 0: break
 
-			fm.print(i)
+			print(hi.sub(
+				term.mod(r'\g<match>', [term.color('yellow'), term.inv()]),
+				fm.format(i)
+			))
 
 			ranges = [(i.start()-20, i.end()+20) for i in hi.finditer(t)]
 			merged = merge(ranges)
 
 			for begin, end in merged:
 				print('> ' + hi.sub(
-					term.mod(r'\g<match>', [term.color('yellow'), term.inv()]),
+					term.mod(r'\g<match>', [term.color('yellow')]),
 					t[max(0, begin):min(len(t), end)] + term.mod('', [])
 				))
 
