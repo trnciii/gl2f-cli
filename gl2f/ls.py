@@ -7,9 +7,7 @@ def add_args(parser, list_board):
 	pretty.add_args(parser)
 
 	def subcommand(args):
-		pretty.post_argparse(args)
-
-		fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
+		fm = pretty.from_args(args)
 		fm.reset_index(digits=len(str(args.number)))
 
 		for i in list_board(args):

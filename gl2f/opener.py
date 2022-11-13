@@ -19,10 +19,8 @@ def add_args(parser, list_board):
 	def subcommand(args):
 		from .core import terminal as term
 
-		pretty.post_argparse(args)
-
 		items = list_board(args)
-		fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
+		fm = pretty.from_args(args)
 
 		if args.all:
 			for i in items:

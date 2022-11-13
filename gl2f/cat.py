@@ -8,7 +8,7 @@ def cat(i, args):
 	if args.dl:
 		save(i, args)
 	print()
-	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
+	fm = pretty.Formatter()
 	fm.print(i)
 	print(article.to_text(i, args.style, args.sixel))
 
@@ -40,15 +40,13 @@ def add_args(parser, list_board):
 	def subcommand(args):
 		from .core import terminal as term
 
-		pretty.post_argparse(args)
-
 		items = list_board(args)
 
 		if args.all:
 			for i in items:
 				cat(i, args)
 		else:
-			fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
+			fm = pretty.from_args(args)
 			selected = term.select([fm.format(i) for i in items])
 			for i in [i for s, i in zip(selected, items) if s]:
 				cat(i, args)

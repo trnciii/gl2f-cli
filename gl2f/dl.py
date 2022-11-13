@@ -59,8 +59,7 @@ def add_args(parser, list_board):
 			for i in items:
 				save(i, args)
 		else:
-			pretty.post_argparse(args)
-			fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
+			fm = pretty.from_args(args)
 			selected = term.select([fm.format(i) for i in items])
 			for i in [i for s, i in zip(selected, items) if s]:
 				save(i, args)

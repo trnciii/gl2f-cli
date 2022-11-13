@@ -4,14 +4,12 @@ from .core import pretty, local
 
 
 def ls(args):
-	pretty.post_argparse(args)
-
 	items = [local.load_content(i) for i in local.listdir('contents')]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
 
-	fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
+	fm = pretty.from_args(args)
 	for i in items:
 		fm.print(i)
 
