@@ -1,5 +1,4 @@
-from .core import lister, pretty, article, terminal as term
-import re
+from .core import lister, pretty
 
 def name(): return 'search'
 
@@ -10,6 +9,9 @@ def add_args(parser, list_board):
 	parser.add_argument('keywords', nargs='+')
 
 	def subcommand(args):
+		from .core import article, terminal as term
+		import re
+
 		pretty.post_argparse(args)
 
 		fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
