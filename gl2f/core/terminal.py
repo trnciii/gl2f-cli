@@ -108,6 +108,10 @@ if os.name == 'nt':
 
 	def select(items):
 		print(mod(" { space: toggle, 'a': all, 'c': clear }", [color('yellow', 'fl')]))
+
+		w, _ = os.get_terminal_size()
+		maxlen = w-5
+
 		n = len(items)
 		selected = [False]*n
 		cursor = 0
@@ -116,7 +120,11 @@ if os.name == 'nt':
 
 			for i, (item, s) in enumerate(zip(items, selected)):
 				clean_row()
-				print(('>' if cursor==i else ' ') + ('[x]' if s else '[ ]'), item)
+				option = ('>' if cursor==i else ' ') + ('[x]' if s else '[ ]') + ' ' + item
+				if len(option) > maxlen:
+					print(option[:maxlen] + '...')
+				else:
+					print(option)
 
 			ch = msvcrt.getch()
 			# print(ch)
