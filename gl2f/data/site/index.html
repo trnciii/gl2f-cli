@@ -52,9 +52,11 @@ tr:nth-child(odd) td{
 <script src="index.js"></script>
 <script type="text/javascript">
 const f = {
+	ID:{
+		data:(k, v)=>`<a href='../contents/${k}'>${k}</a>`
+	},
 	Date:{
 		key:'date',
-		head:()=>'Date',
 		data:(k, v)=>`${new Date(v['date']).toLocaleDateString('ja-JP')}`,
 	},
 	Page:{
@@ -123,6 +125,8 @@ function draw(){
 document.getElementById('columns').innerHTML = keys.map(
 	k=>`<label class=buttonlike><input id=col_${k} class=buttonlike type='checkbox' checked>${k}</label>`
 ).join('');
+
+document.getElementById('col_ID').checked = false;
 
 keys.map(k=>document.getElementById(`col_${k}`))
 .forEach(b=>b.addEventListener('change', draw));
