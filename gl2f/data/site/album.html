@@ -60,7 +60,7 @@ const media_table = table[contentId]['media'];
 document.title = `Album ${table[contentId]['title']}`
 
 document.getElementById('folder').setAttribute('href', dir);
-document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page/${table[contentId]['board']}/${contentId}'>${table[contentId]['title']}</a>`;
+document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page/${table[contentId]['board']}/${contentId}' target='blank'>${table[contentId]['title']}</a>`;
 
 
 const cols = document.getElementById('cols');
