@@ -15,8 +15,8 @@ def save(item, args):
 	else:
 		out = local.refdir(os.path.join('contents', contentId))
 
-	with open(os.path.join(out, f'{contentId}.json'), 'w') as f:
-		f.write(json.dumps(item, indent=2))
+	with open(os.path.join(out, f'{contentId}.json'), 'w', encoding='utf-8') as f:
+		f.write(json.dumps(item, indent=2, ensure_ascii=False))
 
 	article.save_media(item, out, boardId, contentId,
 		skip=args.skip, stream=args.stream, force=args.force, dump=args.dump)

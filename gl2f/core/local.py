@@ -29,7 +29,7 @@ def listdir(path):
 
 
 def load_content(i):
-	with open(os.path.join(refdir('contents'), i, f'{i}.json')) as f:
+	with open(os.path.join(refdir('contents'), i, f'{i}.json'), encoding='utf-8') as f:
 		return json.load(f)
 
 def search_media(mediaId, contentId=None):
