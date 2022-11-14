@@ -108,6 +108,10 @@ if os.name == 'nt':
 
 	def select(items):
 		print(mod(" { space: toggle, 'a': all, 'c': clear }", [color('yellow', 'fl')]))
+
+		w, _ = os.get_terminal_size()
+		maxlen = w-5
+
 		n = len(items)
 		selected = [False]*n
 		cursor = 0
@@ -116,7 +120,10 @@ if os.name == 'nt':
 
 			for i, (item, s) in enumerate(zip(items, selected)):
 				clean_row()
-				print(('>' if cursor==i else ' ') + ('[x]' if s else '[ ]'), item)
+				option = ('>' if cursor==i else ' ') + ('[x]' if s else '[ ]') + ' ' + item
+				if len(option) > maxlen:
+					option = option[:maxlen] + '...'
+				print(option + mod('', []))
 
 			ch = msvcrt.getch()
 			# print(ch)
@@ -183,6 +190,10 @@ elif os.name == 'posix':
 			termios.tcsetattr(fd, termios.TCSANOW, tc)
 
 			print(mod("{ space: toggle, 'a': all, 'c': clear, 'q': quit }", [color('yellow', 'fl')]))
+
+			w, _ = os.get_terminal_size()
+			maxlen = w-5
+
 			n = len(items)
 			selected = [False]*n
 			cursor = 0
@@ -191,7 +202,10 @@ elif os.name == 'posix':
 
 				for i, (item, s) in enumerate(zip(items, selected)):
 					clean_row()
-					print(('>' if cursor==i else ' ') + ('[x]' if s else '[ ]'), item)
+					option = ('>' if cursor==i else ' ') + ('[x]' if s else '[ ]') + ' ' + item
+					if len(option) > maxlen:
+						option = option[:maxlen] + '...'
+					print(option + mod('', []))
 
 				ch = sys.stdin.read(1)
 				# print(ch)
