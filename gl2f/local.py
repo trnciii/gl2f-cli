@@ -67,8 +67,8 @@ def index():
 	table = {i: value(i) for i in local.listdir('contents')}
 
 	out = os.path.join(site, 'index.js')
-	with open(out, 'w') as f:
-		print(f'const table={json.dumps(table, separators=(",", ":"))}', file=f)
+	with open(out, 'w', encoding='utf-8') as f:
+		print(f'const table={json.dumps(table, separators=(",", ":"), ensure_ascii=False)}', file=f)
 
 	print(f'saved {out}')
 
