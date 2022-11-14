@@ -33,8 +33,8 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
 
 		path = os.path.join(dump,  f'{filename}-{now}.json')
-		with open(path, 'w') as f:
-			json.dump(response.json(), f, indent=2)
+		with open(path, 'w', encoding='utf-8') as f:
+			json.dump(response.json(), f, indent=2, ensure_ascii=False)
 		print('saved', path)
 
 	return response.json()

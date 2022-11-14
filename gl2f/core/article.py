@@ -182,8 +182,8 @@ def save_media(item, out, boardId, contentId,
 
 	if dump:
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w') as f:
-			json.dump([f.result() for f in futures], f, indent=2)
+		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w', encoding='utf-8') as f:
+			json.dump([f.result() for f in futures], f, indent=2, ensure_ascii=False)
 
 
 def media_stat(body):
