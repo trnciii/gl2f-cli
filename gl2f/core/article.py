@@ -40,10 +40,10 @@ class MediaRep:
 		return ptn_media.sub('', p)
 
 	def rep_type(self, p):
-		return ptn_media.sub(term.mod('[\\2]', [term.dim()]), p)
+		return ptn_media.sub(term.mod('[\\2]', term.dim()), p)
 
 	def rep_type_id(self, p):
-		return ptn_media.sub(term.mod('[\\2](\\1)', [term.dim()]), p)
+		return ptn_media.sub(term.mod('[\\2](\\1)', term.dim()), p)
 
 	def rep_sixel(self, p):
 		from io import BytesIO
@@ -73,14 +73,14 @@ class MediaRep:
 
 def compose_line(p, mediarep):
 	p = mediarep.rep(p)
-	p = ptn_strong.sub(term.mod('\\1', [term.color('white', 'fl'), term.bold(), term.underline()]), p)
+	p = ptn_strong.sub(term.mod('\\1', term.color('white', 'fl'), term.bold(), term.underline()), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
 	p = ptn_break.sub('', p)
 
 	# after processing tags
 	p = html.unescape(p)
-	p = ptn_http.sub(term.mod(r' \1 ', [term.color('blue', 'fl')]), p)
+	p = ptn_http.sub(term.mod(r' \1 ', term.color('blue', 'fl')), p)
 
 	return p
 

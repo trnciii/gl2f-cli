@@ -24,21 +24,16 @@ class Formatter:
 			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
-		mods = [
-			term.bold(),
-			term.rgb(*colf),
-			term.rgb(*colb, 'b')
-		]
 		return term.justzen(
-			term.mod(fullname, mods),
+			term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b')),
 			member.name_width()
 		)
 
 	def title(self, item):
-		return term.mod(item['values']['title'], [term.bold()])
+		return term.mod(item['values']['title'], term.bold())
 
 	def url(self, item):
-		return term.mod(board.content_url(item), [term.dim()])
+		return term.mod(board.content_url(item), term.dim())
 
 	def date_p(self, item):
 		return date.to_datetime(item['openingAt']).strftime(self.fdstring)

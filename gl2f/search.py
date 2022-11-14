@@ -44,8 +44,8 @@ def add_args(parser, list_board):
 
 			for begin, end in merged:
 				print('> ' + hi.sub(
-					term.mod(r'\g<match>', [term.color('yellow'), term.inv()]),
-					t[max(0, begin):min(len(t), end)] + term.mod('', [])
+					term.mod(r'\g<match>', term.color('yellow'), term.inv()),
+					t[max(0, begin):min(len(t), end)] + term.reset()
 				))
 
 			print()
