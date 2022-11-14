@@ -122,9 +122,8 @@ if os.name == 'nt':
 				clean_row()
 				option = ('>' if cursor==i else ' ') + ('[x]' if s else '[ ]') + ' ' + item
 				if len(option) > maxlen:
-					print(option[:maxlen] + '...')
-				else:
-					print(option)
+					option = option[:maxlen] + '...'
+				print(option + mod('', []))
 
 			ch = msvcrt.getch()
 			# print(ch)
