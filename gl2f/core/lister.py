@@ -121,13 +121,9 @@ def radio(args, key):
 
 def make_simple_lister(page):
 	if isinstance(page, str):
-		boardId = board.from_page(page)
-		return lambda args: fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+		return lambda a: fetch(board.from_page(page), a.number, a.page, a.order, dump=a.dump)['list']
 	else:
-		boardId = {k:board.from_page(v) for k, v in page.items()}
-		def f(args, key):
-			return fetch(boardId[key], args.number, args.page, args.order, dump=args.dump)['list']
-		return f
+		return lambda a,k:fetch(board.from_page(page[k]), a.number, a.page, a.order, dump=a.dump)['list']
 
 
 def today(args):
