@@ -5,9 +5,6 @@
 リストする対象の指定や表示の整形は共通の引数で行うので、 [リストの作り方](./boards.md) に書きます。
 必要に応じてそちらも参照してください。
 
-リストを引数とするコマンドは、記事の種類によって短縮ができます。
-`gl2f <subcommand> <blogs/news/radio>` がそれぞれ `gl2b <subcommand> / gl2n <subcommand> / gl2r <subcommand>` と同等です。
-
 
 ## `gl2f auth` 認証関係
 
@@ -30,9 +27,7 @@ PCに保存されている認証情報を削除します。
 
 [GL2 family ニュース](https://girls2-fc.jp/page/familyNews) のリストを使う
 ```sh
-gl2f cat news family
-# or
-gl2n cat family
+gl2f cat news/family
 ```
 
 オプションは以下のものがあります。
@@ -43,9 +38,7 @@ gl2n cat family
 
 GL2 family のニュース本文を、まったく改行せずに表示する。
 ```sh
-gl2n cat --style compressed family
-# or
-gl2f cat --style compressed news family
+gl2f cat --style compressed news/family
 ```
 
 
@@ -99,16 +92,12 @@ ID が数字ばかりで分かりにくいので、ダウンロードしたフ�
 
 小田柚葉のブログを表示する。urlは改行する。
 ```sh
-gl2r ls yuzuha --break-urls
-# or
-gl2f ls radio yuzuha --break-urls
+gl2f ls radio/yuzuha --break-urls
 ```
 
 lovely2 スタッフのブログ20件を投稿日と公開日（秒まで）表示する。
 ```sh
-gl2b ls lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
-# or
-gl2f ls blogs lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
+gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 ```
 
 
@@ -121,9 +110,7 @@ gl2f ls blogs lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 
 鶴屋美咲のラジオを開く
 ```sh
-gl2f open radio misaki
-# or
-gl2r open misaki
+gl2f open radio/misaki
 ```
 
 オプションは以下のものがあります。
@@ -132,9 +119,7 @@ gl2r open misaki
 
 今日投稿されたブログを全て開く
 ```sh
-gl2b open -a today
-# or
-gl2f open -a blogs today
+gl2f open -a blogs/today
 ```
 
 
@@ -146,7 +131,5 @@ gl2f open -a blogs today
 
 佐藤栞奈の直近99件のブログから"金魚", "弟"を含むものを検索する
 ```sh
-gl2b search -n99 kanna 金魚 弟
-# or
-gl2f search blogs -n99 kanna 金魚 弟
+gl2f search blogs/kanna -n99 金魚 弟
 ```

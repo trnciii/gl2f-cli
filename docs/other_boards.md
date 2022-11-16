@@ -20,7 +20,7 @@ gl2f ls shangrila
 
 例
 ```sh
-gl2f ls brandnewworld photo
+gl2f ls brandnewworld/photo
 ```
 
 
@@ -32,7 +32,7 @@ gl2f ls brandnewworld photo
 
 例
 ```sh
-gl2f ls daijoubu cheer
+gl2f ls daijoubu/cheer
 ```
 
 
@@ -55,7 +55,7 @@ gl2f ls cl
 
 例
 ```sh
-gl2f ls fm girls2
+gl2f ls fm/girls2
 ```
 
 
@@ -78,7 +78,7 @@ gl2f ls enjoythegooddays
 
 例
 ```sh
-gl2f ls famitok lucky2
+gl2f ls famitok/lucky2
 ```
 
 

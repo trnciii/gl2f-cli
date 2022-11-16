@@ -3,33 +3,18 @@
 サブコマンド `cat, dl, ls, open, search` は、対象となるリストや表示の整形を指示する必要があります（[コマンドの説明](./commands.md)）。
 リストの指定はページの種類（ブログ、ニュース、ラジオ等）と、さらに必要なグループまたはメンバーを与えて行います。
 またページとは別に、 `today` とすると全てのページの24時間以内の更新をリストします。
-またメインコマンドとして `gl2b / gl2n  / gl2r / gl2d` を使うと、それぞれ `blogs, news, radio, today` を省略することができます。
 
-Girls2 のブログを開く
 ```sh
-gl2b open girls2
-# or
-gl2f open blogs girls2
-```
+# Girls2 のブログを開く
+gl2f open blogs/girls2
 
-杉浦優來のラジオを開く
-```sh
-gl2r open yura
-# or
-gl2f open radio yura
-```
+# 杉浦優來のラジオを開く
+gl2f open radio/yura
 
-GL2 family のニュースを開く
-```sh
-gl2n open family
-# or
-gl2f open news family
-```
+# GL2 family のニュースを開く
+gl2f open news/family
 
-24時間以内の更新を開く
-```sh
-gl2d open
-# or
+# 24時間以内の更新を開く
 gl2f open today
 ```
 
@@ -42,12 +27,9 @@ gl2f open today
 ### `today` 24時間以内の更新
 
 日記、ニュース、ラジオ、Gtube、commercial movie、またライブ期間中は特設ページをチェックし、24時間以内の更新を返します。
-メインコマンドを `gl2d` とすると `today` を省略できます。
 
 24時間以内の更新を全てリストとして表示する
 ```sh
-gl2d ls
-# or
 gl2f ls today
 ```
 
@@ -55,39 +37,30 @@ gl2f ls today
 
 日記のリスト ( https://girls2-fc.jp/page/blogs 等 ) を取得します。
 指定できるのはグループ名 `girls2, loveky2, lucky2`, メンバーの下の名前のアルファベット小文字 `yuzuha, momoka, misaki, ...`, また当日の更新を取得する `today` です。
-メインコマンドを `gl2b` とすると `blogs` を省略できます。
 
 今日投稿されたブログを全て開く
 ```sh
-gl2b open -a today
-# or
-gl2f open -a blogs today
+gl2f open -a blogs/today
 ```
 
 ### `news` ニュース
 
 ニュースのリスト ( https://girls2-fc.jp/page/familyNews 等 ) を取得します。
 指定できるのはグループ名 `girls2, lovely2, lucky2, mirage2` と、Girls2 + Lucky2 の `family` です。
-メインコマンドを `gl2n` とすると `news` を省略できます。
 
 GL2 family のニュース本文を表示する。
 ```sh
-gl2n cat family
-# or
-gl2f cat news family
+gl2f cat news/family
 ```
 
 ### `radio` ラジオ
 
 ラジオのリスト ( https://girls2-fc.jp/page/lucky2radio 等 ) を取得します。
 指定できるのはグループ名 `girls2, loveky2, lucky2`, メンバーの下の名前のアルファベット小文字 `yuzuha, momoka, misaki, ...` です。
-メインコマンドを `gl2r` とすると `radio` を省略できます。
 
 比嘉優和のラジオをブラウザで開く
 ```sh
-gl2r open yuwa
-# or
-gl2f open radio yuwa
+gl2f open radio/yuwa
 ```
 
 ### `gtube` Gtube
@@ -139,30 +112,22 @@ gl2f dl shangrila
 
 山口莉愛 の lovely2 の頃のブログを開く
 ```sh
-gl2b open rina --group lovely2
-# or
-gl2f open blogs rina --group lovely2
+gl2f open blogs/rina --group lovely2
 ```
 
 lovely2 のブログを20件一覧表示する
 ```sh
-gl2b ls lovely2 -n 20
-# or
-gl2f ls blogs lovely2 -n 20
+gl2f ls blogs/lovely2 -n 20
 ```
 
 Lucky2 のニュースの最新6番目から10番目を一覧表示する (1ページあたり5件の2ページ目)
 ```sh
-gl2n ls lucky2 -n 5 -p 2
-# or
-gl2f ls news lucky2 -n 5 -p 2
+gl2f ls news/lucky2 -n 5 -p 2
 ```
 
 原田都愛のブログをタイトル降順で30件を一覧表示する
 ```sh
-gl2b ls toa --order name:desc -n 30
-# or
-gl2f ls blogs toa --order name:desc -n 30
+gl2f ls blogs/toa --order name:desc -n 30
 ```
 
 ### リストの整形
@@ -186,14 +151,10 @@ gl2f ls blogs toa --order name:desc -n 30
 
 Girls2 のニュースを公開日の早いものから10件一覧表示する。公開年月日も表示する
 ```sh
-gl2n ls girls2 --order reservedAt:asc  -d '%Y/%m/%d'
-# or
-gl2f ls news girls2 --order reservedAt:asc -d '%Y/%m/%d'
+gl2f ls news/girls2 --order reservedAt:asc -d '%Y/%m/%d'
 ```
 
 lovely2 スタッフのブログを、投稿日と公開日とともに一覧表示する。日時は秒まで表示する。
 ```sh
-gl2b ls lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
-# or
-gl2f ls blogs lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
+gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 ```
