@@ -64,6 +64,10 @@ https://github.com/trnciii/gl2f-cli/releases
 > いずれも自身の責任で設定の変更を行ってください。
 
 
+また bash 用の簡単な補完スクリプトを用意しています。
+`gl2f.bash` を bash-completion のインストール先 (`/share/bash-completion/completions` とか `/etc/bash_completion.d`　とかの下?) に保存すると使えます。
+
+
 ## 使い方
 
 ここにはコマンドの例をたくさん載せます。
