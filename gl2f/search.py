@@ -15,7 +15,7 @@ def merge(ranges):
 	return ret
 
 
-def add_args(parser, list_board):
+def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 
@@ -32,7 +32,7 @@ def add_args(parser, list_board):
 
 		hi = re.compile( fr"(?P<match>{'|'.join(args.keywords)})" )
 
-		items = list_board(args)
+		items = lister.listers(args)
 		texts = [article.to_text(i, 'plain', False) for i in items]
 		counts = [
 			sum(int(k in te) + int(k in ti) for k in args.keywords)

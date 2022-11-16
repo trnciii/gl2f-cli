@@ -13,7 +13,7 @@ def cat(i, args):
 	print(article.to_text(i, args.style, args.sixel))
 
 
-def add_args(parser, list_board):
+def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
@@ -40,7 +40,7 @@ def add_args(parser, list_board):
 	def subcommand(args):
 		from .core import terminal as term
 
-		items = list_board(args)
+		items = lister.listers(args)
 
 		if args.all:
 			for i in items:

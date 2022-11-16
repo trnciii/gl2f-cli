@@ -17,10 +17,12 @@ def main():
 
 	subparsers.add_parser('sixel').set_defaults(handler=lambda args:print(sixel.status))
 
-	for cmd in [opener, ls, cat, dl, search]:
-		subsubparsers = subparsers.add_parser(cmd.name()).add_subparsers()
-		for k, v in lister.listers().items():
-			cmd.add_args(subsubparsers.add_parser(k), v)
+	for cmd in [cat, dl, ls, opener, search]:
+		subsubparser = subparsers.add_parser(cmd.name())
+		cmd.add_args(subsubparser)
+		# subsubparsers = subparsers.add_parser(cmd.name()).add_subparsers()
+		# for k, v in lister.listers().items():
+			# cmd.add_args(subsubparsers.add_parser(k), v)
 
 
 	args = parser.parse_args()

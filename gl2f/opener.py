@@ -8,7 +8,7 @@ def open_url(i):
 	webbrowser.open(board.content_url(i), new=0, autoraise=True)
 
 
-def add_args(parser, list_board):
+def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
@@ -19,7 +19,7 @@ def add_args(parser, list_board):
 	def subcommand(args):
 		from .core import terminal as term
 
-		items = list_board(args)
+		items = lister.listers(args)
 		fm = pretty.from_args(args)
 
 		if args.all:

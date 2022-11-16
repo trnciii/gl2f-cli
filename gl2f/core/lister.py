@@ -52,10 +52,10 @@ def list_multiple_boards(boardId, args):
 	return sum((f.result()['list'] for f in futures), [])
 
 
-def get_IDs(domain, args):
-	data = member.get()[args.name]
+def get_IDs(domain, m, g):
+	data = member.get()[m]
 	group_list = data['group']
-	group = args.group if args.group in group_list else group_list[0]
+	group = g if g in group_list else group_list[0]
 
 	if domain == 'blog':
 		return board.blogs(group), data['categoryId'][domain]
@@ -64,8 +64,8 @@ def get_IDs(domain, args):
 
 
 def add_args(parser):
-	parser.add_argument('name', type=str, nargs='?',
-		help='group or member name')
+	parser.add_argument('board', type=str,
+		help='board and group or member name')
 
 	parser.add_argument('-n', '--number', type=int, default=10,
 		help='number of articles in [1, 99]')
@@ -87,35 +87,35 @@ def filter_today(li):
 	return list(filter(lambda i:in24h(i['openingAt']), li))
 
 
-def blogs(args):
-	if member.is_group(args.name):
-		boardId = board.blogs(args.name)
+def blogs(args, key):
+	if member.is_group(key):
+		boardId = board.blogs(key)
 		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
-	elif member.is_member(args.name):
-		boardId, categoryId = get_IDs('blog', args)
+	elif member.is_member(key):
+		boardId, categoryId = get_IDs('blog', key, args.group)
 		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
-	elif args.name == 'today':
+	elif key == 'today':
 		return filter_today(list_multiple_boards([board.blogs(i) for i in ['girls2', 'lucky2']], args))
 
 
-def news(args):
-	if args.name == 'today':
+def news(args, key):
+	if key == 'today':
 		return filter_today(fetch(board.news('family'), size=10, page=1, dump=args.dump)['list'])
 
 	else:
-		boardId = board.news(args.name)
+		boardId = board.news(key)
 		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 
-def radio(args):
-	if member.is_group(args.name):
-		boardId = board.radio(args.name)
+def radio(args, key):
+	if member.is_group(key):
+		boardId = board.radio(key)
 		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
-	elif member.is_member(args.name):
-		boardId, categoryId = get_IDs('radio', args)
+	elif member.is_member(key):
+		boardId, categoryId = get_IDs('radio', key, args.group)
 		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 
@@ -125,7 +125,9 @@ def make_simple_lister(page):
 		return lambda args: fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 	else:
 		boardId = {k:board.from_page(v) for k, v in page.items()}
-		return lambda args: fetch(boardId[args.name], args.number, args.page, args.order, dump=args.dump)['list']
+		def f(args, key):
+			return fetch(boardId[key], args.number, args.page, args.order, dump=args.dump)['list']
+		return f
 
 
 def today(args):
@@ -144,7 +146,8 @@ def today(args):
 
 
 
-def listers():
+def listers(args):
+	k, *keys = args.board.split('/')
 	return {
 		'blogs': blogs,
 		'radio': radio,
@@ -164,4 +167,4 @@ def listers():
 		'chuwapane': make_simple_lister('chuwapaneDiary'),
 		'onlinelive2020': make_simple_lister('onlineliveDiary'),
 		'today': today,
-	}
+	}[k](args, *keys)
