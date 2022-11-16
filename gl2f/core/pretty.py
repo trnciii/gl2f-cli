@@ -1,9 +1,9 @@
 from . import board, member, terminal as term, date
 
 class Formatter:
-	def __init__(self, f='author:title:url', fd='%m/%d', sep=' '):
+	def __init__(self, f='author:title:url', fd=None, sep=' '):
 		self.fstring = f
-		self.fdstring = fd
+		self.fdstring = fd if fd else '%m/%d'
 		self.sep = sep
 
 		self.index = 0
@@ -24,21 +24,16 @@ class Formatter:
 			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
-		mods = [
-			term.bold(),
-			term.rgb(*colf),
-			term.rgb(*colb, 'b')
-		]
 		return term.justzen(
-			term.mod(fullname, mods),
+			term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b')),
 			member.name_width()
 		)
 
 	def title(self, item):
-		return term.mod(item['values']['title'], [term.bold()])
+		return term.mod(item['values']['title'], term.bold())
 
 	def url(self, item):
-		return term.mod(board.content_url(item), [term.dim()])
+		return term.mod(board.content_url(item), term.dim())
 
 	def date_p(self, item):
 		return date.to_datetime(item['openingAt']).strftime(self.fdstring)
@@ -100,17 +95,20 @@ def add_args(parser):
 		help='show index on the left (lefter than date)')
 
 
-def post_argparse(args):
-	args.format = args.format.rstrip(':').lstrip(':')
+def make_format(args):
+	f = args.format.rstrip(':').lstrip(':')
 
 	if args.break_urls:
-		args.format = args.format.replace('url', 'br:url')
+		f = f.replace('url', 'br:url')
 
-	if args.date:
-		if 'date-p' not in args.format:
-			args.format = 'date-p:' + args.format
-	else:
-		args.date = '%m/%d'
+	if args.date and 'date-p' not in f:
+		f = 'date-p:' + f
 
 	if args.enum:
-		args.format = 'index:' + args.format
+		f = 'index:' + f
+
+	return f
+
+
+def from_args(args):
+	return Formatter(f=make_format(args), fd=args.date, sep=args.sep)

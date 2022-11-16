@@ -79,8 +79,12 @@ def hide():
 def strikeline():
 	return '9'
 
-def mod(s, cc):
-	return '\033[{}m'.format(';'.join(cc)) + s + '\033[{}m'.format(reset_all())
+
+def reset():
+	return '\033[m'
+
+def mod(s, *cc):
+	return f'\033[{";".join(cc)}m' + s + reset()
 
 
 def move_cursor(n):
@@ -107,7 +111,7 @@ if os.name == 'nt':
 
 
 	def select(items):
-		print(mod(" { space: toggle, 'a': all, 'c': clear }", [color('yellow', 'fl')]))
+		print(mod(" { space: toggle, 'a': all, 'c': clear }", color('yellow', 'fl')))
 
 		w, _ = os.get_terminal_size()
 		maxlen = w-5
@@ -123,7 +127,7 @@ if os.name == 'nt':
 				option = ('>' if cursor==i else ' ') + ('[x]' if s else '[ ]') + ' ' + item
 				if len(option) > maxlen:
 					option = option[:maxlen] + '...'
-				print(option + mod('', []))
+				print(option + reset())
 
 			ch = msvcrt.getch()
 			# print(ch)
@@ -189,7 +193,7 @@ elif os.name == 'posix':
 		try:
 			termios.tcsetattr(fd, termios.TCSANOW, tc)
 
-			print(mod("{ space: toggle, 'a': all, 'c': clear, 'q': quit }", [color('yellow', 'fl')]))
+			print(mod("{ space: toggle, 'a': all, 'c': clear, 'q': quit }", color('yellow', 'fl')))
 
 			w, _ = os.get_terminal_size()
 			maxlen = w-5
@@ -205,7 +209,7 @@ elif os.name == 'posix':
 					option = ('>' if cursor==i else ' ') + ('[x]' if s else '[ ]') + ' ' + item
 					if len(option) > maxlen:
 						option = option[:maxlen] + '...'
-					print(option + mod('', []))
+					print(option + reset())
 
 				ch = sys.stdin.read(1)
 				# print(ch)

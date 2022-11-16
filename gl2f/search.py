@@ -25,9 +25,7 @@ def add_args(parser, list_board):
 		from .core import article, terminal as term
 		import re
 
-		pretty.post_argparse(args)
-
-		fm = pretty.Formatter(f=args.format, fd=args.date, sep=args.sep)
+		fm = pretty.from_args(args)
 		fm.reset_index(digits=len(str(args.number)))
 
 		hi = re.compile( fr"(?P<match>{'|'.join(args.keywords)})" )
@@ -46,8 +44,8 @@ def add_args(parser, list_board):
 
 			for begin, end in merged:
 				print('> ' + hi.sub(
-					term.mod(r'\g<match>', [term.color('yellow'), term.inv()]),
-					t[max(0, begin):min(len(t), end)] + term.mod('', [])
+					term.mod(r'\g<match>', term.color('yellow'), term.inv()),
+					t[max(0, begin):min(len(t), end)] + term.reset()
 				))
 
 			print()
