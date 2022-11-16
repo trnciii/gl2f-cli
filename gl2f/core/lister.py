@@ -165,9 +165,3 @@ def listers():
 		'onlinelive2020': make_simple_lister('onlineliveDiary'),
 		'today': today,
 	}
-
-
-def add_args_boardwise(parser, cmd):
-	subparsers = parser.add_subparsers()
-	for k, v in listers().items():
-		cmd.add_args(subparsers.add_parser(k), v)
