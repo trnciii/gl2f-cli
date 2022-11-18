@@ -64,7 +64,10 @@ document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page
 
 
 const cols = document.getElementById('cols');
-cols.value = Math.min(Math.sqrt(media_table.length) * (window.innerWidth/window.innerHeight), media_table.length);
+cols.value = Math.min(
+  Math.ceil(Math.sqrt(media_table.length * window.innerWidth/window.innerHeight)),
+  media_table.length
+);
 
 
 function list(size){
