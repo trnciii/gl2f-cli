@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'
+    branches:
+      - 'build'
 
 jobs:
   build:
@@ -37,6 +39,7 @@ jobs:
           path: dist
 
   release:
+    if: github.ref == 'v*'
     needs: [build]
     runs-on: ubuntu-latest
     steps:
