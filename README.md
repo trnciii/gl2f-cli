@@ -38,7 +38,6 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 	* 256 color
 	* url を開いてくれるものが便利です
 	* sixel による画像表示ができます
-* python3 & pip
 * Chrome ブラウザ (ログインのため)
 * [libsixel](https://github.com/saitoha/libsixel) (ターミナル上に画像を表示するため)
 
@@ -48,13 +47,21 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 
 ## インストール
 
-pip でこのリポジトリから直接インストール
+二つのインストール方法があります。
+
+
+### 1. pip を使う
+
+python3 + pip の環境があればこのリポジトリから直接インストールできます。
 
 ```sh
 pip install git+https://github.com/trnciii/gl2f-cli
 ```
 
-Windows と MacOS には、ダウンロードしてすぐ使えるアプリケーションもリリースしています。
+### 2. 実行ファイルをダウンロードする
+
+Windows と MacOS では、ダウンロードしてすぐ使えるアプリケーションをリリースしています。
+
 https://github.com/trnciii/gl2f-cli/releases
 
 > **Note**
@@ -64,8 +71,11 @@ https://github.com/trnciii/gl2f-cli/releases
 > いずれも自身の責任で設定の変更を行ってください。
 
 
-また bash 用の簡単な補完スクリプトを用意しています。
-`gl2f.bash` を bash-completion のインストール先 (`/share/bash-completion/completions` とか `/etc/bash_completion.d`　とかの下?) に保存すると使えます。
+### コマンドの補完スクリプト
+
+bash-completion 用に簡単な補完スクリプト `gl2f.bash` を用意しています。
+`source gl2f.bash` でスクリプト読み込まれ、コマンドやページ名に補完が効くようになります。
+ずっと使えるようにるには、bash-completion の読み込み先 (`/share/bash-completion/completions` とか `/etc/bash_completion.d`　とかの下?) に保存します。
 
 
 ## 使い方

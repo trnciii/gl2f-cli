@@ -57,3 +57,4 @@ jobs:
           files: |
             windows.zip
             macos.zip
+            gl2f.bash
