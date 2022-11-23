@@ -1,12 +1,12 @@
-# GL2F-cli
+# GL2 Familiar CLI
 
 > **Note**
-> 近いうちに、 短縮されたコマンド `gl2b gl2r gl2n gl2d` を廃止します。
-> かわりに bash の補完を提供しコマンドの入力を簡単にします。
-> また、[ページの指定方法](./docs/boards.md)が変更されます。
+> 短縮されたコマンド `gl2b gl2r gl2n gl2d` を削除しました。
+> かわりに bash の補完を提供しコマンドの入力を簡単にしました。
+> また、[ページの指定方法](./docs/boards.md)が変更され、 `blogs/momoka` のように `/` で区切るようになりました。
 
 
-GL2 family ファンクラブサイトをターミナルから閲覧する非公式アプリです。
+[GL2 family](https://girls2-fc.jp/) をターミナルから閲覧する非公式アプリです。
 公式サイトではメンバーごとのリストが用意されていなかったり複数の記事を開くのが大変だったり使いづらかったので作りました。
 ブラウザで開くとき以上のやりとりをしていないので大丈夫と思っていますが、このアプリは利用規約に触れる行為を目的とはしていませんので、問題があるかもしれない部分を見つけたら教えてくださると助かります。
 
@@ -208,7 +208,7 @@ gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 * listing リストする情報や整理について
 * appearance リストや記事の表示・整形について
 
-twitter [@trnciii](https://twitter.com/trnciii) [@trncix](https://twitter.com/trncix) に伝えてもらっても構いません。
+twitter 等に伝えてもらっても構いません。
 
 
 ## 依存
