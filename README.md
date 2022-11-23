@@ -21,6 +21,7 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 * [gl2f dl](./docs/commands.md#gl2f-dl-記事に含まれる画像や動画をダウンロードする) 記事に含まれる画像や動画をダウンロードする
 * [gl2f ls](./docs/commands.md#gl2f-ls-記事の情報をリストする) 一覧表示する
 * [gl2f open](./docs/commands.md#gl2f-open-記事をブラウザで開く) ページを一括でブラウザで開く
+* [gl2f search](./docs/commands.md#gl2f-search-記事の内容を検索する) 記事内容を検索する
 
 対象となるページは
 
@@ -43,7 +44,6 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 	* 256 color
 	* url を開いてくれるものが便利です
 	* sixel による画像表示ができます
-* python3 & pip
 * Chrome ブラウザ (ログインのため)
 * [libsixel](https://github.com/saitoha/libsixel) (ターミナル上に画像を表示するため)
 
@@ -53,13 +53,21 @@ GL2 family ファンクラブサイトをターミナルから閲覧する非公
 
 ## インストール
 
-pip でこのリポジトリから直接インストール
+二つのインストール方法があります。
+
+
+### 1. pip を使う
+
+python3 + pip の環境があればこのリポジトリから直接インストールできます。
 
 ```sh
 pip install git+https://github.com/trnciii/gl2f-cli
 ```
 
-Windows と MacOS には、ダウンロードしてすぐ使えるアプリケーションもリリースしています。
+### 2. 実行ファイルをダウンロードする
+
+Windows と MacOS では、ダウンロードしてすぐ使えるアプリケーションをリリースしています。
+
 https://github.com/trnciii/gl2f-cli/releases
 
 > **Note**
@@ -67,6 +75,13 @@ https://github.com/trnciii/gl2f-cli/releases
 > スキャン項目からアプリを除外する等で実行できると思います。
 > また、Mac では `chmod 755 <ファイル>` で実行できました。
 > いずれも自身の責任で設定の変更を行ってください。
+
+
+### コマンドの補完スクリプト
+
+bash-completion 用に簡単な補完スクリプト `gl2f.bash` を用意しています。
+`source gl2f.bash` でスクリプト読み込まれ、コマンドやページ名に補完が効くようになります。
+ずっと使えるようにるには、bash-completion の読み込み先 (`/share/bash-completion/completions` とか `/etc/bash_completion.d`　とか?) に保存します。
 
 
 ## 使い方
@@ -77,209 +92,115 @@ https://github.com/trnciii/gl2f-cli/releases
 また、ほとんどは記事のリストを作り、それらに対して操作を行うものです。
 リストする対象の指定などは共通で、 [リストの作り方](./docs/boards.md) に詳しく書きます。
 
----
-
-ログイン
 ```sh
+# ログイン
 gl2f auth login
-```
 
-24時間以内の更新を全て開く
-```sh
-gl2d open -a
-# or
+# 24時間以内の更新を全て開く
 gl2f open today -a
-```
 
-Girls2 のブログを開く
-```sh
-gl2b open girls2
-# or
+# Girls2 のブログを開く
 gl2f open blogs girls2
-```
 
-渡辺未優のブログを開く
-```sh
-gl2b open miyu
-# or
-gl2f open blogs miyu
-```
+# 渡辺未優のブログを開く
+gl2f open blogs/miyu
 
-今日投稿されたブログを開く
-```sh
-gl2b open today
-# or
-gl2f open blogs today
-```
+# 佐藤栞奈の直近99件のブログから"金魚", "弟"を含むものを検索する
+gl2f search blogs/kanna -n99 金魚 弟
 
-山口莉愛 の lovely2 の頃のブログを開く
-```sh
-gl2b open rina --group lovely2
-# or
-gl2f open blogs rina --group lovely2
-```
+# 今日投稿されたブログを開く
+gl2f open blogs/today
 
-Lucky2 のラジオを開く
-```sh
-gl2r open lucky2
-# or
-gl2f open radio lucky2
-```
+# 山口莉愛 の lovely2 の頃のブログを開く
+gl2f open blogs/rina --group lovely2
 
-杉浦優來のラジオを開く
-```sh
-gl2r open yura
-# or
-gl2f open radio yura
-```
+# Lucky2 のラジオを開く
+gl2f open radio/lucky2
 
-Girls2 のニュースを開く
-```sh
-gl2n open girls2
-# or
-gl2f open news girls2
-```
+# 杉浦優來のラジオを開く
+gl2f open radio/yura
 
-Girls2 + Lucky2 両方のニュースを開く
-```sh
-gl2n open family
-# or
-gl2f open news family
-```
+# Girls2 のニュースを開く
+gl2f open news/girls2
 
-mirage2 のニュースを表示する
-```sh
-gl2n cat mirage2
-# or
-gl2f cat news mirage2
-```
+# Girls2 + Lucky2 両方のニュースを開く
+gl2f open news/family
 
-Gtube を開く
-```sh
-gl2t open
-# or
+# mirage2 のニュースを表示する
+gl2f cat news/mirage2
+
+# Gtube を開く
 gl2f open gtube
-```
 
-commercial movie をブラウザで開く
-```sh
+# commercial movie をブラウザで開く
 gl2f ls cm
-```
 
-lovely2 のブログを20件一覧表示する
-```sh
-gl2b ls lovely2 -n 20
-# or
-gl2f ls blogs lovely2 -n 20
-```
+# lovely2 のブログを20件一覧表示する
+gl2f ls blogs/lovely2 -n 20
 
-Lucky2 のニュースの最新6番目から10番目を一覧表示する (1ページあたり5件の2ページ目)
-```sh
-gl2n ls lucky2 -n 5 -p 2
-# or
-gl2f ls news lucky2 -n 5 -p 2
-```
+# Lucky2 のニュースの最新6番目から10番目を一覧表示する (1ページあたり5件の2ページ目)
+gl2f ls news/lucky2 -n 5 -p 2
 
-lovely2 のニュースを公開日の早いものから10件一覧表示する。公開年月日も表示する
-```sh
-gl2n ls lovely2 --order reservedAt:asc  --date '%Y/%m/%d'
-# or
-gl2f ls news lovely2 --order reservedAt:asc --date '%Y/%m/%d'
-```
+# lovely2 のニュースを公開日の早いものから10件一覧表示する。公開年月日も表示する
+gl2f ls news/lovely2 --order reservedAt:asc --date '%Y/%m/%d'
 
-原田都愛のブログをタイトル降順で30件を一覧表示する
-```sh
-gl2b ls toa --order name:desc -n 30
-# or
-gl2f ls blogs toa --order name:desc -n 30
-```
-```sh
-原田都愛　 🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆 https://girls2-fc.jp/page/blogs/305718498280080541
-原田都愛　 🥳🥳🥳🥳🥳 https://girls2-fc.jp/page/blogs/296237525440136273
-原田都愛　 🥲😄 https://girls2-fc.jp/page/blogs/571710357186282433
-原田都愛　 🥲 https://girls2-fc.jp/page/blogs/567537622214247465
-原田都愛　 🥦 https://girls2-fc.jp/page/blogs/505608708496032705
-原田都愛　 🤪🤪🤪🤪🤪🤪🤪 https://girls2-fc.jp/page/blogs/526227849607119675
-原田都愛　 🤔🤔🤔🤔🤔🤔 https://girls2-fc.jp/page/blogs/304428618660971677
-原田都愛　 🟦 https://girls2-fc.jp/page/blogs/531432161908097851
-原田都愛　 🟦 https://girls2-fc.jp/page/blogs/590320261769724865
-原田都愛　 🟥 https://girls2-fc.jp/page/blogs/661038676481934273
-原田都愛　 🟡 https://girls2-fc.jp/page/blogs/671935404454183776
-原田都愛　 🙏🙏🙏🙏 https://girls2-fc.jp/page/blogs/474485847387800617
-原田都愛　 😭😭😭🙏😭😭🙏 https://girls2-fc.jp/page/blogs/415343499320230849
-原田都愛　 😭😭😭😭😭😊😊😊😊😊😊 https://girls2-fc.jp/page/blogs/407733763091465324
-原田都愛　 😢😢😢😢😭😭 https://girls2-fc.jp/page/blogs/479292590374519849
-原田都愛　 😛😁😏☺️😋🤨😙😛😏😊😗😉 https://girls2-fc.jp/page/blogs/317133005120341149
-原田都愛　 😑😑😑😑 https://girls2-fc.jp/page/blogs/470792896459572161
-原田都愛　 😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊 https://girls2-fc.jp/page/blogs/434610414874002273
-原田都愛　 😊😊😊 https://girls2-fc.jp/page/blogs/646890072674665409
-原田都愛　 😊 https://girls2-fc.jp/page/blogs/594672645702681403
-原田都愛　 😊 https://girls2-fc.jp/page/blogs/632701706739647529
-原田都愛　 😊 https://girls2-fc.jp/page/blogs/556652576032949289
-原田都愛　 😆😆😆😆😆 https://girls2-fc.jp/page/blogs/302787299039511387
-原田都愛　 😆 https://girls2-fc.jp/page/blogs/576240964746609467
-原田都愛　 😄 https://girls2-fc.jp/page/blogs/586028060705293353
-原田都愛　 😁😁 https://girls2-fc.jp/page/blogs/653436213872558907
-原田都愛　 😁 https://girls2-fc.jp/page/blogs/605703447957734337
-原田都愛　 😁 https://girls2-fc.jp/page/blogs/588185500834071593
-原田都愛　 😁 https://girls2-fc.jp/page/blogs/597980766613275585
-原田都愛　 😁 https://girls2-fc.jp/page/blogs/593649955202139073
-```
+# 原田都愛のブログをタイトル降順で30件を一覧表示する
+gl2f ls blogs/toa --order name:desc -n 30
+> 原田都愛　 🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆🦆 https://girls2-fc.jp/page/blogs/305718498280080541
+> 原田都愛　 🥳🥳🥳🥳🥳 https://girls2-fc.jp/page/blogs/296237525440136273
+> 原田都愛　 🥲😄 https://girls2-fc.jp/page/blogs/571710357186282433
+> 原田都愛　 🥲 https://girls2-fc.jp/page/blogs/567537622214247465
+> 原田都愛　 🥦 https://girls2-fc.jp/page/blogs/505608708496032705
+> 原田都愛　 🤪🤪🤪🤪🤪🤪🤪 https://girls2-fc.jp/page/blogs/526227849607119675
+> 原田都愛　 🤔🤔🤔🤔🤔🤔 https://girls2-fc.jp/page/blogs/304428618660971677
+> 原田都愛　 🟦 https://girls2-fc.jp/page/blogs/531432161908097851
+> 原田都愛　 🟦 https://girls2-fc.jp/page/blogs/590320261769724865
+> 原田都愛　 🟥 https://girls2-fc.jp/page/blogs/661038676481934273
+> 原田都愛　 🟡 https://girls2-fc.jp/page/blogs/671935404454183776
+> 原田都愛　 🙏🙏🙏🙏 https://girls2-fc.jp/page/blogs/474485847387800617
+> 原田都愛　 😭😭😭🙏😭😭🙏 https://girls2-fc.jp/page/blogs/415343499320230849
+> 原田都愛　 😭😭😭😭😭😊😊😊😊😊😊 https://girls2-fc.jp/page/blogs/407733763091465324
+> 原田都愛　 😢😢😢😢😭😭 https://girls2-fc.jp/page/blogs/479292590374519849
+> 原田都愛　 😛😁😏☺️😋🤨😙😛😏😊😗😉 https://girls2-fc.jp/page/blogs/317133005120341149
+> 原田都愛　 😑😑😑😑 https://girls2-fc.jp/page/blogs/470792896459572161
+> 原田都愛　 😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊😊 https://girls2-fc.jp/page/blogs/434610414874002273
+> 原田都愛　 😊😊😊 https://girls2-fc.jp/page/blogs/646890072674665409
+> 原田都愛　 😊 https://girls2-fc.jp/page/blogs/594672645702681403
+> 原田都愛　 😊 https://girls2-fc.jp/page/blogs/632701706739647529
+> 原田都愛　 😊 https://girls2-fc.jp/page/blogs/556652576032949289
+> 原田都愛　 😆😆😆😆😆 https://girls2-fc.jp/page/blogs/302787299039511387
+> 原田都愛　 😆 https://girls2-fc.jp/page/blogs/576240964746609467
+> 原田都愛　 😄 https://girls2-fc.jp/page/blogs/586028060705293353
+> 原田都愛　 😁😁 https://girls2-fc.jp/page/blogs/653436213872558907
+> 原田都愛　 😁 https://girls2-fc.jp/page/blogs/605703447957734337
+> 原田都愛　 😁 https://girls2-fc.jp/page/blogs/588185500834071593
+> 原田都愛　 😁 https://girls2-fc.jp/page/blogs/597980766613275585
+> 原田都愛　 😁 https://girls2-fc.jp/page/blogs/593649955202139073
 
-Girls2 のニュース本文を表示する。
-```sh
-gl2n cat girls2
-# or
-gl2f cat news girls2
-```
+# Girls2 のニュース本文を表示する。
+gl2f cat news/girls2
 
-GL2 family のニュース本文を、すべての改行を維持して表示する。
-```sh
-gl2n cat --option full family
-# or
-gl2f cat --option full news family
-```
+# GL2 family のニュース本文を、すべての改行を維持して表示する。
+gl2f cat --style full news/family
 
-森朱里のブログを、左端に番号を振って一覧表示する
-```sh
-gl2b ls akari --enum
+# 森朱里のブログを、左端に番号を振って一覧表示する
+gl2f ls blogs/akari --enum
 # or
-gl2f ls blogs akari --enum
-# or
-gl2b ls akari -f index:author:title:url
-# or
-gl2f ls blogs akari -f index:author:title:url
-```
+gl2f ls blogs/akari -f index:author:title:url
 
-鶴屋美咲のラジオを公開日とともに一覧表示する
-```sh
-gl2r ls misaki -d
+# 鶴屋美咲のラジオを公開日とともに一覧表示する
+gl2f ls radio/misaki -d
 # or
-gl2f ls radio misaki -d
-# or
-gl2r ls misaki -f date-p:author:title:url
-# or
-gl2f ls radio misaki -f date-p:author:title:url
-```
+gl2f ls radio/misaki -f date-p:author:title:url
 
-永山椿のブログを url を改行して一覧表示する
-```sh
-gl2b ls tsubaki --break-urls
+# 永山椿のブログを url を改行して一覧表示する
+gl2f ls blogs/tsubaki --break-urls
 # or
-gl2f ls blogs tsubaki --break-urls
-# or
-gl2b ls tsubaki -f author:title:br:url
-# or
-gl2f ls blogs tsubaki -f author:title:br:url
-```
+gl2f ls blogs/tsubaki -f author:title:br:url
 
-lovely2 スタッフのブログを、投稿日と公開日とともに一覧表示する。日時は秒まで表示する。
-```sh
-gl2b ls lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
-# or
-gl2f ls blogs lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
+# lovely2 スタッフのブログを、投稿日と公開日とともに一覧表示する。日時は秒まで表示する。
+gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 ```
-
 
 ## 開発予定
 

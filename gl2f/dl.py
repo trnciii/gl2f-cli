@@ -26,7 +26,7 @@ def save(item, args):
 	print('downloaded', fm.format(item))
 
 
-def add_args(parser, list_board):
+def add_args(parser):
 	lister.add_args(parser)
 
 	pretty.add_args(parser)
@@ -53,7 +53,7 @@ def add_args(parser, list_board):
 		from .core.local import refdir_untouch
 		from .local import index
 
-		items = list_board(args)
+		items = lister.listers(args)
 
 		if args.all:
 			for i in items:
