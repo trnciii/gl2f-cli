@@ -93,9 +93,6 @@ bash-completion 用に簡単な補完スクリプト `gl2f.bash` を用意して
 リストする対象の指定などは共通で、 [リストの作り方](./docs/boards.md) に詳しく書きます。
 
 ```sh
-# ログイン
-gl2f auth login
-
 # 24時間以内の更新を全て開く
 gl2f open today -a
 
@@ -105,8 +102,8 @@ gl2f open blogs girls2
 # 渡辺未優のブログを開く
 gl2f open blogs/miyu
 
-# 佐藤栞奈の直近99件のブログから"金魚", "弟"を含むものを検索する
-gl2f search blogs/kanna -n99 金魚 弟
+# family ニュースから"誕生日"を検索する
+gl2f search news/family 誕生日
 
 # 今日投稿されたブログを開く
 gl2f open blogs/today
