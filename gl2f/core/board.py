@@ -1,182 +1,216 @@
-def get():
-	return {
+def table():
+	return [
 		# blogs
-		'271474317252887717': {
+		{
+			'id': '271474317252887717',
+			'key': 'blogs/girls2',
 			'group': 'girls2',
 			'page': 'blogs',
 		},
 
-		'436708526618837819': {
+		{
+			'id': '436708526618837819',
+			'key': 'blogs/lovely2',
 			'group': 'lovely2',
 			'page': 'lovely2blogs',
 		},
 
-		'540071536506176315': {
+		{
+			'id': '540071536506176315',
+			'key': 'blogs/lucky2',
 			'group': 'lucky2',
 			'page': 'lucky2blogs',
 		},
 
 		# news
-		'540067120025699131': {
+		{
+			'id': '540067120025699131',
+			'key': 'news/family',
 			'page': 'familyNews',
 		},
 
-		'270441012457899173': {
+		{
+			'id': '270441012457899173',
+			'key': 'news/girls2',
 			'group': 'girls2',
 			'page': 'news',
 		},
 
-		'415001844964656065': {
+		{
+			'id': '415001844964656065',
+			'key': 'news/lovely2',
 			'group': 'lovely2',
 			'page': 'lovely2news',
 		},
-		'540071356465677115': {
+		{
+			'id': '540071356465677115',
+			'key': 'news/lucky2',
 			'group': 'lucky2',
 			'page': 'lucky2news',
 		},
 
-		'270810062216233612': {
+		{
+			'id': '270810062216233612',
+			'key': 'news/mirage2',
 			'group': 'mirage2',
 			'page': 'mirage2news',
 		},
 
 		# radio
-		'455630760846558145': {
+		{
+			'id': '455630760846558145',
+			'key': 'radio/girls2',
 			'group': 'girls2',
 			'page': 'girls2radio',
 		},
 
-		'540071136604455739': {
+		{
+			'id': '540071136604455739',
+			'key': 'radio/lucky2',
 			'group': 'lucky2',
 			'page': 'lucky2radio',
 		},
 
 		# gtube
-		'270809837141492901': {
+		{
+			'id': '270809837141492901',
+			'key': 'gtube',
 			'page': 'gtube',
 		},
 
 		# commercial movie
-		'504468501197489089':{
+		{
+			'id': '504468501197489089',
+			'key': 'cm',
 			'page': 'commercialmovie',
 		},
 
 
-		'297314731440473169':{
+		{
+			'id': '297314731440473169',
+			'key': 'others',
 			'page': 'others',
 		},
 
 		# Shangri-la
-		'689409591506633568': {
+		{
+			'id': '689409591506633568',
+			'key': 'shangrila',
 			'page': 'ShangrilaPG',
 		},
 
 		# Brand New World!
-		'666819802651689824':{
+		{
+			'id': '666819802651689824',
+			'key': 'brandnewworld/cheer',
 			'page': 'FirstLiveCheerForL2',
 		},
 
-		'664746725843403713':{
+		{
+			'id': '664746725843403713',
+			'key': 'brandnewworld/photo',
 			'page': 'Lucky2FirstLivePG',
 		},
 
 		# daijoubu
-		'660050132594590761':{
+		{
+			'id': '660050132594590761',
+			'key': 'daijoubu/photo',
 			'page': '3rdAnnivPG',
 		},
 
-		'653506325782725569':{
+		{
+			'id': '653506325782725569',
+			'key': 'daijoubu/cheer',
 			'page': '3rdAnnivCheerForG2',
 		},
 
 		# CL special live
-		'639636551948567355':{
+		{
+			'id': '639636551948567355',
+			'key': 'cl',
 			'page': 'CLsplivepg',
 		},
 
 		# fan meeting
-		'613606146413953985':{
+		{
+			'id': '613606146413953985',
+			'key': 'fm/girls2',
 			'group': 'girls2',
 			'page': 'G2fcmeetingpg',
 		},
 
-		'613607790937637825':{
+		{
+			'id': '613607790937637825',
+			'key': 'fm/lucky2',
 			'group': 'lucky2',
 			'page': 'L2fcmeetingpg',
 		},
 
 		# enjoy the good days
-		'558593359405384641':{
+		{
+			'id': '558593359405384641',
+			'key': 'enjoythegooddays',
 			'group': 'girls2',
 			'page': 'EnjoyTheGoodDaysBackstage',
 		},
 
 		# famitok
-		'550521936032039739':{
+		{
+			'id': '550521936032039739',
+			'key': 'famitok/girls2',
 			'group': 'girls2',
 			'page': 'Girls2famitok',
 		},
 
-		'550521867736187707':{
+		{
+			'id': '550521867736187707',
+			'key': 'famitok/lucky2',
 			'group': 'lucky2',
 			'page': 'Lucky2famitok',
 		},
 
 		# lovely2 special live
-		'527414639852520385':{
+		{
+			'id': '527414639852520385',
+			'key': 'lovely2live',
 			'page': 'lovely2Live2021Diary',
 		},
 
 		# garugaku live
-		'499846974107812667':{
+		{
+			'id': '499846974107812667',
+			'key': 'garugakulive',
 			'page': 'garugakuliveDiary',
 		},
 
 		# chuwapane
-		'357805845389509857':{
+		{
+			'id': '357805845389509857',
+			'key': 'chuwapane',
 			'page': 'chuwapaneDiary',
 		},
 
 		# onlinelive
-		'449506330521109545':{
+		{
+			'id': '449506330521109545',
+			'key': 'onlinelive2020',
 			'page': 'onlineliveDiary',
 		},
 
 		# wallpaper
-		'516921408022905897':{
+		{
+			'id': '516921408022905897',
+			'key': 'wallpaper',
 			'page': 'wallpaper'
 		},
-	}
+	]
 
 
-def from_page(p):
-	return {v['page']:k for k, v in get().items()}[p]
-
-
-def blogs(key):
-	return {
-		'girls2': from_page('blogs'),
-		'lovely2': from_page('lovely2blogs'),
-		'lucky2': from_page('lucky2blogs')
-	}[key]
-
-def news(key):
-	return {
-		'family': from_page('familyNews'),
-		'girls2': from_page('news'),
-		'lovely2': from_page('lovely2news'),
-		'lucky2': from_page('lucky2news'),
-		'mirage2': from_page('mirage2news'),
-	}[key]
-
-def radio(key):
-	return{
-		'girls2': from_page('girls2radio'),
-		'lucky2': from_page('lucky2radio'),
-	}[key]
-
+def get(k, v):
+	return next(x for x in table() if x[k] == v)
 
 def content_url(item):
-	page = get()[item['boardId']]['page']
+	page = get('id', item['boardId'])['page']
 	content = item['contentId']
 	return f'https://girls2-fc.jp/page/{page}/{content}'

@@ -25,7 +25,7 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 		return
 
 	if dump:
-		filename = board.get()[boardId]['page']
+		filename = board.get('id', boardId)['page']
 		if categoryId:
 			name, _ = member.from_id(categoryId)
 			filename += f'-{name}'
@@ -58,9 +58,9 @@ def get_IDs(domain, m, g):
 	group = g if g in group_list else group_list[0]
 
 	if domain == 'blog':
-		return board.blogs(group), data['categoryId'][domain]
+		return board.get('key', f'blogs/{group}')['id'], data['categoryId'][domain]
 	elif domain == 'radio':
-		return board.radio(group), data['categoryId'][domain]
+		return board.get('key', f'radio/{group}')['id'], data['categoryId'][domain]
 
 
 def add_args(parser):
@@ -90,41 +90,10 @@ def filter_today(li):
 def listers(args):
 	key, *sub = args.board.split('/')
 
-	pages = {
-		'gtube':'gtube',
-		'cm':'commercialmovie',
-		'others':'others',
-		'shangrila':'ShangrilaPG',
-		'cl':'CLsplivepg',
-		'lovely2live':'lovely2Live2021Diary',
-		'garugakulive':'garugakuliveDiary',
-		'chuwapane':'chuwapaneDiary',
-		'onlinelive2020':'onlineliveDiary',
-		'enjoythegooddays':'EnjoyTheGoodDaysBackstage',
-		'wallpaper': 'wallpaper',
-		'brandnewworld':{
-			'photo': 'Lucky2FirstLivePG',
-			'cheer': 'FirstLiveCheerForL2'
-		},
-		'daijoubu':{
-			'photo': '3rdAnnivPG',
-			'cheer': '3rdAnnivCheerForG2'
-		},
-		'fm':{
-			'girls2':'G2fcmeetingpg',
-			'lucky2':'L2fcmeetingpg'
-		},
-		'famitok':{
-			'girls2': 'Girls2famitok',
-			'lucky2': 'Lucky2famitok'
-		},
-	}
-
-
 	if key == 'blogs':
 		skey = sub[0]
 		if member.is_group(skey):
-			boardId = board.blogs(skey)
+			boardId = board.get('key', args.board)['id']
 			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 		elif member.is_member(skey):
@@ -132,13 +101,16 @@ def listers(args):
 			return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 		elif skey == 'today':
-			return filter_today(list_multiple_boards([board.blogs(i) for i in ['girls2', 'lucky2']], args))
+			return filter_today(list_multiple_boards(
+				[board.get('key', f'blogs/{g}')['id'] for g in ['girls2', 'lucky2']],
+				args
+			))
 
 
 	elif key == 'radio':
 		skey = sub[0]
 		if member.is_group(skey):
-			boardId = board.radio(skey)
+			boardId = board.get('key', args.board)['id']
 			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 		elif member.is_member(skey):
@@ -149,41 +121,32 @@ def listers(args):
 	elif key == 'news':
 		skey = sub[0]
 		if skey == 'today':
-			return filter_today(fetch(board.news('family'), size=10, page=1, dump=args.dump)['list'])
+			boardId = board.get('key', 'news/family')['id']
+			return filter_today(fetch(boardId, size=10, page=1, dump=args.dump)['list'])
 
 		else:
-			boardId = board.news(skey)
+			boardId = board.get('key', args.board)['id']
 			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 
 	elif key == 'today':
 		ret = list_multiple_boards([
-			board.blogs('girls2'),
-			board.blogs('lucky2'),
-			board.news('family'),
-			board.radio('girls2'),
-			board.radio('lucky2'),
-			board.from_page('gtube'),
-			board.from_page('commercialmovie'),
-			board.from_page('ShangrilaPG'),
-			board.from_page('wallpaper'),
+			board.get('key', x)['id'] for x in [
+				'blogs/girls2',
+				'blogs/lucky2',
+				'news/family',
+				'radio/girls2',
+				'radio/lucky2',
+				'gtube',
+				'cm',
+				'shangrila',
+				'wallpaper'
+			]
 		], args)
 		return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
 
-
-	elif key in pages.keys():
-		v = pages[key]
-		if isinstance(v, dict):
-			return fetch(
-				board.from_page(v[sub[0]]),
-				args.number, args.page, args.order, dump=args.dump
-			)['list']
-		else:
-			return fetch(
-				board.from_page(v),
-				args.number, args.page, args.order, dump=args.dump
-			)['list']
-
 	else:
-		print('key not found')
-		return []
+		return fetch(
+			board.get('key', args.board)['id'],
+			args.number, args.page, args.order, dump=args.dump
+		)['list']

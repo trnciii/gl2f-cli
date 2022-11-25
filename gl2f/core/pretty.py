@@ -18,7 +18,7 @@ class Formatter:
 		_, v = member.from_id(item.get('categoryId'))
 		if v:
 			fullname = v['fullname']
-			group = board.get()[item['boardId']]['group']
+			group = board.get('id', item['boardId'])['group']
 			colf, colb = v['color'][group].values()
 		else:
 			fullname = item.get('category', {'name':''})['name']
