@@ -96,7 +96,7 @@ def add_args(parser):
 
 
 def make_format(args):
-	f = args.format.rstrip(':').lstrip(':')
+	f = args.format.strip(':')
 
 	if args.break_urls:
 		f = f.replace('url', 'br:url')
