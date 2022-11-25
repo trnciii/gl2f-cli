@@ -30,7 +30,7 @@ def install():
 	import shutil
 
 	file = 'site'
-	src = os.path.join(os.path.dirname(__file__), 'data', file)
+	src = local.package_data(file)
 	dst = os.path.join(local.home(), file)
 
 	if os.path.exists(dst):
