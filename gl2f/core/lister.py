@@ -83,7 +83,7 @@ def filter_today(li):
 	return list(filter(lambda i:in24h(i['openingAt']), li))
 
 
-def listers(args):
+def list_contents(args):
 	if args.board.startswith('blogs/'):
 		sub = args.board.split('/')[1]
 		if member.is_group(sub):

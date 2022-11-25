@@ -10,7 +10,7 @@ def add_args(parser):
 		fm = pretty.from_args(args)
 		fm.reset_index(digits=len(str(args.number)))
 
-		for i in lister.listers(args):
+		for i in lister.list_contents(args):
 			fm.print(i)
 
 	parser.set_defaults(handler=subcommand)

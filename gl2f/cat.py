@@ -40,7 +40,7 @@ def add_args(parser):
 	def subcommand(args):
 		from .core import terminal as term
 
-		items = lister.listers(args)
+		items = lister.list_contents(args)
 
 		if args.all:
 			for i in items:

@@ -53,7 +53,7 @@ def add_args(parser):
 		from .core.local import refdir_untouch
 		from .local import index
 
-		items = lister.listers(args)
+		items = lister.list_contents(args)
 
 		if args.all:
 			for i in items:
