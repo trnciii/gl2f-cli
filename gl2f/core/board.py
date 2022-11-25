@@ -142,6 +142,10 @@ def get():
 			'page': 'onlineliveDiary',
 		},
 
+		# wallpaper
+		'516921408022905897':{
+			'page': 'wallpaper'
+		},
 	}
 
 

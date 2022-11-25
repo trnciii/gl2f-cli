@@ -101,6 +101,7 @@ def listers(args):
 		'chuwapane':'chuwapaneDiary',
 		'onlinelive2020':'onlineliveDiary',
 		'enjoythegooddays':'EnjoyTheGoodDaysBackstage',
+		'wallpaper': 'wallpaper',
 		'brandnewworld':{
 			'photo': 'Lucky2FirstLivePG',
 			'cheer': 'FirstLiveCheerForL2'
@@ -164,7 +165,8 @@ def listers(args):
 			board.radio('lucky2'),
 			board.from_page('gtube'),
 			board.from_page('commercialmovie'),
-			board.from_page('ShangrilaPG')
+			board.from_page('ShangrilaPG'),
+			board.from_page('wallpaper'),
 		], args)
 		return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
 
