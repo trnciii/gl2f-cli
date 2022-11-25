@@ -34,7 +34,7 @@ def add_args(parser):
 
 		hi = re.compile( fr"(?P<match>{'|'.join(keywords)})" )
 
-		items = lister.listers(args)
+		items = lister.list_contents(args)
 		texts = [article.to_text(i, 'plain', False) for i in items]
 		counts = [
 			sum(int(k in te) + int(k in ti) for k in keywords)

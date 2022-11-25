@@ -5,7 +5,7 @@ def get():
 			'fullname': '小田柚葉',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [0, 190, 243]}},
 			'categoryId': {
-				'blog': '271548290024080549',
+				'blogs': '271548290024080549',
 				'radio': '271548290024080549',
 			}
 		},
@@ -14,7 +14,7 @@ def get():
 			'fullname': '隅谷百花',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [31, 82, 209]}},
 			'categoryId': {
-				'blog': '271548304888693925',
+				'blogs': '271548304888693925',
 				'radio': '271548304888693925',
 			}
 		},
@@ -23,7 +23,7 @@ def get():
 			'fullname': '鶴屋美咲',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [247, 117, 0]}},
 			'categoryId': {
-				'blog': '271548319161909900',
+				'blogs': '271548319161909900',
 				'radio': '271548319161909900',
 			}
 		},
@@ -32,7 +32,7 @@ def get():
 			'fullname': '小川桜花',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}},
 			'categoryId': {
-				'blog': '271548334819247269',
+				'blogs': '271548334819247269',
 				'radio': '271548334819247269',
 			}
 		},
@@ -41,7 +41,7 @@ def get():
 			'fullname': '増田來亜',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
 			'categoryId': {
-				'blog': '271548349729997452',
+				'blogs': '271548349729997452',
 				'radio': '271548349729997452',
 			}
 		},
@@ -50,7 +50,7 @@ def get():
 			'fullname': '菱田未渚美',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [255, 80, 159]}},
 			'categoryId': {
-				'blog': '271548364363924645',
+				'blogs': '271548364363924645',
 				'radio': '271548364363924645',
 			}
 		},
@@ -59,7 +59,7 @@ def get():
 			'fullname': '山口綺羅',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [229, 182, 15]}},
 			'categoryId': {
-				'blog': '271548377827639948',
+				'blogs': '271548377827639948',
 				'radio': '271548377827639948',
 			}
 		},
@@ -68,7 +68,7 @@ def get():
 			'fullname': '原田都愛',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [32, 203, 115]}},
 			'categoryId': {
-				'blog': '271548392222491813',
+				'blogs': '271548392222491813',
 				'radio': '271548392222491813',
 			}
 		},
@@ -77,7 +77,7 @@ def get():
 			'fullname': '石井蘭',
 			'color':{'girls2': {'foreground': [255, 255, 255], 'background': [255, 46, 46]}},
 			'categoryId': {
-				'blog': '271548406038528652',
+				'blogs': '271548406038528652',
 				'radio': '271548406038528652',
 			}
 		},
@@ -87,7 +87,7 @@ def get():
 			'fullname': '渡辺未優',
 			'color':{'lovely2': {'foreground': [255, 255, 255], 'background': [243, 111, 163]}},
 			'categoryId': {
-				'blog': '436713148108505915',
+				'blogs': '436713148108505915',
 			}
 		},
 		'yui': {
@@ -95,7 +95,7 @@ def get():
 			'fullname': '山下結衣',
 			'color':{'lovely2': {'foreground': [255, 255, 255], 'background': [95, 189, 225]}},
 			'categoryId': {
-				'blog': '436714399051285307',
+				'blogs': '436714399051285307',
 			}
 		},
 
@@ -107,7 +107,7 @@ def get():
 				'lovely2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}
 			},
 			'categoryId': {
-				'blog': '436713912444912481',
+				'blogs': '436713912444912481',
 				'radio': '436713912444912481',
 			}
 		},
@@ -119,7 +119,7 @@ def get():
 				'lovely2': {'foreground': [255, 255, 255], 'background': [247, 117, 0]}
 			},
 			'categoryId': {
-				'blog': '443306956518589243',
+				'blogs': '443306956518589243',
 				'radio': '443306956518589243',
 			}
 		},
@@ -129,7 +129,7 @@ def get():
 			'fullname': '永山椿',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
 			'categoryId': {
-				'blog': '540078282813473595',
+				'blogs': '540078282813473595',
 				'radio': '562927300052517691',
 			}
 		},
@@ -138,7 +138,7 @@ def get():
 			'fullname': '深澤日彩',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}},
 			'categoryId': {
-				'blog': '540080651374691131',
+				'blogs': '540080651374691131',
 				'radio': '540080651374691131',
 			}
 		},
@@ -147,7 +147,7 @@ def get():
 			'fullname': '比嘉優和',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 80, 159]}},
 			'categoryId': {
-				'blog': '540080829989127105',
+				'blogs': '540080829989127105',
 				'radio': '540080829989127105',
 			}
 		},
@@ -156,7 +156,7 @@ def get():
 			'fullname': '佐藤栞奈',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
 			'categoryId': {
-				'blog': '540081291836523457',
+				'blogs': '540081291836523457',
 				'blradioog': '540081291836523457',
 			}
 		},
@@ -165,7 +165,7 @@ def get():
 			'fullname': '上村梨々香',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [229, 182, 15]}},
 			'categoryId': {
-				'blog': '661170107531133993',
+				'blogs': '661170107531133993',
 				'radio': '661170107531133993',
 			}
 		},
@@ -174,7 +174,7 @@ def get():
 			'fullname': '森朱里',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [32, 203, 115]}},
 			'categoryId': {
-				'blog': '661169466536625193',
+				'blogs': '661169466536625193',
 				'radio': '661169466536625193',
 			}
 		},
@@ -183,7 +183,7 @@ def get():
 			'fullname': '佐藤妃希',
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 46, 46]}},
 			'categoryId': {
-				'blog': '661168410020807520',
+				'blogs': '661168410020807520',
 				'radio': '661168410020807520',
 			}
 		},
@@ -193,7 +193,7 @@ def get():
 			'fullname': "スタッフ",
 			'color':{'lovely2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
 			'categoryId': {
-				'blog': "436714547944883137",
+				'blogs': "436714547944883137",
 			}
 		}
 	}

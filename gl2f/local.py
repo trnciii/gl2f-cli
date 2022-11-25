@@ -58,7 +58,7 @@ def index():
 		item = local.load_content(i)
 		return {
 			'title': item['values']['title'],
-			'board': board.get()[item['boardId']]['page'],
+			'board': board.get('id', item['boardId'])['page'],
 			'author': item.get('category', {'name':''})['name'],
 			'date': item['openingAt'],
 			'media': list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))

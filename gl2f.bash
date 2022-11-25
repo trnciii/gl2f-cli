@@ -6,7 +6,7 @@ _gl2f_init_completion()
 
 
 _gl2f(){
-	local boards='today blogs/ radio/ news/ gtube cm others shangrila brandnewworld/ daijoubu/ cl fm/ enjoythegooddays famitok/ lovely2live garugakulive chuwapane onlinelive2020'
+	local boards='today blogs/ radio/ news/ gtube cm others shangrila brandnewworld/ daijoubu/ cl fm/ enjoythegooddays famitok/ lovely2live garugakulive chuwapane onlinelive2020 wallpaper'
 	local groups='girls2 lucky2 lovely2'
 	local mem_G2='yuzuha momoka misaki youka kurea minami kira toa ran'
 	local mem_L2='rina yura tsubaki hiro yuwa kanna ririka akari kiki'

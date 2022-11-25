@@ -25,7 +25,7 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 		return
 
 	if dump:
-		filename = board.get()[boardId]['page']
+		filename = board.get('id', boardId)['page']
 		if categoryId:
 			name, _ = member.from_id(categoryId)
 			filename += f'-{name}'
@@ -56,11 +56,7 @@ def get_IDs(domain, m, g):
 	data = member.get()[m]
 	group_list = data['group']
 	group = g if g in group_list else group_list[0]
-
-	if domain == 'blog':
-		return board.blogs(group), data['categoryId'][domain]
-	elif domain == 'radio':
-		return board.radio(group), data['categoryId'][domain]
+	return board.get('key', f'{domain}/{group}')['id'], data['categoryId'][domain]
 
 
 def add_args(parser):
@@ -87,80 +83,62 @@ def filter_today(li):
 	return list(filter(lambda i:in24h(i['openingAt']), li))
 
 
-def blogs(args, key):
-	if member.is_group(key):
-		boardId = board.blogs(key)
-		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+def list_contents(args):
+	if args.board.startswith('blogs/'):
+		sub = args.board.split('/')[1]
+		if member.is_group(sub):
+			boardId = board.get('key', args.board)['id']
+			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
-	elif member.is_member(key):
-		boardId, categoryId = get_IDs('blog', key, args.group)
-		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
+		elif member.is_member(sub):
+			boardId, categoryId = get_IDs('blogs', sub, args.group)
+			return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
-	elif key == 'today':
-		return filter_today(list_multiple_boards([board.blogs(i) for i in ['girls2', 'lucky2']], args))
+		elif sub == 'today':
+			return filter_today(list_multiple_boards(
+				[board.get('key', f'blogs/{g}')['id'] for g in ['girls2', 'lucky2']],
+				args
+			))
 
 
-def news(args, key):
-	if key == 'today':
-		return filter_today(fetch(board.news('family'), size=10, page=1, dump=args.dump)['list'])
+	elif args.board.startswith('radio/'):
+		sub = args.board.split('/')[1]
+		if member.is_group(sub):
+			boardId = board.get('key', args.board)['id']
+			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+
+		elif member.is_member(sub):
+			boardId, categoryId = get_IDs('radio', sub, args.group)
+			return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
+
+
+	elif args.board.startswith('news/'):
+		sub = args.board.split('/')[1]
+		if sub == 'today':
+			boardId = board.get('key', 'news/family')['id']
+			return filter_today(fetch(boardId, size=10, page=1, dump=args.dump)['list'])
+
+		else:
+			boardId = board.get('key', args.board)['id']
+			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+
+
+	elif args.board == 'today':
+		ret = list_multiple_boards([
+			board.get('key', x)['id'] for x in [
+				'blogs/girls2',
+				'blogs/lucky2',
+				'news/family',
+				'radio/girls2',
+				'radio/lucky2',
+				'gtube',
+				'cm',
+				'shangrila',
+				'wallpaper'
+			]
+		], args)
+		return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
 
 	else:
-		boardId = board.news(key)
+		boardId = board.get('key', args.board)['id']
 		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
-
-
-def radio(args, key):
-	if member.is_group(key):
-		boardId = board.radio(key)
-		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
-
-	elif member.is_member(key):
-		boardId, categoryId = get_IDs('radio', key, args.group)
-		return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
-
-
-def make_simple_lister(page):
-	if isinstance(page, str):
-		return lambda a: fetch(board.from_page(page), a.number, a.page, a.order, dump=a.dump)['list']
-	else:
-		return lambda a,k:fetch(board.from_page(page[k]), a.number, a.page, a.order, dump=a.dump)['list']
-
-
-def today(args):
-	boardId = [
-		board.blogs('girls2'),
-		board.blogs('lucky2'),
-		board.news('family'),
-		board.radio('girls2'),
-		board.radio('lucky2'),
-		board.from_page('gtube'),
-		board.from_page('commercialmovie'),
-		board.from_page('ShangrilaPG')
-	]
-	ret = list_multiple_boards(boardId, args)
-	return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
-
-
-
-def listers(args):
-	k, *keys = args.board.split('/')
-	return {
-		'blogs': blogs,
-		'radio': radio,
-		'news': news,
-		'gtube': make_simple_lister('gtube'),
-		'cm': make_simple_lister('commercialmovie'),
-		'others': make_simple_lister('others'),
-		'shangrila': make_simple_lister('ShangrilaPG'),
-		'brandnewworld': make_simple_lister({'photo': 'Lucky2FirstLivePG', 'cheer': 'FirstLiveCheerForL2'}),
-		'daijoubu': make_simple_lister({'photo': '3rdAnnivPG', 'cheer': '3rdAnnivCheerForG2'}),
-		'cl': make_simple_lister('CLsplivepg'),
-		'fm': make_simple_lister({'girls2': 'G2fcmeetingpg', 'lucky2': 'L2fcmeetingpg'}),
-		'enjoythegooddays': make_simple_lister('EnjoyTheGoodDaysBackstage'),
-		'famitok': make_simple_lister({'girls2':'Girls2famitok', 'lucky2': 'Lucky2famitok'}),
-		'lovely2live': make_simple_lister('lovely2Live2021Diary'),
-		'garugakulive': make_simple_lister('garugakuliveDiary'),
-		'chuwapane': make_simple_lister('chuwapaneDiary'),
-		'onlinelive2020': make_simple_lister('onlineliveDiary'),
-		'today': today,
-	}[k](args, *keys)
