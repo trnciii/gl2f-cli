@@ -59,8 +59,12 @@ _gl2f(){
 								;;
 						esac
 					else
-					  COMPREPLY=( $(compgen -W "${boards}" -- ${cur}) )
-						# [[ $COMPREPLY == */ ]] && compopt -o nospace # not work on mac
+						COMPREPLY=( $(compgen -W "${boards}" -- ${cur}) )
+
+						if declare -F _init_completion >/dev/null 2>&1; then
+							[[ $COMPREPLY == */ ]] && compopt -o nospace # not work on mac
+						fi
+
 					fi
 					;;
 				esac
