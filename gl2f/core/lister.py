@@ -56,11 +56,7 @@ def get_IDs(domain, m, g):
 	data = member.get()[m]
 	group_list = data['group']
 	group = g if g in group_list else group_list[0]
-
-	if domain == 'blog':
-		return board.get('key', f'blogs/{group}')['id'], data['categoryId'][domain]
-	elif domain == 'radio':
-		return board.get('key', f'radio/{group}')['id'], data['categoryId'][domain]
+	return board.get('key', f'{domain}/{group}')['id'], data['categoryId'][domain]
 
 
 def add_args(parser):
@@ -88,39 +84,37 @@ def filter_today(li):
 
 
 def listers(args):
-	key, *sub = args.board.split('/')
-
-	if key == 'blogs':
-		skey = sub[0]
-		if member.is_group(skey):
+	if args.board.startswith('blogs/'):
+		sub = args.board.split('/')[1]
+		if member.is_group(sub):
 			boardId = board.get('key', args.board)['id']
 			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
-		elif member.is_member(skey):
-			boardId, categoryId = get_IDs('blog', skey, args.group)
+		elif member.is_member(sub):
+			boardId, categoryId = get_IDs('blogs', sub, args.group)
 			return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
-		elif skey == 'today':
+		elif sub == 'today':
 			return filter_today(list_multiple_boards(
 				[board.get('key', f'blogs/{g}')['id'] for g in ['girls2', 'lucky2']],
 				args
 			))
 
 
-	elif key == 'radio':
-		skey = sub[0]
-		if member.is_group(skey):
+	elif args.board.startswith('radio/'):
+		sub = args.board.split('/')[1]
+		if member.is_group(sub):
 			boardId = board.get('key', args.board)['id']
 			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
-		elif member.is_member(skey):
-			boardId, categoryId = get_IDs('radio', skey, args.group)
+		elif member.is_member(sub):
+			boardId, categoryId = get_IDs('radio', sub, args.group)
 			return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 
-	elif key == 'news':
-		skey = sub[0]
-		if skey == 'today':
+	elif args.board.startswith('news/'):
+		sub = args.board.split('/')[1]
+		if sub == 'today':
 			boardId = board.get('key', 'news/family')['id']
 			return filter_today(fetch(boardId, size=10, page=1, dump=args.dump)['list'])
 
@@ -129,7 +123,7 @@ def listers(args):
 			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
 
 
-	elif key == 'today':
+	elif args.board == 'today':
 		ret = list_multiple_boards([
 			board.get('key', x)['id'] for x in [
 				'blogs/girls2',
@@ -146,7 +140,5 @@ def listers(args):
 		return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
 
 	else:
-		return fetch(
-			board.get('key', args.board)['id'],
-			args.number, args.page, args.order, dump=args.dump
-		)['list']
+		boardId = board.get('key', args.board)['id']
+		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
