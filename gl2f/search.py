@@ -27,15 +27,17 @@ def add_args(parser):
 		from .core import article, terminal as term
 		import re
 
+		keywords = sum((k.split('　') for k in args.keywords), [])
+
 		fm = pretty.from_args(args)
 		fm.reset_index(digits=len(str(args.number)))
 
-		hi = re.compile( fr"(?P<match>{'|'.join(args.keywords)})" )
+		hi = re.compile( fr"(?P<match>{'|'.join(keywords)})" )
 
 		items = lister.listers(args)
 		texts = [article.to_text(i, 'plain', False) for i in items]
 		counts = [
-			sum(int(k in te) + int(k in ti) for k in args.keywords)
+			sum(int(k in te) + int(k in ti) for k in keywords)
 			for te, ti in zip(texts, [i['values']['title'] for i in items])
 		]
 
