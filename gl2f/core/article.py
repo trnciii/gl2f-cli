@@ -22,7 +22,7 @@ class MediaRep:
 		if style == 'type':
 			self.rep = self.rep_type
 
-		elif style == 'sixel' and sixel.supported():
+		elif style == 'sixel' and sixel.init():
 			from functools import partial
 
 			local.refdir('cache')

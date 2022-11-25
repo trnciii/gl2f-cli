@@ -15,7 +15,7 @@ def main():
 
 	local.add_args(subparsers.add_parser('local'))
 
-	subparsers.add_parser('sixel').set_defaults(handler=lambda args:print(sixel.status))
+	subparsers.add_parser('sixel').set_defaults(handler=lambda args:sixel.check())
 
 	for cmd in [cat, dl, ls, opener, search]:
 		cmd.add_args(subparsers.add_parser(cmd.name()))

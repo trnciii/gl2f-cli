@@ -3,6 +3,7 @@ from io import BytesIO
 from . import terminal
 import re
 
+libsixel = None
 
 def supported_terminal():
 	r = terminal.query('\033[c', 'c')
@@ -10,25 +11,30 @@ def supported_terminal():
 	return '4' in n
 
 
-try:
-	assert supported_terminal()
-	import libsixel
-	status = 'supported'
+def init():
+	try:
+		assert supported_terminal()
+		import libsixel as _lib
+		global libsixel
+		libsixel = _lib
+		return True
+	except:
+		return False
 
-except Exception as e:
-	libsixel = None
+def check():
+	try:
+		assert supported_terminal()
+		import libsixel
+		print('supported')
 
-	if type(e) == AssertionError:
-		status = 'terminal does not support sixel'
-	elif type(e) == ImportError:
-		status = 'failed to import libsixel'
-	else:
-		import traceback, sys
-		traceback.print_exc(file=sys.stdout)
-
-
-def supported():
-	return libsixel != None
+	except Exception as e:
+		if type(e) == AssertionError:
+			print('terminal does not support sixel')
+		elif type(e) == ImportError:
+			print('failed to import libsixel')
+		else:
+			import traceback, sys
+			traceback.print_exc(file=sys.stdout)
 
 
 def fit(image, size):
