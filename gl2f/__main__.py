@@ -1,5 +1,5 @@
 import argparse
-from . import opener, ls, cat, dl, search
+from . import opener, ls, cat, dl, search, completion
 import sys, time
 
 
@@ -16,6 +16,8 @@ def main():
 	local.add_args(subparsers.add_parser('local'))
 
 	subparsers.add_parser('sixel').set_defaults(handler=lambda args:sixel.check())
+
+	completion.add_args(subparsers.add_parser('completion'))
 
 	for cmd in [cat, dl, ls, opener, search]:
 		cmd.add_args(subparsers.add_parser(cmd.name()))
