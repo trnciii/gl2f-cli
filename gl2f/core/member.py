@@ -216,6 +216,10 @@ def is_member(member):
 	return member in get().keys()
 
 
+def of_group(g):
+	return {k:v for k, v in get().items() if g in v['group']}
+
+
 def name_width():
 	return max(len(i['fullname']) for i in get().values())
 
