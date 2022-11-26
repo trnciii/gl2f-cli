@@ -42,6 +42,22 @@ gl2f cat --style compressed news/family
 ```
 
 
+## `gl2f completion` Bash 補完を生成する
+
+bash-completion 用の簡単なスクリプトを用意しています。
+インストール後、 `gl2f completion` で生成されるので、シェルの起動時などに読み込むとコマンドやページ名に補完が効くようになります。
+
+```sh
+eval "$(gl2f completion)"
+```
+
+もしくはbash-completion の読み込み先 (`/share/bash-completion/completions` とか `/etc/bash_completion.d`　とか?) にファイルとして保存します。
+
+```sh
+gl2f completion > path/to/bash_completions/gl2f.bash
+```
+
+
 ## `gl2f dl` 記事に含まれる画像や動画をダウンロードする
 
 引数に記事のリストを与えます。

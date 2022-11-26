@@ -90,9 +90,18 @@ chmod 755 path/to/gl2f
 
 ### コマンドの補完スクリプト
 
-bash-completion 用に簡単な補完スクリプト `gl2f.bash` を用意しています。
-`source gl2f.bash` でスクリプト読み込まれ、コマンドやページ名に補完が効くようになります。
-ずっと使えるようにるには、bash-completion の読み込み先 (`/share/bash-completion/completions` とか `/etc/bash_completion.d`　とか?) に保存します。
+bash-completion 用の簡単なスクリプトを用意しています。
+インストール後、 `gl2f completion` で生成されるので、シェルの起動時などに読み込むとコマンドやページ名に補完が効くようになります。
+
+```sh
+eval "$(gl2f completion)"
+```
+
+もしくはbash-completion の読み込み先 (`/share/bash-completion/completions` とか `/etc/bash_completion.d`　とか?) にファイルとして保存します。
+
+```sh
+gl2f completion > path/to/bash_completions/gl2f.bash
+```
 
 
 ## 使い方
