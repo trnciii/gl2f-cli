@@ -1,4 +1,4 @@
-from .core import local, board
+from .core import local, board, member
 import os
 
 
@@ -18,13 +18,13 @@ def page_second():
 		for k in {p[0] for p in pairs}
 	}
 
-	mem_G2='yuzuha momoka misaki youka kurea minami kira toa ran'.split()
-	mem_L2='rina yura tsubaki hiro yuwa kanna ririka akari kiki'.split()
-	mem_l2='miyu yui rina yura lovely2staff'.split()
+	mem_G2 = member.of_group('girls2').keys()
+	mem_L2 = member.of_group('lucky2').keys()
+	mem_l2 = member.of_group('lovely2').keys()
 
 	tree['news'].append('today')
-	tree['blogs'] += (mem_G2 + mem_L2 + mem_l2)
-	tree['radio'] += (mem_G2 + mem_L2)
+	tree['blogs'] += (mem_G2 | mem_L2 | mem_l2)
+	tree['radio'] += (mem_G2 | mem_L2)
 
 	return ''.join(f'''
       {k})
