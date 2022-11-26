@@ -34,17 +34,16 @@ def page_second():
 		for k, v in tree.items())
 
 
-def generate(_):
-	d = local.package_data('completion.bash')
-	with open(d) as f:
+def generate():
+	with open(local.package_data('completion.bash')) as f:
 		source = f.read()
 
 	source = source\
 		.replace('## REPLACE_PAGES_FIRST', page_first())\
 		.replace('## REPLACE_PAGES_SECOND', page_second())
 
-	print(source)
+	return source
 
 
 def add_args(parser):
-	parser.set_defaults(handler=generate)
+	parser.set_defaults(handler=lambda _:print(generate()))
