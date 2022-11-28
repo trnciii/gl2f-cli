@@ -1,30 +1,23 @@
-from .core import local, board, member
-import os
-
-
-def page_first():
-	boards = {k + ('/' if len(v)>0 else '') for k, v in board.tree().items()}
-
-	return f'''
-    COMPREPLY=( $(compgen -W "{' '.join(boards)}" -- ${{cur}}) )
-'''
-
-def page_second():
-	return ''.join(f'''
-      {k})
-        COMPREPLY=( $(compgen -W "{' '.join(set(v))}" -P "${{prefix}}/" -- ${{realcur}}) )
-        ;;
-'''
-		for k, v in board.tree().items() if len(v)>0)
-
+from .core import local, board
 
 def generate():
 	with open(local.package_data('completion.bash')) as f:
 		source = f.read()
 
+	tree = board.tree()
+
 	source = source\
-		.replace('## REPLACE_PAGES_FIRST', page_first())\
-		.replace('## REPLACE_PAGES_SECOND', page_second())
+		.replace('## REPLACE_PAGES_FIRST', f'''
+    COMPREPLY=( $(compgen -W "{' '.join({k + ('/' if len(v)>0 else '') for k, v in tree.items()})}" -- ${{cur}}) )
+'''
+		)\
+		.replace('## REPLACE_PAGES_SECOND', ''.join(f'''
+      {k})
+        COMPREPLY=( $(compgen -W "{' '.join(set(v))}" -P "${{prefix}}/" -- ${{realcur}}) )
+        ;;
+'''
+			for k, v in tree.items() if len(v)>0)
+		)
 
 	return source
 
