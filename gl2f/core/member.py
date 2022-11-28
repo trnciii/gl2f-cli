@@ -157,7 +157,7 @@ def get():
 			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
 			'categoryId': {
 				'blogs': '540081291836523457',
-				'blradioog': '540081291836523457',
+				'radio': '540081291836523457',
 			}
 		},
 		'ririka': {
