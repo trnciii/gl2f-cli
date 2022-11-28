@@ -214,3 +214,25 @@ def content_url(item):
 	page = get('id', item['boardId'])['page']
 	content = item['contentId']
 	return f'https://girls2-fc.jp/page/{page}/{content}'
+
+
+def tree():
+	from . import member
+
+	keys = [i['key'] for i in table()]
+
+	first = {k.split('/')[0] for k in keys} | {'today'}
+	tree = {
+		f:{k.split('/')[1] for k in filter(lambda i:i.startswith(f'{f}/'), keys)}
+		for f in first
+	}
+
+	mem_G2 = member.of_group('girls2').keys()
+	mem_L2 = member.of_group('lucky2').keys()
+	mem_l2 = member.of_group('lovely2').keys()
+
+	tree['news'] |= {'today'}
+	tree['blogs'] |= (mem_G2 | mem_L2 | mem_l2)
+	tree['radio'] |= (mem_G2 | mem_L2)
+
+	return tree
