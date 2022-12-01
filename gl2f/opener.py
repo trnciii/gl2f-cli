@@ -14,6 +14,8 @@ def add_args(parser):
 	parser.set_defaults(format='author:title')
 	parser.add_argument('-a', '--all', action='store_true',
 		help='open all items')
+	parser.add_argument('--pick', type=int, nargs='+',
+		help='select articles to show')
 
 
 	def subcommand(args):
@@ -24,6 +26,10 @@ def add_args(parser):
 
 		if args.all:
 			for i in items:
+				fm.print(i)
+				open_url(i)
+		elif args.pick:
+			for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
 				fm.print(i)
 				open_url(i)
 		else:
