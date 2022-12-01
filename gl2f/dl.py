@@ -26,6 +26,29 @@ def save(item, args):
 	print('downloaded', fm.format(item))
 
 
+def subcommand(args):
+	from .core import terminal as term
+	from .core.local import refdir_untouch
+	from .local import index
+
+	items = lister.list_contents(args)
+
+	if args.all:
+		for i in items:
+			save(i, args)
+	elif args.pick:
+		for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
+			save(i, args)
+	else:
+		fm = pretty.from_args(args)
+		selected = term.select([fm.format(i) for i in items])
+		for i in [i for s, i in zip(selected, items) if s]:
+			save(i, args)
+
+	if refdir_untouch('site'):
+		index()
+
+
 def add_args(parser):
 	lister.add_args(parser)
 
@@ -49,28 +72,5 @@ def add_args(parser):
 
 	parser.add_argument('-o', type=str, default='',
 		help='output path')
-
-
-	def subcommand(args):
-		from .core import terminal as term
-		from .core.local import refdir_untouch
-		from .local import index
-
-		items = lister.list_contents(args)
-
-		if args.all:
-			for i in items:
-				save(i, args)
-		elif args.pick:
-			for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
-				save(i, args)
-		else:
-			fm = pretty.from_args(args)
-			selected = term.select([fm.format(i) for i in items])
-			for i in [i for s, i in zip(selected, items) if s]:
-				save(i, args)
-
-		if refdir_untouch('site'):
-			index()
 
 	parser.set_defaults(handler=subcommand)

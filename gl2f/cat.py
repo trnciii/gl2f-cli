@@ -13,6 +13,24 @@ def cat(i, args):
 	print(article.to_text(i, args.style, args.sixel))
 
 
+def subcommand(args):
+	from .core import terminal as term
+
+	items = lister.list_contents(args)
+
+	if args.all:
+		for i in items:
+			cat(i, args)
+	elif args.pick:
+		for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
+			cat(i, args)
+	else:
+		fm = pretty.from_args(args)
+		selected = term.select([fm.format(i) for i in items])
+		for i in [i for s, i in zip(selected, items) if s]:
+			cat(i, args)
+
+
 def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
@@ -37,23 +55,5 @@ def add_args(parser):
 		help='force download to overwrite existing files')
 	parser.add_argument('-o', type=str, default='',
 		help='output path')
-
-
-	def subcommand(args):
-		from .core import terminal as term
-
-		items = lister.list_contents(args)
-
-		if args.all:
-			for i in items:
-				cat(i, args)
-		elif args.pick:
-			for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
-				cat(i, args)
-		else:
-			fm = pretty.from_args(args)
-			selected = term.select([fm.format(i) for i in items])
-			for i in [i for s, i in zip(selected, items) if s]:
-				cat(i, args)
 
 	parser.set_defaults(handler=subcommand)

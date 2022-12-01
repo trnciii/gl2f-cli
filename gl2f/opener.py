@@ -8,6 +8,26 @@ def open_url(i):
 	webbrowser.open(board.content_url(i), new=0, autoraise=True)
 
 
+def subcommand(args):
+	from .core import terminal as term
+
+	items = lister.list_contents(args)
+	fm = pretty.from_args(args)
+
+	if args.all:
+		for i in items:
+			fm.print(i)
+			open_url(i)
+	elif args.pick:
+		for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
+			fm.print(i)
+			open_url(i)
+	else:
+		selected = term.select([fm.format(i) for i in items])
+		for i in [i for s, i in zip(selected, items) if s]:
+			open_url(i)
+
+
 def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
@@ -16,25 +36,5 @@ def add_args(parser):
 		help='open all items')
 	parser.add_argument('--pick', type=int, nargs='+',
 		help='select articles to show')
-
-
-	def subcommand(args):
-		from .core import terminal as term
-
-		items = lister.list_contents(args)
-		fm = pretty.from_args(args)
-
-		if args.all:
-			for i in items:
-				fm.print(i)
-				open_url(i)
-		elif args.pick:
-			for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
-				fm.print(i)
-				open_url(i)
-		else:
-			selected = term.select([fm.format(i) for i in items])
-			for i in [i for s, i in zip(selected, items) if s]:
-				open_url(i)
 
 	parser.set_defaults(handler=subcommand)
