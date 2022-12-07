@@ -67,7 +67,7 @@ def add_args(parser):
 	parser.add_argument('--skip', action='store_true',
 		help='not actually download video files')
 
-	parser.add_argument('--force', action='store_true',
+	parser.add_argument('-F', '--force', action='store_true',
 		help='force download to overwrite existing files')
 
 	parser.add_argument('-o', type=str, default='',
