@@ -160,6 +160,9 @@ def save_media(item, out, boardId, contentId,
 	lock = Lock()
 	xauth = auth.update(auth.load())
 
+	report = lambda:print(f'downloading {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
+	report()
+
 	def dl(mediaId):
 		ptn = re.compile(mediaId + r'\..+')
 		if (not force) and any(map(ptn.search, os.listdir(out))):
@@ -170,7 +173,7 @@ def save_media(item, out, boardId, contentId,
 		with lock:
 			bar.inc()
 			term.clean_row()
-			print(f'downloading media in {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
+			report()
 
 		if image:
 			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
