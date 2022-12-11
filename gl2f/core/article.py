@@ -92,7 +92,7 @@ def lines(item, style, use_sixel):
 		'plain': 'none'
 	}[style], item['contentId'], item['boardId']))
 
-	with ThreadPoolExecutor() as e:
+	with ThreadPoolExecutor(max_workers=5) as e:
 		futures = [e.submit(f, p.group(1)) for p in ptn_paragraph.finditer(item['values']['body'])]
 
 		if style == 'full':
