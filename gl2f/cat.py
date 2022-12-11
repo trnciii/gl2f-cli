@@ -7,10 +7,11 @@ def cat(i, args):
 
 	if args.dl:
 		save(i, args)
-	print()
 	fm = pretty.Formatter()
 	fm.print(i)
-	print(article.to_text(i, args.style, args.sixel))
+	for s in article.lines(i, args.style, args.sixel):
+		print(s, end='')
+	print()
 
 
 def subcommand(args):
@@ -36,7 +37,7 @@ def add_args(parser):
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
 
-	parser.add_argument('--style', type=str, choices=article.style_options(), default='compact')
+	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',
 		help='not use sixel image')
 	parser.add_argument('-a', '--all', action='store_true',

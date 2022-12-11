@@ -13,10 +13,6 @@ ptn_span = re.compile(r'<span.*?>(.*?)</span>')
 ptn_http = re.compile(r'(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
 
 
-def paragraphs(body):
-	return [ptn_paragraph.sub(r'\1', line) for line in ptn_paragraph.findall(body)]
-
-
 class MediaRep:
 	def __init__(self, style, contentId, boardId):
 		if style == 'type':
@@ -71,7 +67,7 @@ class MediaRep:
 		return ret
 
 
-def compose_line(p, mediarep):
+def line_kernel(p, mediarep):
 	p = mediarep.rep(p)
 	p = ptn_strong.sub(term.mod('\\1', term.color('white', 'fl'), term.bold(), term.underline()), p)
 	p = ptn_link.sub(r'\1 ', p)
@@ -85,32 +81,40 @@ def compose_line(p, mediarep):
 	return p
 
 
-def lines(item, mediarepstyle):
+def lines(item, style, use_sixel):
 	from concurrent.futures import ThreadPoolExecutor
+	from functools import partial
 
-	body = item['values']['body']
-	m = MediaRep(mediarepstyle, item['contentId'], item['boardId'])
+	f = partial(line_kernel, mediarep=MediaRep({
+		'full': 'sixel' if use_sixel else 'type_id',
+		'compact': 'sixel' if use_sixel else 'type_id',
+		'compressed': 'type',
+		'plain': 'none'
+	}[style], item['contentId'], item['boardId']))
 
-	with ThreadPoolExecutor() as executor:
-		futures = [executor.submit(compose_line, p, m) for p in paragraphs(body)]
-	return [f.result() for f in futures]
+	with ThreadPoolExecutor() as e:
+		futures = [e.submit(f, p.group(1)) for p in ptn_paragraph.finditer(item['values']['body'])]
 
+		if style == 'full':
+			for f in futures:
+				yield f'{f.result()}\n'
 
-def style_options(): return {'full', 'compact', 'compressed', 'plain'}
+		elif style == 'compact':
+			for f in futures:
+				l = f.result()
+				if len(l):
+					yield f'{l}\n'
 
-def to_text(item, key, use_sixel=True):
-	if key == 'full':
-		return '\n'.join(lines(item, 'sixel' if use_sixel else 'type_id'))
+		elif style == 'compressed':
+			for f in futures:
+				l = f.result()
+				if len(l):
+					yield f'{l} '
+			yield '\n'
 
-	elif key == 'compact':
-		return '\n'.join(filter(len, lines(item, 'sixel' if use_sixel else 'type_id')))
-
-	elif key == 'compressed':
-		return ' '.join(filter( len, lines(item, 'type') ))
-
-	elif key == 'plain':
-		return ''.join(lines(item, 'none'))
-
+		elif style == 'plain':
+			for f in futures:
+				yield f.result()
 
 
 def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None):
