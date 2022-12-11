@@ -85,35 +85,41 @@ def compose_line(p, mediarep):
 	return p
 
 
-def lines(item, mediarepstyle):
+def lines(item, style, use_sixel):
 	from concurrent.futures import ThreadPoolExecutor
 
-	body = item['values']['body']
-	m = MediaRep(mediarepstyle, item['contentId'], item['boardId'])
+	mrep = {
+		'full': 'sixel' if use_sixel else 'type_id',
+		'compact': 'sixel' if use_sixel else 'type_id',
+		'compressed': 'type',
+		'plain': 'none'
+	}
+
+	m = MediaRep(mrep[style], item['contentId'], item['boardId'])
 
 	with ThreadPoolExecutor() as executor:
-		futures = [executor.submit(compose_line, p, m) for p in paragraphs(body)]
-		for f in futures:
-			yield f.result()
+		futures = [executor.submit(compose_line, p, m) for p in paragraphs(item['values']['body'])]
 
+		if style == 'full':
+			for f in futures:
+				yield f'{f.result()}\n'
 
-def to_text(item, key, use_sixel=True):
-	if key == 'full':
-		for l in  lines(item, 'sixel' if use_sixel else 'type_id'):
-			yield f'{l}\n'
+		elif style == 'compact':
+			for f in futures:
+				l = f.result()
+				if len(l):
+					yield f'{l}\n'
 
-	elif key == 'compact':
-		for l in filter(len, lines(item, 'sixel' if use_sixel else 'type_id')):
-			yield f'{l}\n'
+		elif style == 'compressed':
+			for f in futures:
+				l = f.result()
+				if len(l):
+					yield f'{l} '
+			yield '\n'
 
-	elif key == 'compressed':
-		for l in filter(len, lines(item, 'type')):
-			yield f'{l} '
-		yield '\n'
-
-	elif key == 'plain':
-		for l in lines(item, 'none'):
-			yield l
+		elif style == 'plain':
+			for f in futures:
+				yield f.result()
 
 
 def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None):

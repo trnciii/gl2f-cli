@@ -9,7 +9,7 @@ def cat(i, args):
 		save(i, args)
 	fm = pretty.Formatter()
 	fm.print(i)
-	for s in article.to_text(i, args.style, args.sixel):
+	for s in article.lines(i, args.style, args.sixel):
 		print(s, end='')
 	print()
 
