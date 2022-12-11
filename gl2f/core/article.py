@@ -87,18 +87,17 @@ def compose_line(p, mediarep):
 
 def lines(item, style, use_sixel):
 	from concurrent.futures import ThreadPoolExecutor
+	from functools import partial
 
-	mrep = {
+	f = partial(compose_line, mediarep=MediaRep({
 		'full': 'sixel' if use_sixel else 'type_id',
 		'compact': 'sixel' if use_sixel else 'type_id',
 		'compressed': 'type',
 		'plain': 'none'
-	}
-
-	m = MediaRep(mrep[style], item['contentId'], item['boardId'])
+	}[style], item['contentId'], item['boardId']))
 
 	with ThreadPoolExecutor() as executor:
-		futures = [executor.submit(compose_line, p, m) for p in paragraphs(item['values']['body'])]
+		futures = [executor.submit(f, p) for p in paragraphs(item['values']['body'])]
 
 		if style == 'full':
 			for f in futures:
