@@ -71,7 +71,7 @@ class MediaRep:
 		return ret
 
 
-def compose_line(p, mediarep):
+def line_kernel(p, mediarep):
 	p = mediarep.rep(p)
 	p = ptn_strong.sub(term.mod('\\1', term.color('white', 'fl'), term.bold(), term.underline()), p)
 	p = ptn_link.sub(r'\1 ', p)
@@ -89,7 +89,7 @@ def lines(item, style, use_sixel):
 	from concurrent.futures import ThreadPoolExecutor
 	from functools import partial
 
-	f = partial(compose_line, mediarep=MediaRep({
+	f = partial(line_kernel, mediarep=MediaRep({
 		'full': 'sixel' if use_sixel else 'type_id',
 		'compact': 'sixel' if use_sixel else 'type_id',
 		'compressed': 'type',
