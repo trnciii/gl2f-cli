@@ -13,10 +13,6 @@ ptn_span = re.compile(r'<span.*?>(.*?)</span>')
 ptn_http = re.compile(r'(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
 
 
-def paragraphs(body):
-	return [ptn_paragraph.sub(r'\1', line) for line in ptn_paragraph.findall(body)]
-
-
 class MediaRep:
 	def __init__(self, style, contentId, boardId):
 		if style == 'type':
@@ -96,8 +92,8 @@ def lines(item, style, use_sixel):
 		'plain': 'none'
 	}[style], item['contentId'], item['boardId']))
 
-	with ThreadPoolExecutor() as executor:
-		futures = [executor.submit(f, p) for p in paragraphs(item['values']['body'])]
+	with ThreadPoolExecutor() as e:
+		futures = [e.submit(f, p.group(1)) for p in ptn_paragraph.finditer(item['values']['body'])]
 
 		if style == 'full':
 			for f in futures:
