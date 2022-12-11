@@ -97,8 +97,6 @@ def lines(item, mediarepstyle):
 			yield f.result()
 
 
-def style_options(): return {'full', 'compact', 'compressed', 'plain'}
-
 def to_text(item, key, use_sixel=True):
 	if key == 'full':
 		for l in  lines(item, 'sixel' if use_sixel else 'type_id'):

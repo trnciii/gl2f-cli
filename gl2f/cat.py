@@ -37,7 +37,7 @@ def add_args(parser):
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
 
-	parser.add_argument('--style', type=str, choices=article.style_options(), default='compact')
+	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',
 		help='not use sixel image')
 	parser.add_argument('-a', '--all', action='store_true',
