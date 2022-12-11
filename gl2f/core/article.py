@@ -93,24 +93,29 @@ def lines(item, mediarepstyle):
 
 	with ThreadPoolExecutor() as executor:
 		futures = [executor.submit(compose_line, p, m) for p in paragraphs(body)]
-	return [f.result() for f in futures]
+		for f in futures:
+			yield f.result()
 
 
 def style_options(): return {'full', 'compact', 'compressed', 'plain'}
 
 def to_text(item, key, use_sixel=True):
 	if key == 'full':
-		return '\n'.join(lines(item, 'sixel' if use_sixel else 'type_id'))
+		for l in  lines(item, 'sixel' if use_sixel else 'type_id'):
+			yield f'{l}\n'
 
 	elif key == 'compact':
-		return '\n'.join(filter(len, lines(item, 'sixel' if use_sixel else 'type_id')))
+		for l in filter(len, lines(item, 'sixel' if use_sixel else 'type_id')):
+			yield f'{l}\n'
 
 	elif key == 'compressed':
-		return ' '.join(filter( len, lines(item, 'type') ))
+		for l in filter(len, lines(item, 'type')):
+			yield f'{l} '
+		yield '\n'
 
 	elif key == 'plain':
-		return ''.join(lines(item, 'none'))
-
+		for l in lines(item, 'none'):
+			yield l
 
 
 def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None):

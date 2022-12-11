@@ -7,10 +7,11 @@ def cat(i, args):
 
 	if args.dl:
 		save(i, args)
-	print()
 	fm = pretty.Formatter()
 	fm.print(i)
-	print(article.to_text(i, args.style, args.sixel))
+	for s in article.to_text(i, args.style, args.sixel):
+		print(s, end='')
+	print()
 
 
 def subcommand(args):
