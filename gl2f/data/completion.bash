@@ -1,10 +1,3 @@
-_gl2f_init_completion()
-{
-  COMPREPLY=()
-  _get_comp_words_by_ref "$@" cur prev words cword
-}
-
-
 __gl2f_complete_boards(){
   if [[ "$cur" == */* ]]; then
     local realcur=${cur##*/}
@@ -28,7 +21,8 @@ _gl2f(){
   if declare -F _init_completion >/dev/null 2>&1; then
     _init_completion -n :/ || return
   else
-    _gl2f_init_completion -n :/ || return
+    COMPREPLY=()
+    _get_comp_words_by_ref -n :/ cur prev words cword || return
   fi
 
   case $cword in
