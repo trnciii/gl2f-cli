@@ -46,7 +46,7 @@ def install():
 
 
 def index():
-	from .core import board
+	from .core import board, article
 
 	site = local.refdir_untouch('site')
 	if not site:
@@ -56,12 +56,18 @@ def index():
 
 	def value(i):
 		item = local.load_content(i)
+		media = [i for i, _ in article.ptn_media.findall(item['values']['body'])]
 		return {
 			'title': item['values']['title'],
 			'board': board.get('id', item['boardId'])['page'],
 			'author': item.get('category', {'name':''})['name'],
 			'date': item['openingAt'],
-			'media': list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
+			'media': [''.join(x) for x in sorted(
+				filter(lambda x:x[0] in media,
+					(os.path.splitext(i) for i in local.listdir(os.path.join('contents', i)))
+				),
+				key=lambda x:media.index(x[0])
+			)]
 		}
 
 	table = {i: value(i) for i in local.listdir('contents')}
