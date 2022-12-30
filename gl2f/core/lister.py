@@ -133,7 +133,6 @@ def list_contents(args):
 				'radio/lucky2',
 				'gtube',
 				'cm',
-				'shangrila',
 				'wallpaper'
 			]
 		], args)
