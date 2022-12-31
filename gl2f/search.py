@@ -59,7 +59,7 @@ def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 
-	parser.set_defaults(date='%m/%d')
+	parser.set_defaults(date='%m/%d', number=30)
 
 	parser.add_argument('keywords', nargs='+')
 
