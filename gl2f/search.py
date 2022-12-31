@@ -16,7 +16,8 @@ def merge(ranges):
 
 
 def subcommand(args):
-	from .core import article, terminal as term
+	from .ayame import terminal as term
+	from .core import article
 	import re
 
 	keywords = sum((k.split('　') for k in args.keywords), [])

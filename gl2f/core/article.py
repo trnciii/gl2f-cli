@@ -1,5 +1,6 @@
 import re, html
-from . import terminal as term, sixel, local
+from . import local
+from ..ayame import sixel, terminal as term
 import json, os, datetime
 from .. import auth
 

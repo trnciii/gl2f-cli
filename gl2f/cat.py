@@ -15,7 +15,7 @@ def cat(i, args):
 
 
 def subcommand(args):
-	from .core import terminal as term
+	from .ayame import terminal as term
 
 	items = lister.list_contents(args)
 
