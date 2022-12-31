@@ -232,7 +232,7 @@ def tree():
 	mem_l2 = member.of_group('lovely2').keys()
 
 	tree['news'] |= {'today'}
-	tree['blogs'] |= (mem_G2 | mem_L2 | mem_l2)
+	tree['blogs'] |= (mem_G2 | mem_L2 | mem_l2 | {'today'})
 	tree['radio'] |= (mem_G2 | mem_L2)
 
 	return tree
