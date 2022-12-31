@@ -4,7 +4,8 @@ def name(): return 'dl'
 
 def save(item, args):
 	import json, os
-	from .core import local, article, terminal as term
+	from .core import local, article
+	from .ayame import terminal as term
 
 	boardId = item['boardId']
 	contentId = item['contentId']
@@ -27,7 +28,7 @@ def save(item, args):
 
 
 def subcommand(args):
-	from .core import terminal as term
+	from .ayame import terminal as term
 	from .core.local import refdir_untouch
 	from .local import index
 

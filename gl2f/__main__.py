@@ -5,7 +5,8 @@ import sys, time
 
 def main():
 	from . import auth, local
-	from .core import lister, sixel
+	from .core import lister
+	from .ayame import sixel
 
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers()
