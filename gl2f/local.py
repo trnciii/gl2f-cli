@@ -42,19 +42,26 @@ def install():
 	cp(src, dst)
 	print(f'copied site into {dst}')
 
-	index()
+	index.main()
 
 
-def index():
-	from .core import board, article
+class index:
+	@staticmethod
+	def load():
+		try:
+			path = os.path.join(local.refdir_untouch('site'), 'index.js')
+			with open(path, encoding='utf-8') as f:
+				raw = f.read()
+			return json.loads(re.sub(r'^.+?=', '', raw))
 
-	site = local.refdir_untouch('site')
-	if not site:
-		if 'n' != input('site not found. install now? (Y/n)').lower():
-			install()
-		return
+		except:
+			return {}
 
+
+	@staticmethod
 	def value(i):
+		from .core import board, article
+
 		item = local.load_content(i)
 		media = [i for i, _ in article.ptn_media.findall(item['values']['body'])]
 		return {
@@ -70,13 +77,36 @@ def index():
 			)]
 		}
 
-	table = {i: value(i) for i in local.listdir('contents')}
 
-	out = os.path.join(site, 'index.js')
-	with open(out, 'w', encoding='utf-8') as f:
-		print(f'const table={json.dumps(table, separators=(",", ":"), ensure_ascii=False)}', file=f)
+	@staticmethod
+	def create_table(contents):
+		from concurrent.futures import ThreadPoolExecutor
+		with ThreadPoolExecutor() as e:
+			values = e.map(index.value, contents)
+		return {k:v for k, v in zip(contents, values)}
 
-	print(f'saved {out}')
+
+	@staticmethod
+	def main(full=False):
+		site = local.refdir_untouch('site')
+		if not site:
+			if 'n' != input('site not found. install now? (Y/n)').lower():
+				install()
+			return
+
+
+		if full:
+			table = index.create_table(local.listdir('contents'))
+		else:
+			prev = index.load()
+			contents = list(set(local.listdir('contents')).difference(prev.keys()))
+			table = prev | index.create_table(contents)
+
+		out = os.path.join(site, 'index.js')
+		with open(out, 'w', encoding='utf-8') as f:
+			print(f'const table={json.dumps(table, separators=(",", ":"), ensure_ascii=False)}', file=f)
+
+		print(f'saved {out}')
 
 
 def open_site():
@@ -90,7 +120,7 @@ def open_site():
 		else:
 			return
 
-	index()
+	index.main()
 	webbrowser.open(f'file://{html}')
 
 
@@ -138,7 +168,10 @@ def add_args(parser):
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
-	sub.add_parser('index').set_defaults(handler=lambda _:index())
+
+	p = sub.add_parser('index')
+	p.add_argument('--full', action='store_true')
+	p.set_defaults(handler=lambda args:index.main(args.full))
 	sub.add_parser('install').set_defaults(handler=lambda _:install())
 
 	p = sub.add_parser('ls')

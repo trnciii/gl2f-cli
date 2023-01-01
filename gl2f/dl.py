@@ -47,7 +47,7 @@ def subcommand(args):
 			save(i, args)
 
 	if refdir_untouch('site'):
-		index()
+		index.main()
 
 
 def add_args(parser):
