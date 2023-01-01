@@ -45,7 +45,18 @@ def install():
 	index()
 
 
-def index():
+def load_index():
+	try:
+		path = os.path.join(local.refdir_untouch('site'), 'index.js')
+		with open(path, encoding='utf-8') as f:
+			raw = f.read()
+		return json.loads(re.sub(r'^.+?=', '', raw))
+
+	except:
+		return {}
+
+
+def index(full=False):
 	from .core import board, article
 	from concurrent.futures import ThreadPoolExecutor
 
@@ -71,10 +82,22 @@ def index():
 			)]
 		}
 
-	contents = local.listdir('contents')
-	with ThreadPoolExecutor() as e:
-		values = e.map(value, contents)
-	table = {k:v for k, v in zip(contents, values)}
+
+	if full:
+		contents = local.listdir('contents')
+
+		with ThreadPoolExecutor() as e:
+			values = e.map(value, contents)
+		table = {k:v for k, v in zip(contents, values)}
+
+	else:
+		prev = load_index()
+		contents = list(set(local.listdir('contents')).difference(prev.keys()))
+
+		with ThreadPoolExecutor() as e:
+			values = e.map(value, contents)
+		table = prev | {k:v for k, v in zip(contents, values)}
+
 
 	out = os.path.join(site, 'index.js')
 	with open(out, 'w', encoding='utf-8') as f:
@@ -142,7 +165,10 @@ def add_args(parser):
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
-	sub.add_parser('index').set_defaults(handler=lambda _:index())
+
+	p = sub.add_parser('index')
+	p.add_argument('--full', action='store_true')
+	p.set_defaults(handler=lambda args:index(args.full))
 	sub.add_parser('install').set_defaults(handler=lambda _:install())
 
 	p = sub.add_parser('ls')
