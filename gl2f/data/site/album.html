@@ -36,6 +36,8 @@
     <a class="buttonlike item" id='folder' href='_'>folder</a>
     &nbsp;/
     <label class='buttonlike'><input id='list' class=buttonlike type='checkbox' onchange='draw()'>list</label>
+    &nbsp;/&nbsp;
+    <button class='buttonlike item' id='copy_id' onclick='_'>id</button>
   </div>
 
   <div style="margin: auto; padding: 0px 40px;">
@@ -61,6 +63,10 @@ document.title = `Album ${table[contentId]['title']}`
 
 document.getElementById('folder').setAttribute('href', dir);
 document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page/${table[contentId]['board']}/${contentId}' target='blank'>${table[contentId]['title']}</a>`;
+document.getElementById('copy_id').onclick = ()=>{
+  const path = location.href.split('file:///')[1].split('/gl2f/site/')[0];
+  navigator.clipboard.writeText(contentId);
+}
 
 
 const cols = document.getElementById('cols');

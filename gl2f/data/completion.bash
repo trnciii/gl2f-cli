@@ -35,7 +35,7 @@ _gl2f(){
           COMPREPLY=( $(compgen -W 'file load login remove update set-token' -- "$cur") )
           ;;
         local)
-          COMPREPLY=( $(compgen -W 'clear-cache dir index install ls stat open' -- "$cur") )
+          COMPREPLY=( $(compgen -W 'clear-cache dir index install ls stat open build' -- "$cur") )
           ;;
         cat | dl | ls | open | search)
           __gl2f_complete_boards

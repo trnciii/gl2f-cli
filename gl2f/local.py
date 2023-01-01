@@ -46,7 +46,7 @@ def install():
 
 
 def index():
-	from .core import board
+	from .core import board, article
 
 	site = local.refdir_untouch('site')
 	if not site:
@@ -56,12 +56,18 @@ def index():
 
 	def value(i):
 		item = local.load_content(i)
+		media = [i for i, _ in article.ptn_media.findall(item['values']['body'])]
 		return {
 			'title': item['values']['title'],
 			'board': board.get('id', item['boardId'])['page'],
 			'author': item.get('category', {'name':''})['name'],
 			'date': item['openingAt'],
-			'media': list(filter(lambda x:not x.endswith('.json'), local.listdir(os.path.join('contents', i))))
+			'media': [''.join(x) for x in sorted(
+				filter(lambda x:x[0] in media,
+					(os.path.splitext(i) for i in local.listdir(os.path.join('contents', i)))
+				),
+				key=lambda x:media.index(x[0])
+			)]
 		}
 
 	table = {i: value(i) for i in local.listdir('contents')}
@@ -88,26 +94,47 @@ def open_site():
 	webbrowser.open(f'file://{html}')
 
 
-def extract_bodies(filename):
-	with open(filename) as f:
-		log = json.load(f)
+def create_html(item):
+	from .core import article
 
-	dirname = os.path.splitext(filename)[0]
-	os.makedirs(dirname, exist_ok=True)
+	i = item['contentId']
+	body = item['values']['body']
+	contents = local.refdir_untouch('contents')
+	li = local.listdir(f'contents/{i}')
 
-	para = re.compile(r'(?P<all><p>.*?</p>)')
-	breaks = re.compile(r'\n+')
+	def up(match):
+		m, t = match.groups()
+		try:
+			p = next(p for p in li if p.startswith(m))
+		except:
+			return ''
 
-	for i, item in enumerate(log['list']):
-		title = re.sub('/', r'-', item['values']['title'])
-		body = breaks.sub('\n', para.sub(r'\n\g<all>\n', item['values']['body']))
-		base = f'{i}-{title}.html'
-		with open(os.path.join(dirname, base), 'w', encoding='utf-8') as f:
-			f.write(body)
+		if t == 'image':
+			return f'<img src={contents}/{i}/{p} width=100%></img>'
+		elif t == 'video':
+			return f'<video controls autoplay muted loop src={contents}/{i}/{p} width=100%></video>'
+		else:
+			return ''
+
+	return article.ptn_media.sub(up, body)
+
+
+def build(i, view=False):
+	page = os.path.join(local.refdir('site/pages'), f'{i}.html')
+	body = create_html(local.load_content(i))
+	with open(page, 'w', encoding='utf-8') as f:
+		f.write(body)
+
+	print(f'saved file:///{page}')
 
 
 def add_args(parser):
 	sub = parser.add_subparsers()
+
+	p = sub.add_parser('build')
+	p.add_argument('content_id')
+	p.add_argument('--view', action='store_true')
+	p.set_defaults(handler=lambda args: build(args.content_id, args.view))
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
