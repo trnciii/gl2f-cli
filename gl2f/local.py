@@ -47,6 +47,7 @@ def install():
 
 def index():
 	from .core import board, article
+	from concurrent.futures import ThreadPoolExecutor
 
 	site = local.refdir_untouch('site')
 	if not site:
@@ -70,7 +71,10 @@ def index():
 			)]
 		}
 
-	table = {i: value(i) for i in local.listdir('contents')}
+	contents = local.listdir('contents')
+	with ThreadPoolExecutor() as e:
+		values = e.map(value, contents)
+	table = {k:v for k, v in zip(contents, values)}
 
 	out = os.path.join(site, 'index.js')
 	with open(out, 'w', encoding='utf-8') as f:
