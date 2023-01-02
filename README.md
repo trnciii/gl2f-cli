@@ -55,12 +55,12 @@
 二つのインストール方法があります。
 
 
-### 1. pip を使う
+### 1. pip + git を使う
 
-python3 + pip の環境があればこのリポジトリから直接インストールできます。
+python3, pip, git の環境があればこのリポジトリから直接インストールできます。
 
 ```sh
-pip install git+https://github.com/trnciii/gl2f-cli
+pip install git+https://github.com/trnciii/gl2f-cli@release
 ```
 
 ### 2. 実行ファイルをダウンロードする
