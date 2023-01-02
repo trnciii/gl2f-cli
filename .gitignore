@@ -6,3 +6,4 @@ build/
 dist/
 *.spec
 venv
+gl2f/_v.py
