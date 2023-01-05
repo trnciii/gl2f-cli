@@ -20,7 +20,8 @@ def subcommand(args):
 	from .core import article
 	import re
 
-	keywords = sum((k.split('　') for k in args.keywords), [])
+	keywords = list(filter(len, sum((k.split('　') for k in args.keywords), [])))
+
 
 	fm = pretty.from_args(args)
 	fm.reset_index(digits=len(str(args.number)))
