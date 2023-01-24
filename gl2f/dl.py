@@ -20,7 +20,7 @@ def save(item, args):
 		f.write(json.dumps(item, indent=2, ensure_ascii=False))
 
 	article.save_media(item, out, boardId, contentId,
-		skip=args.skip, stream=args.stream, force=args.force, dump=args.dump)
+		skip=args.skip, streamfile=args.stream, force=args.force, dump=args.dump)
 
 	term.clean_row()
 	fm = pretty.Formatter(f='id:media:author:title')
@@ -63,7 +63,7 @@ def add_args(parser):
 		help='select articles to show')
 
 	parser.add_argument('--stream', action='store_true',
-		help='save video files as stream')
+		help='save video files as stream file')
 
 	parser.add_argument('--skip', action='store_true',
 		help='not actually download video files')

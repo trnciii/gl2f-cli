@@ -58,10 +58,10 @@ class MediaRep:
 			image = Image.open(file)
 		else:
 			_, data = self.dl(mediaId=i)
-			if data:
+			if data.ok:
 				with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
-					f.write(data)
-			image = Image.open(BytesIO(data))
+					f.write(data.content)
+			image = Image.open(BytesIO(data.content))
 
 		image = sixel.limit(image, (1600, 1600))
 		ret = sixel.to_sixel(image)
@@ -118,8 +118,11 @@ def lines(item, style, use_sixel):
 				yield f.result()
 
 
-def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None):
+def dl_medium(boardId, contentId, mediaId, head=False, streamfile=False, xauth=None):
 	import requests
+
+	class bad_response:
+		ok = False
 
 	response = requests.get(
 		f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
@@ -130,28 +133,19 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None)
 		})
 
 	if not response.ok:
-		return {'error': 'bad response at url query', 'reason': response.reason}, None
+		return response, bad_response
 
-	data = response.json()
+	meta = response.json()
+	url = meta['accessUrl'] if streamfile else meta.get('originalUrl', meta['accessUrl'])
 
-	if skip:
-		return data, None
-
-
-	response = requests.get(
-		data['originalUrl'] if ('originalUrl' in data.keys() and not stream)\
-		else data['accessUrl']
-	)
-
-	if response.ok:
-		return data, response.content
-
+	if head:
+		return meta, requests.head(url)
 	else:
-		return {'error': 'bad response at media download', 'reason': response.reason}, None
+		return meta, requests.get(url)
 
 
 def save_media(item, out, boardId, contentId,
-	skip=False, stream=False, force=False, dump=False
+	skip=False, streamfile=False, force=False, dump=False
 ):
 	from threading import Lock
 	from concurrent.futures import ThreadPoolExecutor
@@ -169,19 +163,19 @@ def save_media(item, out, boardId, contentId,
 		if (not force) and any(map(ptn.search, os.listdir(out))):
 			return 'skipped'
 
-		info, image = dl_medium(boardId, contentId, mediaId, skip, stream, xauth=xauth)
+		meta, response = dl_medium(boardId, contentId, mediaId, head=skip, streamfile=streamfile, xauth=xauth)
 
 		with lock:
 			bar.inc()
 			term.clean_row()
 			report()
 
-		if image:
-			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
+		if response.ok:
+			file = os.path.join(out, f'{meta["mediaId"]}.{meta["meta"]["ext"]}')
 			with open(file, 'wb') as f:
-				f.write(image)
+				f.write(response.content)
 
-		return info
+		return meta
 
 
 	with ThreadPoolExecutor() as executor:
