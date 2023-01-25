@@ -61,7 +61,7 @@ class Formatter:
 		return board.get('id', item['boardId'])['key']
 
 
-	def format(self, item, end='\n'):
+	def format(self, item):
 		dic = {
 			'author': self.author,
 			'title': self.title,
