@@ -83,9 +83,7 @@ class Formatter:
 
 def add_args(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
-		help='formatting specified by a list of  {{ {} }} separated by ":". default "author:title:url".'\
-		.format(', '.join(Formatter.format.__code__.co_consts[1]))
-	)
+		help='format of items. default is "author:title:url"')
 
 	parser.add_argument('--sep', type=str, default=' ',
 		help='separator string.')
