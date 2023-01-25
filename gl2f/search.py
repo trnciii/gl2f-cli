@@ -1,4 +1,5 @@
 from .core import lister, pretty
+from .ayame import terminal as term
 
 def name(): return 'search'
 
@@ -16,7 +17,6 @@ def merge(ranges):
 
 
 def subcommand(args):
-	from .ayame import terminal as term
 	from .core import article
 	import re
 

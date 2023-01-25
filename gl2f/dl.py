@@ -1,14 +1,12 @@
 from .core import lister, pretty
+from .ayame import terminal as term
+import os
 
 def name(): return 'dl'
 
 class Bar:
 	def __init__(self, li, contentId):
 		from threading import Lock
-		from .ayame.terminal import clean_row
-		import os
-
-		self.clean_row = clean_row
 
 		self.n = len(li)
 		self.dig = len(str(self.n))
@@ -34,16 +32,15 @@ class Bar:
 
 	def print(self):
 		with self.lock:
-			self.clean_row()
+			term.clean_row()
 			print(f'{self.contentId} {self.bar()} {self.count()}', end='', flush=True)
 
 
 def save(item, args):
-	import json, os, datetime, re
+	import json, datetime, re
 	from .core import local, article
 	from concurrent.futures import ThreadPoolExecutor
 	from functools import partial
-	from .ayame import terminal as term
 	from . import auth
 
 	boardId = item['boardId']
@@ -105,7 +102,6 @@ def save(item, args):
 
 
 def subcommand(args):
-	from .ayame import terminal as term
 	from .core.local import refdir_untouch
 	from .local import index
 
