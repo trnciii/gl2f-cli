@@ -1,5 +1,5 @@
 from . import board, member, date
-from ..ayame import terminal as term
+from ..ayame import terminal as term, zen
 
 class Formatter:
 	def __init__(self, f='author:title:url', fd=None, sep=' '):
@@ -25,9 +25,9 @@ class Formatter:
 			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
-		return term.justzen(
+		return zen.ljust(
 			term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b')),
-			member.name_width()
+			2*member.name_width()
 		)
 
 	def title(self, item):
