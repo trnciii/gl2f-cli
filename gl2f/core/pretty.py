@@ -1,5 +1,8 @@
 from . import board, member, date
 from ..ayame import terminal as term, zen
+import re
+
+ptn_endspaces = re.compile(r' +(\n|$)')
 
 class Formatter:
 	def __init__(self, f='author:title:url', fd=None, sep=' ', items=None):
@@ -91,7 +94,9 @@ class Formatter:
 
 
 	def format(self, item):
-		return self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
+		return ptn_endspaces.sub(r'\1',
+			self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
+		)
 
 	def print(self, item, end='\n'):
 		print(self.format(item), end=end)
