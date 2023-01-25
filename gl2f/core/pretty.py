@@ -78,7 +78,7 @@ class Formatter:
 		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
 
 	def print(self, item, end='\n'):
-		print(self.format(item, end))
+		print(self.format(item), end=end)
 
 
 def add_args(parser):
