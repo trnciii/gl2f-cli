@@ -2,10 +2,49 @@ from .core import lister, pretty
 
 def name(): return 'dl'
 
+class Bar:
+	def __init__(self, li, contentId):
+		from threading import Lock
+		from .ayame.terminal import clean_row
+		import os
+
+		self.clean_row = clean_row
+
+		self.n = len(li)
+		self.dig = len(str(self.n))
+
+		w, _ = os.get_terminal_size()
+		self.width = w - 2*self.dig - 26
+
+		self.lock = Lock()
+
+		self.contentId = contentId
+
+		self.progress = {k:{'progress':0, 'length':1} for k in li}
+
+
+	def bar(self):
+		f = sum(p['progress']/p['length'] for p in self.progress.values()) / len(self.progress)
+		i = int(f*self.width)
+		return f'[{"#"*i}{"-"*(self.width-i)}]'
+
+	def count(self):
+		i = sum(1 for _ in (i['progress'] for i in self.progress.values() if i['progress']>0))
+		return f'[{i:{self.dig}}/{self.n:{self.dig}}]'
+
+	def print(self):
+		with self.lock:
+			self.clean_row()
+			print(f'{self.contentId} {self.bar()} {self.count()}', end='', flush=True)
+
+
 def save(item, args):
-	import json, os
+	import json, os, datetime, re
 	from .core import local, article
+	from concurrent.futures import ThreadPoolExecutor
+	from functools import partial
 	from .ayame import terminal as term
+	from . import auth
 
 	boardId = item['boardId']
 	contentId = item['contentId']
@@ -19,8 +58,46 @@ def save(item, args):
 	with open(os.path.join(out, f'{contentId}.json'), 'w', encoding='utf-8') as f:
 		f.write(json.dumps(item, indent=2, ensure_ascii=False))
 
-	article.save_media(item, out, boardId, contentId,
-		skip=args.skip, streamfile=args.stream, force=args.force, dump=args.dump)
+
+	li = [i.group(1) for i in article.ptn_media.finditer(item['values']['body'])]
+
+	bar = Bar(li, contentId)
+	bar.print()
+
+	xauth = auth.update(auth.load())
+	_dl = partial(article.dl_medium, boardId, contentId,
+		head=args.skip, stream=True, streamfile=args.stream, xauth=xauth
+	)
+
+	def dl(mediaId):
+		ptn = re.compile(mediaId + r'\..+')
+		if (not args.force) and any(map(ptn.search, os.listdir(out))):
+			return 'skipped'
+
+		meta, response = _dl(mediaId=mediaId)
+
+		bar.progress[mediaId]['length'] = int(response.headers['content-length'])
+
+		with open(os.path.join(out, f'{meta["mediaId"]}.{meta["meta"]["ext"]}'), 'wb') as f:
+			for i in response.iter_content(chunk_size=1024*1024):
+				f.write(i)
+
+				bar.progress[mediaId]['progress'] += len(i)
+				bar.print()
+
+		response.close()
+
+		return meta
+
+
+	with ThreadPoolExecutor() as executor:
+		futures = [executor.submit(dl, i) for i in li]
+
+	if args.dump:
+		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
+		with open(os.path.join(args.dump, f'media-{contentId}-{now}.json'), 'w', encoding='utf-8') as f:
+			json.dump([f.result() for f in futures], f, indent=2, ensure_ascii=False)
+
 
 	term.clean_row()
 	fm = pretty.Formatter(f='id:media:author:title')
