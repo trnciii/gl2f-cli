@@ -118,7 +118,7 @@ def lines(item, style, use_sixel):
 				yield f.result()
 
 
-def dl_medium(boardId, contentId, mediaId, head=False, streamfile=False, xauth=None):
+def dl_medium(boardId, contentId, mediaId, head=False, stream=False, streamfile=False, xauth=None):
 	import requests
 
 	class bad_response:
@@ -141,45 +141,79 @@ def dl_medium(boardId, contentId, mediaId, head=False, streamfile=False, xauth=N
 	if head:
 		return meta, requests.head(url)
 	else:
-		return meta, requests.get(url)
+		return meta, requests.get(url, stream=stream)
+
+
+class Bar:
+	def __init__(self, li, contentId):
+		from threading import Lock
+
+		self.n = len(li)
+		self.dig = len(str(self.n))
+
+		w, _ = os.get_terminal_size()
+		self.width = w - 2*self.dig - 26
+
+		self.lock = Lock()
+
+		self.contentId = contentId
+
+		self.progress = {k:{'progress':0, 'length':1} for k in li}
+
+
+	def bar(self):
+		f = sum(p['progress']/p['length'] for p in self.progress.values()) / len(self.progress)
+		i = int(f*self.width)
+		return f'[{"#"*i}{"-"*(self.width-i)}]'
+
+	def count(self):
+		i = sum(1 for _ in (i['progress'] for i in self.progress.values() if i['progress']>0))
+		return f'[{i:{self.dig}}/{self.n:{self.dig}}]'
+
+	def print(self):
+		with self.lock:
+			term.clean_row()
+			print(f'{self.contentId} {self.bar()} {self.count()}', end='', flush=True)
 
 
 def save_media(item, out, boardId, contentId,
 	skip=False, streamfile=False, force=False, dump=False
 ):
-	from threading import Lock
 	from concurrent.futures import ThreadPoolExecutor
+	from functools import partial
 
-	li = ptn_media.findall(item['values']['body'])
-	bar = term.Bar(len(li))
-	lock = Lock()
+	li = [i.group(1) for i in ptn_media.finditer(item['values']['body'])]
+
+	bar = Bar(li, contentId)
+	bar.print()
+
 	xauth = auth.update(auth.load())
-
-	report = lambda:print(f'downloading {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
-	report()
+	_dl = partial(dl_medium, boardId, contentId, head=skip, stream=True, streamfile=streamfile, xauth=xauth)
 
 	def dl(mediaId):
 		ptn = re.compile(mediaId + r'\..+')
 		if (not force) and any(map(ptn.search, os.listdir(out))):
 			return 'skipped'
 
-		meta, response = dl_medium(boardId, contentId, mediaId, head=skip, streamfile=streamfile, xauth=xauth)
+		meta, response = _dl(mediaId=mediaId)
 
-		with lock:
-			bar.inc()
-			term.clean_row()
-			report()
+		bar.progress[mediaId]['length'] = int(response.headers['content-length'])
 
-		if response.ok:
-			file = os.path.join(out, f'{meta["mediaId"]}.{meta["meta"]["ext"]}')
-			with open(file, 'wb') as f:
-				f.write(response.content)
+		with open(os.path.join(out, f'{meta["mediaId"]}.{meta["meta"]["ext"]}'), 'wb') as f:
+			for i in response.iter_content(chunk_size=1024*1024):
+				f.write(i)
+
+				bar.progress[mediaId]['progress'] += len(i)
+				bar.print()
+
+
+		response.close()
 
 		return meta
 
 
 	with ThreadPoolExecutor() as executor:
-		futures = [executor.submit(dl, i) for i, _ in li]
+		futures = [executor.submit(dl, i) for i in li]
 
 	if dump:
 		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
