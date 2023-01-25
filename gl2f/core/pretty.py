@@ -10,6 +10,12 @@ class Formatter:
 		self.index = 0
 		self.digits = 2
 
+		self.width = {
+			'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
+			'page': max(map(len, (i['key'] for i in board.table()) )),
+		}
+
+
 	def reset_index(self, i=0, digits=2):
 		self.index = i
 		self.digits = digits
@@ -25,10 +31,7 @@ class Formatter:
 			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
-		return zen.ljust(
-			term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b')),
-			2*member.name_width()
-		)
+		return term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b'))
 
 	def title(self, item):
 		return term.mod(item['values']['title'], term.bold())
@@ -75,7 +78,7 @@ class Formatter:
 			'page': self.page,
 		}
 
-		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
+		return self.sep.join(zen.ljust(dic[key](item), self.width.get(key, 0)) for key in self.fstring.split(':'))
 
 	def print(self, item, end='\n'):
 		print(self.format(item), end=end)
