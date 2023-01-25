@@ -1,4 +1,5 @@
 from .core import lister, pretty, article
+from .ayame import terminal as term
 
 def name(): return 'cat'
 
@@ -15,8 +16,6 @@ def cat(i, args):
 
 
 def subcommand(args):
-	from .ayame import terminal as term
-
 	items = lister.list_contents(args)
 
 	if args.all:
