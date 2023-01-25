@@ -57,6 +57,9 @@ class Formatter:
 		re = article.media_stat(item['values']['body'])
 		return self.sep.join([f'i{re["image"]:02}', f'v{re["video"]}'])
 
+	def page(self, item):
+		return board.get('id', item['boardId'])['key']
+
 
 	def format(self, item, end='\n'):
 		dic = {
@@ -69,6 +72,7 @@ class Formatter:
 			'br': self.breakline,
 			'id': self.content_id,
 			'media': self.media_stat,
+			'page': self.page,
 		}
 
 		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
