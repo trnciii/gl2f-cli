@@ -11,7 +11,7 @@ def open_url(i):
 
 def subcommand(args):
 	items = lister.list_contents(args)
-	fm = pretty.from_args(args)
+	fm = pretty.from_args(args, items)
 
 	if args.all:
 		for i in items:

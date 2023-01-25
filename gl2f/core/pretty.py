@@ -2,7 +2,7 @@ from . import board, member, date
 from ..ayame import terminal as term, zen
 
 class Formatter:
-	def __init__(self, f='author:title:url', fd=None, sep=' '):
+	def __init__(self, f='author:title:url', fd=None, sep=' ', items=None):
 		self.fstring = f
 		self.fdstring = fd if fd else '%m/%d'
 		self.sep = sep
@@ -10,10 +10,20 @@ class Formatter:
 		self.index = 0
 		self.digits = 2
 
-		self.width = {
-			'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
-			'page': max(map(len, (i['key'] for i in board.table()) )),
+		self.functions = {
+			'author': self.author,
+			'title': self.title,
+			'url': self.url,
+			'date-p': self.date_p,
+			'date-c': self.date_c,
+			'index': self.inc_index,
+			'br': self.breakline,
+			'id': self.content_id,
+			'media': self.media_stat,
+			'page': self.page,
 		}
+
+		self.set_width(items)
 
 
 	def reset_index(self, i=0, digits=2):
@@ -64,21 +74,24 @@ class Formatter:
 		return board.get('id', item['boardId'])['key']
 
 
-	def format(self, item):
-		dic = {
-			'author': self.author,
-			'title': self.title,
-			'url': self.url,
-			'date-p': self.date_p,
-			'date-c': self.date_c,
-			'index': self.inc_index,
-			'br': self.breakline,
-			'id': self.content_id,
-			'media': self.media_stat,
-			'page': self.page,
-		}
+	def keys(self):
+		return self.fstring.split(':')
 
-		return self.sep.join(zen.ljust(dic[key](item), self.width.get(key, 0)) for key in self.fstring.split(':'))
+	def set_width(self, items=None):
+		if items:
+			self.width = {
+				k:max(map( zen.display_length, (self.functions[k](i) for i in items) ))
+				for k in self.keys()
+			}
+		else:
+			self.width = {
+				'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
+				'page': max(map(len, (i['key'] for i in board.table()) )),
+			}
+
+
+	def format(self, item):
+		return self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
 
 	def print(self, item, end='\n'):
 		print(self.format(item), end=end)
@@ -116,5 +129,5 @@ def make_format(args):
 	return f
 
 
-def from_args(args):
-	return Formatter(f=make_format(args), fd=args.date, sep=args.sep)
+def from_args(args, items=None):
+	return Formatter(f=make_format(args), fd=args.date, sep=args.sep, items=items)
