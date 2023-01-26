@@ -2,7 +2,7 @@ import re, html
 from . import local
 from ..ayame import sixel, terminal as term
 import json, os, datetime
-from .. import auth
+from . import auth
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')

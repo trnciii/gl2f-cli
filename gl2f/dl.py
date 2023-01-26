@@ -38,10 +38,9 @@ class Bar:
 
 def save(item, args):
 	import json, datetime, re
-	from .core import local, article
+	from .core import local, article, auth
 	from concurrent.futures import ThreadPoolExecutor
 	from functools import partial
-	from . import auth
 
 	boardId = item['boardId']
 	contentId = item['contentId']
