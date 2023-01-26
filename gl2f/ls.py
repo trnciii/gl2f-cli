@@ -3,10 +3,11 @@ from .core import lister, pretty
 def name(): return 'ls'
 
 def subcommand(args):
-	fm = pretty.from_args(args)
-	fm.reset_index(digits=len(str(args.number)))
+	items = lister.list_contents(args)
 
-	for i in lister.list_contents(args):
+	fm = pretty.from_args(args, items)
+
+	for i in items:
 		fm.print(i)
 
 def add_args(parser):

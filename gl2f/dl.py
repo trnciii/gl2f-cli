@@ -114,7 +114,7 @@ def subcommand(args):
 		for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
 			save(i, args)
 	else:
-		fm = pretty.from_args(args)
+		fm = pretty.from_args(args, items)
 		selected = term.select([fm.format(i) for i in items])
 		for i in [i for s, i in zip(selected, items) if s]:
 			save(i, args)

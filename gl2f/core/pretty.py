@@ -1,14 +1,33 @@
 from . import board, member, date
-from ..ayame import terminal as term
+from ..ayame import terminal as term, zen
+import re
+
+ptn_endspaces = re.compile(r' +(\n|$)')
 
 class Formatter:
-	def __init__(self, f='author:title:url', fd=None, sep=' '):
+	def __init__(self, f='author:title:url', fd=None, sep=' ', items=None):
 		self.fstring = f
 		self.fdstring = fd if fd else '%m/%d'
 		self.sep = sep
 
 		self.index = 0
 		self.digits = 2
+
+		self.functions = {
+			'author': self.author,
+			'title': self.title,
+			'url': self.url,
+			'date-p': self.date_p,
+			'date-c': self.date_c,
+			'index': self.inc_index,
+			'br': self.breakline,
+			'id': self.content_id,
+			'media': self.media_stat,
+			'page': self.page,
+		}
+
+		self.set_width(items)
+
 
 	def reset_index(self, i=0, digits=2):
 		self.index = i
@@ -25,10 +44,7 @@ class Formatter:
 			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
-		return term.justzen(
-			term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b')),
-			member.name_width()
-		)
+		return term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b'))
 
 	def title(self, item):
 		return term.mod(item['values']['title'], term.bold())
@@ -61,31 +77,34 @@ class Formatter:
 		return board.get('id', item['boardId'])['key']
 
 
-	def format(self, item, end='\n'):
-		dic = {
-			'author': self.author,
-			'title': self.title,
-			'url': self.url,
-			'date-p': self.date_p,
-			'date-c': self.date_c,
-			'index': self.inc_index,
-			'br': self.breakline,
-			'id': self.content_id,
-			'media': self.media_stat,
-			'page': self.page,
-		}
+	def keys(self):
+		return self.fstring.split(':')
 
-		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
+	def set_width(self, items=None):
+		if items:
+			self.width = {
+				k:max(map( zen.display_length, (self.functions[k](i) for i in items) ))
+				for k in self.keys()
+			}
+		else:
+			self.width = {
+				'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
+				'page': max(map(len, (i['key'] for i in board.table()) )),
+			}
+
+
+	def format(self, item):
+		return ptn_endspaces.sub(r'\1',
+			self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
+		)
 
 	def print(self, item, end='\n'):
-		print(self.format(item, end))
+		print(self.format(item), end=end)
 
 
 def add_args(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
-		help='formatting specified by a list of  {{ {} }} separated by ":". default "author:title:url".'\
-		.format(', '.join(Formatter.format.__code__.co_consts[1]))
-	)
+		help='format of items. default is "author:title:url"')
 
 	parser.add_argument('--sep', type=str, default=' ',
 		help='separator string.')
@@ -115,5 +134,5 @@ def make_format(args):
 	return f
 
 
-def from_args(args):
-	return Formatter(f=make_format(args), fd=args.date, sep=args.sep)
+def from_args(args, items=None):
+	return Formatter(f=make_format(args), fd=args.date, sep=args.sep, items=items)
