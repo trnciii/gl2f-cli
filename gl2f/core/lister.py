@@ -4,9 +4,9 @@ from .date import in24h
 import datetime, os, json
 
 
-def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, template='texts', dump=False, xauth=None):
+def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=False, xauth=None):
 	response = requests.get(
-		f'https://api.fensi.plus/v1/sites/girls2-fc/{template}/{boardId}/contents',
+		f'https://api.fensi.plus/v1/sites/girls2-fc/texts/{boardId}/contents',
 		params={
 			'size': str(size),
 			'page': str(page),
@@ -41,7 +41,7 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, templat
 
 def list_multiple_boards(boardId, args):
 	# only returns the 'list' value of boards.
-	# category id and template are fixed.
+	# category id is fixed to None.
 	from concurrent.futures import ThreadPoolExecutor
 
 	xauth = auth.update(auth.load())
