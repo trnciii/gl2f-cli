@@ -21,6 +21,8 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=Fa
 		})
 
 	if not response.ok:
+		print(response)
+		print(response.reason)
 		return
 
 	if dump:
