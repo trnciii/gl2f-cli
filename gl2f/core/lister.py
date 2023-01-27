@@ -1,6 +1,5 @@
 import requests
-from . import board, member, auth
-from .util import to_datetime
+from . import board, member, auth, util
 import datetime, os, json, re
 
 
@@ -23,20 +22,15 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=Fa
 	if not response.ok:
 		return
 
+	data = response.json()
+
 	if dump:
-		filename = board.get('id', boardId)['page']
+		name = board.get('id', boardId)['page']
 		if categoryId:
-			name, _ = member.from_id(categoryId)
-			filename += f'-{name}'
+			name += f'-{member.from_id(categoryId)[0]}'
+		util.dump(dump, name, data)
 
-		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-
-		path = os.path.join(dump,  f'{filename}-{now}.json')
-		with open(path, 'w', encoding='utf-8') as f:
-			json.dump(response.json(), f, indent=2, ensure_ascii=False)
-		print('saved', path)
-
-	return response.json()
+	return data
 
 def fetch_content(url, dump=False, xauth=None):
 	page, contentId = re.search(
@@ -58,17 +52,12 @@ def fetch_content(url, dump=False, xauth=None):
 		print(response.reason)
 		return
 
-	ret = response.json()
+	data = response.json()
 
 	if dump:
-		filename = f'{page}-{contentId}'
-		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-		filepath = os.path.join(dump, f'{filename}-{now}.json')
-		with open(filepath, 'w', encoding='utf-8') as f:
-			json.dump(ret, f, indent=2, ensure_ascii=False)
-		print('saved', filepath)
+		util.dump(dump, f'{page}-{contentId}', data)
 
-	return ret
+	return data
 
 
 def list_multiple_boards(boardId, args):
@@ -111,7 +100,7 @@ def add_args(parser):
 
 
 def in24h(i):
-	return (datetime.datetime.now() - to_datetime(i['openingAt'])).total_seconds() < 24*3600
+	return (datetime.datetime.now() - util.to_datetime(i['openingAt'])).total_seconds() < 24*3600
 
 def list_contents(args):
 	if args.board.startswith('blogs/'):
