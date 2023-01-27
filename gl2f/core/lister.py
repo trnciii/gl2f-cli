@@ -1,7 +1,7 @@
 import requests
 from . import board, member, auth
 from .date import in24h
-import datetime, os, json
+import datetime, os, json, re
 
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=False, xauth=None):
@@ -37,6 +37,38 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=Fa
 		print('saved', path)
 
 	return response.json()
+
+def fetch_content(url, dump=False, xauth=None):
+	page, contentId = re.search(
+		r'https://girls2-fc\.jp/page/(?P<page>.+)/(?P<contentId>.+)',
+		url
+	).groups()
+	boardId = board.get('page', page)['id']
+
+	response = requests.get(
+		f'https://api.fensi.plus/v1/sites/girls2-fc/texts/{boardId}/contents/{contentId}',
+		headers={
+			'origin': 'https://girls2-fc.jp',
+			'x-from': 'https://girls2-fc.jp',
+			'x-authorization': xauth if xauth else auth.update(auth.load()),
+		})
+
+	if not response.ok:
+		print(response)
+		print(response.reason)
+		return
+
+	ret = response.json()
+
+	if dump:
+		filename = f'{page}-{contentId}'
+		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
+		filepath = os.path.join(dump, f'{filename}-{now}.json')
+		with open(filepath, 'w', encoding='utf-8') as f:
+			json.dump(ret, f, indent=2, ensure_ascii=False)
+		print('saved', filepath)
+
+	return ret
 
 
 def list_multiple_boards(boardId, args):
