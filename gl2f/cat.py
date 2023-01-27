@@ -16,6 +16,10 @@ def cat(i, args):
 
 
 def subcommand(args):
+	if args.board.startswith('https'):
+		cat(lister.fetch_content(args.board, dump=args.dump), args)
+		return
+
 	items = lister.list_contents(args)
 
 	if args.all:

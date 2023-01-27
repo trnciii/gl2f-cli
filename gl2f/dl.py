@@ -104,6 +104,10 @@ def subcommand(args):
 	from .core.local import refdir_untouch
 	from .local import index
 
+	if args.board.startswith('https'):
+		save(lister.fetch_content(args.board, dump=args.dump), args)
+		return
+
 	items = lister.list_contents(args)
 
 	if args.all:
