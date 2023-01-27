@@ -74,7 +74,7 @@ class Formatter:
 		return self.sep.join([f'i{re["image"]:02}', f'v{re["video"]}'])
 
 	def page(self, item):
-		return board.get('id', item['boardId'])['key']
+		return board.get('id', item['boardId'])['key'].split('/')[0]
 
 
 	def keys(self):
@@ -89,7 +89,7 @@ class Formatter:
 		else:
 			self.width = {
 				'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
-				'page': max(map(len, (i['key'] for i in board.table()) )),
+				'page': max(map(len, (i['key'].split('/')[0] for i in board.table()) )),
 			}
 
 
