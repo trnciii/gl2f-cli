@@ -123,18 +123,7 @@ def list_contents(args):
 
 
 	elif args.board == 'today':
-		ret = list_multiple_boards([
-			board.get('key', x)['id'] for x in [
-				'blogs/girls2',
-				'blogs/lucky2',
-				'news/family',
-				'radio/girls2',
-				'radio/lucky2',
-				'gtube',
-				'cm',
-				'wallpaper'
-			]
-		], args)
+		ret = list_multiple_boards([board.get('key', x)['id'] for x in board.active()], args)
 		return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
 
 	else:

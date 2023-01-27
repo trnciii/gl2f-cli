@@ -89,7 +89,7 @@ class Formatter:
 		else:
 			self.width = {
 				'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
-				'page': max(map(len, (i['key'].split('/')[0] for i in board.table()) )),
+				'page': max(len(i.split('/')[0]) for i in board.active()),
 			}
 
 

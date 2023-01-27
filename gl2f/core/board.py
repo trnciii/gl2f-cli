@@ -236,3 +236,15 @@ def tree():
 	tree['radio'] |= (mem_G2 | mem_L2)
 
 	return tree
+
+def active():
+	return [
+		'blogs/girls2',
+		'blogs/lucky2',
+		'news/family',
+		'radio/girls2',
+		'radio/lucky2',
+		'gtube',
+		'cm',
+		'wallpaper'
+	]
