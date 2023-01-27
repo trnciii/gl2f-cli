@@ -1,4 +1,4 @@
-from . import board, member, date
+from . import board, member, util
 from ..ayame import terminal as term, zen
 import re
 
@@ -53,10 +53,10 @@ class Formatter:
 		return term.mod(board.content_url(item), term.dim())
 
 	def date_p(self, item):
-		return date.to_datetime(item['openingAt']).strftime(self.fdstring)
+		return util.to_datetime(item['openingAt']).strftime(self.fdstring)
 
 	def date_c(self, item):
-		return date.to_datetime(item['createdAt']).strftime(self.fdstring)
+		return util.to_datetime(item['createdAt']).strftime(self.fdstring)
 
 	def breakline(self, item):
 		return '\n'

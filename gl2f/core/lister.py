@@ -1,6 +1,6 @@
 import requests
 from . import board, member, auth
-from .date import in24h
+from .util import in24h
 import datetime, os, json, re
 
 
