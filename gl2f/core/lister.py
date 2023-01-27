@@ -1,6 +1,6 @@
 import requests
 from . import board, member, auth
-from .util import in24h
+from .util import to_datetime
 import datetime, os, json, re
 
 
@@ -110,9 +110,8 @@ def add_args(parser):
 		help='dump response from server as ./response.json')
 
 
-def filter_today(li):
-	return list(filter(lambda i:in24h(i['openingAt']), li))
-
+def in24h(i):
+	return (datetime.datetime.now() - to_datetime(i['openingAt'])).total_seconds() < 24*3600
 
 def list_contents(args):
 	if args.board.startswith('blogs/'):
@@ -126,10 +125,10 @@ def list_contents(args):
 			return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 		elif sub == 'today':
-			return filter_today(list_multiple_boards(
+			return list(filter(in24h, list_multiple_boards(
 				[board.get('key', f'blogs/{g}')['id'] for g in ['girls2', 'lucky2']],
 				args
-			))
+			)))
 
 
 	elif args.board.startswith('radio/'):
@@ -147,7 +146,7 @@ def list_contents(args):
 		sub = args.board.split('/')[1]
 		if sub == 'today':
 			boardId = board.get('key', 'news/family')['id']
-			return filter_today(fetch(boardId, size=10, page=1, dump=args.dump)['list'])
+			return list(filter(in24h, fetch(boardId, size=10, page=1, dump=args.dump)['list']))
 
 		else:
 			boardId = board.get('key', args.board)['id']
@@ -156,7 +155,7 @@ def list_contents(args):
 
 	elif args.board == 'today':
 		ret = list_multiple_boards([board.get('key', x)['id'] for x in board.active()], args)
-		return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
+		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True)
 
 	else:
 		boardId = board.get('key', args.board)['id']
