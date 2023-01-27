@@ -1,6 +1,7 @@
 import requests
 from . import board, member, auth, util
-import datetime, os, json, re
+import os, json, re
+from datetime import datetime
 
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=False, xauth=None):
@@ -100,7 +101,7 @@ def add_args(parser):
 
 
 def in24h(i):
-	return (datetime.datetime.now() - util.to_datetime(i['openingAt'])).total_seconds() < 24*3600
+	return (datetime.now() - util.to_datetime(i['openingAt'])).total_seconds() < 24*3600
 
 def list_contents(args):
 	if args.board.startswith('blogs/'):
