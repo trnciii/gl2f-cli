@@ -57,42 +57,42 @@ def save(item, args):
 
 	li = [i.group(1) for i in article.ptn_media.finditer(item['values']['body'])]
 
-	bar = Bar(li, contentId)
-	bar.print()
+	if len(li) > 0:
+		bar = Bar(li, contentId)
+		bar.print()
 
-	xauth = auth.update(auth.load())
-	_dl = partial(article.dl_medium, boardId, contentId,
-		head=args.skip, stream=True, streamfile=args.stream, xauth=xauth
-	)
+		xauth = auth.update(auth.load())
 
-	def dl(mediaId):
-		ptn = re.compile(mediaId + r'\..+')
-		if (not args.force) and any(map(ptn.search, os.listdir(out))):
-			return 'skipped'
+		def dl(mediaId):
+			ptn = re.compile(mediaId + r'\..+')
+			if (not args.force) and any(map(ptn.search, os.listdir(out))):
+				return 'skipped'
 
-		meta, response = _dl(mediaId=mediaId)
+			meta, response = article.dl_medium(boardId, contentId, mediaId,
+				head=args.skip, stream=True, streamfile=args.stream, xauth=xauth)
 
-		bar.progress[mediaId]['length'] = int(response.headers['content-length'])
+			bar.progress[mediaId]['length'] = int(response.headers['content-length'])
 
-		with open(os.path.join(out, f'{meta["mediaId"]}.{meta["meta"]["ext"]}'), 'wb') as f:
-			for i in response.iter_content(chunk_size=1024*1024):
-				f.write(i)
+			with open(os.path.join(out, f'{meta["mediaId"]}.{meta["meta"]["ext"]}'), 'wb') as f:
+				for i in response.iter_content(chunk_size=1024*1024):
+					f.write(i)
 
-				bar.progress[mediaId]['progress'] += len(i)
-				bar.print()
+					bar.progress[mediaId]['progress'] += len(i)
+					bar.print()
 
-		response.close()
+			response.close()
 
-		return meta
+			return meta
 
 
-	with ThreadPoolExecutor() as executor:
-		futures = [executor.submit(dl, i) for i in li]
+		with ThreadPoolExecutor() as executor:
+			futures = [executor.submit(dl, i) for i in li]
 
-	if args.dump:
-		util.dump(args.dump, f'media-{contentId}', [f.result() for f in futures])
+		term.clean_row()
 
-	term.clean_row()
+		if args.dump:
+			util.dump(args.dump, f'media-{contentId}', [f.result() for f in futures])
+
 	fm = pretty.Formatter(f='id:media:author:title')
 	print('downloaded', fm.format(item))
 
