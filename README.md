@@ -52,18 +52,30 @@
 
 ## インストール
 
-二つのインストール方法があります。
+三つのインストール方法があります。
 
 
 ### 1. pip + git を使う
 
-python3, pip, git の環境があればこのリポジトリから直接インストールできます。
+Python3, pip, git の環境があればこのリポジトリから直接インストールできます。
 
 ```sh
 pip install git+https://github.com/trnciii/gl2f-cli@release
 ```
 
-### 2. 実行ファイルをダウンロードする
+### 2. ソースファイルから pip でインストールする
+
+Gitが無い場合はソースを落としてpipでインストールできます。
+まず[Release](https://github.com/trnciii/gl2f-cli/releases/latest)の `source.zip` をダウンロードます。
+( `Source code (zip), Source code (tar.gz)` ではありません! )
+ファイルを展開し、そのフォルダに対して次のコマンドを実行してください。
+
+```sh
+pip install <path/to/extracted/directory>
+```
+
+
+### 3. 実行ファイルをダウンロードする
 
 Windows と MacOS では、ダウンロードしてすぐ使えるアプリケーションをリリースしています。
 
