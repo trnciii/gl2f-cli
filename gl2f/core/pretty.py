@@ -122,7 +122,7 @@ def add_args(parser):
 def make_format(args):
 	f = args.format.strip(':')
 
-	if args.board in {'today'} and 'page' not in f:
+	if hasattr(args, 'board') and args.board in {'today'} and 'page' not in f:
 		f = 'page:' + f
 
 	if args.break_urls:
