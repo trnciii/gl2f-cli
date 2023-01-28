@@ -145,6 +145,9 @@ gl2f open news/family
 # mirage2 のニュースを表示する
 gl2f cat news/mirage2
 
+# 特定の記事を表示する
+gl2f cat https://girls2-fc.jp/page/lucky2blogs/748008846546437131
+
 # Gtube を開く
 gl2f open gtube
 
