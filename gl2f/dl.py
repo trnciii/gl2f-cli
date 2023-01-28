@@ -1,4 +1,4 @@
-from .core import lister, pretty
+from .core import lister, pretty, util
 from .ayame import terminal as term
 import os
 
@@ -90,10 +90,7 @@ def save(item, args):
 		futures = [executor.submit(dl, i) for i in li]
 
 	if args.dump:
-		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-		with open(os.path.join(args.dump, f'media-{contentId}-{now}.json'), 'w', encoding='utf-8') as f:
-			json.dump([f.result() for f in futures], f, indent=2, ensure_ascii=False)
-
+		util.dump(args.dump, f'media-{contentId}', [f.result() for f in futures])
 
 	term.clean_row()
 	fm = pretty.Formatter(f='id:media:author:title')

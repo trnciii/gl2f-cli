@@ -1,7 +1,7 @@
 import requests
-from . import board, member, auth
-from .date import in24h
-import datetime, os, json, re
+from . import board, member, auth, util
+import os, json, re
+from datetime import datetime
 
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=False, xauth=None):
@@ -25,20 +25,15 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=Fa
 		print(response.reason)
 		return
 
+	data = response.json()
+
 	if dump:
-		filename = board.get('id', boardId)['page']
+		name = board.get('id', boardId)['page']
 		if categoryId:
-			name, _ = member.from_id(categoryId)
-			filename += f'-{name}'
+			name += f'-{member.from_id(categoryId)[0]}'
+		util.dump(dump, name, data)
 
-		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-
-		path = os.path.join(dump,  f'{filename}-{now}.json')
-		with open(path, 'w', encoding='utf-8') as f:
-			json.dump(response.json(), f, indent=2, ensure_ascii=False)
-		print('saved', path)
-
-	return response.json()
+	return data
 
 def fetch_content(url, dump=False, xauth=None):
 	page, contentId = re.search(
@@ -60,17 +55,12 @@ def fetch_content(url, dump=False, xauth=None):
 		print(response.reason)
 		return
 
-	ret = response.json()
+	data = response.json()
 
 	if dump:
-		filename = f'{page}-{contentId}'
-		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-		filepath = os.path.join(dump, f'{filename}-{now}.json')
-		with open(filepath, 'w', encoding='utf-8') as f:
-			json.dump(ret, f, indent=2, ensure_ascii=False)
-		print('saved', filepath)
+		util.dump(dump, f'{page}-{contentId}', data)
 
-	return ret
+	return data
 
 
 def list_multiple_boards(boardId, args):
@@ -112,9 +102,8 @@ def add_args(parser):
 		help='dump response from server as ./response.json')
 
 
-def filter_today(li):
-	return list(filter(lambda i:in24h(i['openingAt']), li))
-
+def in24h(i):
+	return (datetime.now() - util.to_datetime(i['openingAt'])).total_seconds() < 24*3600
 
 def list_contents(args):
 	if args.board.startswith('blogs/'):
@@ -128,10 +117,10 @@ def list_contents(args):
 			return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
 
 		elif sub == 'today':
-			return filter_today(list_multiple_boards(
+			return list(filter(in24h, list_multiple_boards(
 				[board.get('key', f'blogs/{g}')['id'] for g in ['girls2', 'lucky2']],
 				args
-			))
+			)))
 
 
 	elif args.board.startswith('radio/'):
@@ -149,7 +138,7 @@ def list_contents(args):
 		sub = args.board.split('/')[1]
 		if sub == 'today':
 			boardId = board.get('key', 'news/family')['id']
-			return filter_today(fetch(boardId, size=10, page=1, dump=args.dump)['list'])
+			return list(filter(in24h, fetch(boardId, size=10, page=1, dump=args.dump)['list']))
 
 		else:
 			boardId = board.get('key', args.board)['id']
@@ -158,7 +147,7 @@ def list_contents(args):
 
 	elif args.board == 'today':
 		ret = list_multiple_boards([board.get('key', x)['id'] for x in board.active()], args)
-		return sorted(filter_today(ret), key=lambda i:i['openingAt'], reverse=True)
+		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True)
 
 	else:
 		boardId = board.get('key', args.board)['id']
