@@ -171,10 +171,7 @@ def add_args(parser):
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
-
-	p = sub.add_parser('index')
-	p.add_argument('--full', action='store_true')
-	p.set_defaults(handler=lambda args:index.main(args.full))
+	sub.add_parser('index').set_defaults(handler = lambda _:index.main(full=True))
 	sub.add_parser('install').set_defaults(handler=lambda _:install())
 
 	p = sub.add_parser('ls')
