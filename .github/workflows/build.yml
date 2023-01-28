@@ -44,16 +44,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # windows
       - uses: actions/download-artifact@v1
         with:
           name: windows
       - run: zip windows.zip windows/*
 
+      # mac
       - uses: actions/download-artifact@v1
         with:
           name: macos
       - run: zip macos.zip macos/*
 
+      # source
+      - run: git submodule update --init --recursive
+      - run: zip -r source.zip gl2f/* setup.py
 
       - name: Release
         id: create_release
@@ -62,3 +67,4 @@ jobs:
           files: |
             windows.zip
             macos.zip
+            source.zip
