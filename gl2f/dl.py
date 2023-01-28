@@ -86,12 +86,12 @@ def save(item, args):
 
 
 		with ThreadPoolExecutor() as executor:
-			futures = [executor.submit(dl, i) for i in li]
+			results = list(executor.map(dl, li))
 
 		term.clean_row()
 
 		if args.dump:
-			util.dump(args.dump, f'media-{contentId}', [f.result() for f in futures])
+			util.dump(args.dump, f'media-{contentId}', results)
 
 	fm = pretty.Formatter(f='id:media:author:title')
 	print('downloaded', fm.format(item))

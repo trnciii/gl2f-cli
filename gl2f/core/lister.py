@@ -67,12 +67,13 @@ def list_multiple_boards(boardId, args):
 	# only returns the 'list' value of boards.
 	# category id is fixed to None.
 	from concurrent.futures import ThreadPoolExecutor
+	from functools import partial
 
-	xauth = auth.update(auth.load())
+	f = partial(fetch, size=10, page=1, xauth=auth.update(auth.load()), dump=args.dump)
 	with ThreadPoolExecutor() as executor:
-		futures = [executor.submit(fetch, i, 10, 1, xauth=xauth, dump=args.dump) for i in boardId]
+		results = executor.map(f, boardId)
 
-	return sum((f.result()['list'] for f in futures), [])
+	return sum((r['list'] for r in results), [])
 
 
 def get_IDs(domain, m, g):

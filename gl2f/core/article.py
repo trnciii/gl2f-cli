@@ -94,28 +94,26 @@ def lines(item, style, use_sixel):
 	}[style], item['contentId'], item['boardId']))
 
 	with ThreadPoolExecutor(max_workers=5) as e:
-		futures = [e.submit(f, p.group(1)) for p in ptn_paragraph.finditer(item['values']['body'])]
+		results = e.map(f, (p.group(1) for p in ptn_paragraph.finditer(item['values']['body'])))
 
 		if style == 'full':
-			for f in futures:
-				yield f'{f.result()}\n'
+			for r in results:
+				yield f'{r}\n'
 
 		elif style == 'compact':
-			for f in futures:
-				l = f.result()
-				if len(l):
-					yield f'{l}\n'
+			for r in results:
+				if len(r):
+					yield f'{r}\n'
 
 		elif style == 'compressed':
-			for f in futures:
-				l = f.result()
-				if len(l):
-					yield f'{l} '
+			for r in results:
+				if len(r):
+					yield f'{r} '
 			yield '\n'
 
 		elif style == 'plain':
-			for f in futures:
-				yield f.result()
+			for r in results:
+				yield r
 
 
 def dl_medium(boardId, contentId, mediaId, head=False, stream=False, streamfile=False, xauth=None):
