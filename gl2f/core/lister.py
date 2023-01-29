@@ -150,6 +150,10 @@ def list_contents(args):
 		ret = list_multiple_boards([board.get('key', x)['id'] for x in board.active()], args)
 		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True)
 
-	else:
-		boardId = board.get('key', args.board)['id']
-		return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+	elif b := board.get('key', args.board):
+		return fetch(b['id'], args.number, args.page, args.order, dump=args.dump)['list']
+
+
+	elif os.path.isfile(args.board):
+		with open(args.board, encoding='utf-8') as f:
+			return json.load(f)['list']

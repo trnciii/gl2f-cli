@@ -208,7 +208,10 @@ def table():
 
 
 def get(k, v):
-	return next(x for x in table() if x[k] == v)
+	try:
+		return next(x for x in table() if x[k] == v)
+	except StopIteration:
+		return None
 
 def content_url(item):
 	page = get('id', item['boardId'])['page']
