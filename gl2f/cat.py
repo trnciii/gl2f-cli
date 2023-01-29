@@ -9,10 +9,10 @@ def cat(i, args):
 	if args.dl:
 		save(i, args)
 	fm = pretty.Formatter()
-	fm.print(i)
+	fm.print(i, encoding=args.encoding)
 	for s in article.lines(i, args.style, args.sixel):
-		print(s, end='')
-	print()
+		term.write_with_encoding(s, encoding=args.encoding, errors='ignore')
+	term.write_with_encoding('\n', encoding=args.encoding)
 
 
 def subcommand(args):
@@ -39,6 +39,8 @@ def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
+
+	parser.add_argument('--encoding')
 
 	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',
