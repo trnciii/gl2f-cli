@@ -38,10 +38,10 @@ def subcommand(args):
 	for c, t, i in sorted(zip(counts, texts, items), reverse=True, key=lambda x:x[0]):
 		if c == 0: break
 
-		print(hi.sub(
+		term.write_with_encoding(hi.sub(
 			term.mod(r'\g<match>', term.color('yellow'), term.inv()),
 			fm.format(i)
-		))
+		) + '\n', args.encoding)
 
 		ranges = [(i.start()-20, i.end()+20) for i in hi.finditer(t)]
 		merged = merge(ranges)
@@ -49,12 +49,12 @@ def subcommand(args):
 			merged = merged[:5]
 
 		for begin, end in merged:
-			print('> ' + hi.sub(
+			term.write_with_encoding('> ' + hi.sub(
 				term.mod(r'\g<match>', term.color('yellow')),
 				t[max(0, begin):min(len(t), end)] + term.reset()
-			))
+			) + '\n', args.encoding)
 
-		print()
+		term.write_with_encoding('\n', args.encoding)
 
 
 def add_args(parser):
@@ -64,5 +64,6 @@ def add_args(parser):
 	parser.set_defaults(date='%m/%d', number=30)
 
 	parser.add_argument('keywords', nargs='+')
+	parser.add_argument('--encoding')
 
 	parser.set_defaults(handler=subcommand)

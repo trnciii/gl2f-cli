@@ -98,8 +98,8 @@ class Formatter:
 			self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
 		)
 
-	def print(self, item, end='\n'):
-		print(self.format(item), end=end)
+	def print(self, item, end='\n', encoding=None):
+		term.write_with_encoding(f'{self.format(item)}\n', encoding=encoding)
 
 
 def add_args(parser):

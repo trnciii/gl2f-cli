@@ -14,7 +14,7 @@ def ls(args):
 
 	fm = pretty.from_args(args, items)
 	for i in items:
-		fm.print(i)
+		fm.print(i, encoding=args.encoding)
 
 
 def clear_cache():
@@ -178,6 +178,7 @@ def add_args(parser):
 	p.add_argument('--order', type=str,
 		help='sort order')
 	pretty.add_args(p)
+	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')
 
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
