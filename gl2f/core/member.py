@@ -218,15 +218,3 @@ def is_member(member):
 
 def of_group(g):
 	return {k:v for k, v in get().items() if g in v['group']}
-
-
-def name_width():
-	return max(len(i['fullname']) for i in get().values())
-
-
-if __name__ == '__main__':
-	assert is_group('yuzuha') == False
-	assert is_group('girls2') == True
-
-	assert is_member('miyu') == True
-	assert is_member('lovely2') == False
