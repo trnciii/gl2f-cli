@@ -237,11 +237,6 @@ gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 
 [issues](https://github.com/trnciii/gl2f-cli/issues) を見てください。
 また希望があれば追加してください。
-分類のため、以下のタグを用意しています。
-
-* listing リストする情報や整理について
-* appearance リストや記事の表示・整形について
-
 twitter 等に伝えてもらっても構いません。
 
 
