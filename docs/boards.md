@@ -26,7 +26,7 @@ gl2f open today
 
 ### `today` 24時間以内の更新
 
-日記、ニュース、ラジオ、Gtube、commercial movie、またライブ期間中は特設ページをチェックし、24時間以内の更新を返します。
+日記、ニュース、ラジオ、Gtube、commercial movie、またイベント期間中は特設ページをチェックし、24時間以内の更新を返します。
 
 24時間以内の更新を全てリストとして表示する
 ```sh
@@ -84,15 +84,18 @@ commercial movie をブラウザで開く
 gl2f ls cm
 ```
 
+### fm
 
-### `shangrila` Girls2 Live Tour 2022 Shangri-la Photo Gallery
+ファンミーティングのフォトギャラリーを取得します。
 
-Shangri-la のフォトギャラリー ( https://girls2-fc.jp/page/ShangrilaPG ) を取得します。
-`pg` を省略できるメインコマンドはありません。
+引数
+* `lucky2-2023` https://girls2-fc.jp/page/L2FanMeetingPG2
+* `girls2-2022` https://girls2-fc.jp/page/G2fcmeetingpg
+* `lucky2-2022` https://girls2-fc.jp/page/L2fcmeetingpg
 
-Shangri-la Photo Gallery の画像をダウンロードする
+Girls2 ファンミーティング2022 の画像をリストする
 ```sh
-gl2f dl shangrila
+gl2f ls fm/girls2-2022
 ```
 
 

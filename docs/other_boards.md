@@ -2,6 +2,19 @@
 
 特設ページなどのリストを取得するためのコマンドと引数です。
 
+## fm
+
+引数
+* `lucky2-2023` https://girls2-fc.jp/page/L2FanMeetingPG2
+* `girls2-2022` https://girls2-fc.jp/page/G2fcmeetingpg
+* `lucky2-2022` https://girls2-fc.jp/page/L2fcmeetingpg
+
+例
+```sh
+gl2f ls fm/girls2-2022
+```
+
+
 ## shangrila
 
 引数
@@ -44,18 +57,6 @@ gl2f ls daijoubu/cheer
 例
 ```sh
 gl2f ls cl
-```
-
-
-## fm
-
-引数
-* `girls2` https://girls2-fc.jp/page/G2fcmeetingpg
-* `lucky2` https://girls2-fc.jp/page/L2fcmeetingpg
-
-例
-```sh
-gl2f ls fm/girls2
 ```
 
 
