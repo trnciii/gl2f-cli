@@ -135,17 +135,25 @@ def table():
 		# fan meeting
 		{
 			'id': '613606146413953985',
-			'key': 'fm/girls2',
+			'key': 'fm/girls2-2022',
 			'group': 'girls2',
 			'page': 'G2fcmeetingpg',
 		},
 
 		{
 			'id': '613607790937637825',
-			'key': 'fm/lucky2',
+			'key': 'fm/lucky2-2022',
 			'group': 'lucky2',
 			'page': 'L2fcmeetingpg',
 		},
+
+		{
+			'id': '750275859142673638',
+			'key': 'fm/lucky2-2023',
+			'group': 'lucky2',
+			'page': 'L2FanMeetingPG2'
+		},
+
 
 		# enjoy the good days
 		{
@@ -242,6 +250,7 @@ def tree():
 
 def active():
 	return [
+		'fm/lucky2-2023',
 		'blogs/girls2',
 		'blogs/lucky2',
 		'news/family',
