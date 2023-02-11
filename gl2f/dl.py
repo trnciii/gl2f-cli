@@ -102,22 +102,20 @@ def subcommand(args):
 	from .local import index
 
 	if args.board.startswith('https'):
-		save(lister.fetch_content(args.board, dump=args.dump), args)
-		return
-
-	items = lister.list_contents(args)
-
-	if args.all:
-		for i in items:
-			save(i, args)
+		items = [lister.fetch_content(args.board, dump=args.dump)]
+	elif args.all:
+		items = lister.list_contents(args)
 	elif args.pick:
-		for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
-			save(i, args)
+		li = lister.list_contents(args)
+		items = (li[i-1] for i in args.pick if 0<i<=len(li))
 	else:
-		fm = pretty.from_args(args, items)
-		selected = term.select([fm.format(i) for i in items])
-		for i in [i for s, i in zip(selected, items) if s]:
-			save(i, args)
+		li = lister.list_contents(args)
+		fm = pretty.from_args(args, li)
+		selected = term.select([fm.format(i) for i in li])
+		items = (i for s, i in zip(selected, li) if s)
+
+	for i in items:
+		save(i, args)
 
 	if refdir_untouch('site'):
 		index.main()
