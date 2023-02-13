@@ -47,7 +47,15 @@ class Formatter:
 		return term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b'))
 
 	def title(self, item):
-		return term.mod(item['values']['title'], term.bold())
+		ret = term.mod(item['values']['title'], term.bold())
+
+		if closing := item.get('closingAt', None):
+			ret += term.mod(
+				f' (Expires on {util.to_datetime(closing).strftime("%m/%d %H:%M")}!!)',
+				term.color('yellow'), term.bold()
+			)
+
+		return ret
 
 	def url(self, item):
 		return term.mod(board.content_url(item), term.dim())
