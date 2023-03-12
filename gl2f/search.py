@@ -4,6 +4,8 @@ from .ayame import terminal as term
 def name(): return 'search'
 
 def merge(ranges):
+	if len(ranges) == 0: return []
+
 	ret = []
 	cur = ranges[0]
 	for j in range(1, len(ranges)):
