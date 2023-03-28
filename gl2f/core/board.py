@@ -148,6 +148,13 @@ def table():
 		},
 
 		{
+			'id': '770515521794737285',
+			'key': 'fm/girls2-2023',
+			'group': 'girls2',
+			'page': 'G2FanMeetingPG2',
+		},
+
+		{
 			'id': '750275859142673638',
 			'key': 'fm/lucky2-2023',
 			'group': 'lucky2',
@@ -250,7 +257,7 @@ def tree():
 
 def active():
 	return [
-		'fm/lucky2-2023',
+		'fm/girls2-2023',
 		'blogs/girls2',
 		'blogs/lucky2',
 		'news/family',
