@@ -82,3 +82,8 @@ jobs:
             windows.zip
             macos.zip
             source.zip
+
+      - run: |
+          git switch release
+          git reset --hard ${{ github.ref_name }}
+          git push origin release
