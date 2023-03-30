@@ -29,18 +29,15 @@
 
 <body>
 
+<header id='filepath' style="padding: 0 4; font-size: 11;"></header>
 <header>
-  <div style="display: flex;margin-right: auto;">
+  <div style="display: flex; margin-right: auto;">
     <a class="buttonlike item" href=./index.html>home</a>
-    &nbsp;/&nbsp;
-    <a class="buttonlike item" id='folder' href='_'>folder</a>
     &nbsp;/
     <label class='buttonlike'><input id='list' class=buttonlike type='checkbox' onchange='draw()'>list</label>
-    &nbsp;/&nbsp;
-    <button class='buttonlike item' id='copy_id' onclick='_'>id</button>
   </div>
 
-  <div style="margin: auto; padding: 0px 40px;">
+  <div style="margin: auto; padding: 0px 25px;">
     <span id='title'></span>
   </div>
 
@@ -58,16 +55,16 @@
 const contentId = location.search.split("?")[1];
 const dir = `../contents/${contentId}`
 const media_table = table[contentId]['media'];
+const home = location.href.split('file:///')[1].split('/site/')[0];
+const filepath = `${home}/contents/${contentId}`;
 
 document.title = `Album ${table[contentId]['title']}`
 
-document.getElementById('folder').setAttribute('href', dir);
 document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page/${table[contentId]['board']}/${contentId}' target='blank'>${table[contentId]['title']}</a>`;
-document.getElementById('copy_id').onclick = ()=>{
-  const path = location.href.split('file:///')[1].split('/gl2f/site/')[0];
-  navigator.clipboard.writeText(contentId);
-}
 
+document.getElementById('filepath').innerHTML = `<a href=${filepath}>${filepath}</a>`
+  + '&ensp;'
+  + `<button class='buttonlike item' id='copy_path' onclick='navigator.clipboard.writeText("${filepath}");' style='padding: 0 1; font-size: 11;'>copy</button>`;
 
 const cols = document.getElementById('cols');
 cols.value = Math.min(
