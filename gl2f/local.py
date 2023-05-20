@@ -161,6 +161,31 @@ def build(i, view=False):
 	print(f'saved file:///{page}')
 
 
+def export(out):
+	import shutil
+	from datetime import datetime
+
+	contents = local.refdir_untouch('contents')
+	if not contents:
+		print('contents not found')
+		return
+
+	out = os.path.abspath(out)
+	if os.path.isdir(out):
+		now = datetime.now().strftime("%Y%m%d%H%M%S")
+		base = os.path.join(out, f'gl2f-contents-{now}')
+	else:
+		par, chi = os.path.split(out)
+		if not os.path.isdir(par):
+			print(f'{par} is not a directory')
+			return
+
+		base = out
+
+	print('zipping contents into', base)
+	shutil.make_archive(base, 'zip', root_dir=contents)
+
+
 def add_args(parser):
 	sub = parser.add_subparsers()
 
@@ -171,6 +196,11 @@ def add_args(parser):
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
+
+	p = sub.add_parser('export')
+	p.add_argument('-o', default='.')
+	p.set_defaults(handler=lambda args:export(args.o))
+
 	sub.add_parser('index').set_defaults(handler = lambda _:index.main(full=True))
 	sub.add_parser('install').set_defaults(handler=lambda _:install())
 
