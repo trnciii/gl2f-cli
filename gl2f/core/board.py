@@ -219,6 +219,13 @@ def table():
 			'key': 'wallpaper',
 			'page': 'wallpaper'
 		},
+
+		# ticket
+		{
+			'id': '335268051140216033',
+			'key': 'ticket',
+			'page': 'ticket',
+		},
 	]
 
 
