@@ -226,6 +226,13 @@ def table():
 			'key': 'ticket',
 			'page': 'ticket',
 		},
+
+		# history
+		{
+			'id': '801380069393040517',
+			'key': 'history/girls2',
+			'page': 'Girls2history',
+		}
 	]
 
 
