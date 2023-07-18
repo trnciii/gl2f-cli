@@ -271,7 +271,6 @@ def tree():
 
 def active():
 	return [
-		'fm/girls2-2023',
 		'blogs/girls2',
 		'blogs/lucky2',
 		'news/family',
