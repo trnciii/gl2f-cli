@@ -1,14 +1,33 @@
-from . import board, member, date
-from ..ayame import terminal as term
+from . import board, member, util
+from ..ayame import terminal as term, zen
+import re
+
+ptn_endspaces = re.compile(r' +(\n|$)')
 
 class Formatter:
-	def __init__(self, f='author:title:url', fd=None, sep=' '):
+	def __init__(self, f='author:title:url', fd=None, sep=' ', items=None):
 		self.fstring = f
 		self.fdstring = fd if fd else '%m/%d'
 		self.sep = sep
 
 		self.index = 0
 		self.digits = 2
+
+		self.functions = {
+			'author': self.author,
+			'title': self.title,
+			'url': self.url,
+			'date-p': self.date_p,
+			'date-c': self.date_c,
+			'index': self.inc_index,
+			'br': self.breakline,
+			'id': self.content_id,
+			'media': self.media_stat,
+			'page': self.page,
+		}
+
+		self.set_width(items)
+
 
 	def reset_index(self, i=0, digits=2):
 		self.index = i
@@ -25,22 +44,27 @@ class Formatter:
 			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
-		return term.justzen(
-			term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b')),
-			member.name_width()
-		)
+		return term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b'))
 
 	def title(self, item):
-		return term.mod(item['values']['title'], term.bold())
+		ret = term.mod(item['values']['title'], term.bold())
+
+		if closing := item.get('closingAt', None):
+			ret += term.mod(
+				f' (Expires on {util.to_datetime(closing).strftime("%m/%d %H:%M")}!!)',
+				term.color('yellow'), term.bold()
+			)
+
+		return ret
 
 	def url(self, item):
 		return term.mod(board.content_url(item), term.dim())
 
 	def date_p(self, item):
-		return date.to_datetime(item['openingAt']).strftime(self.fdstring)
+		return util.to_datetime(item['openingAt']).strftime(self.fdstring)
 
 	def date_c(self, item):
-		return date.to_datetime(item['createdAt']).strftime(self.fdstring)
+		return util.to_datetime(item['createdAt']).strftime(self.fdstring)
 
 	def breakline(self, item):
 		return '\n'
@@ -57,31 +81,38 @@ class Formatter:
 		re = article.media_stat(item['values']['body'])
 		return self.sep.join([f'i{re["image"]:02}', f'v{re["video"]}'])
 
+	def page(self, item):
+		return board.get('id', item['boardId'])['key'].split('/')[0]
 
-	def format(self, item, end='\n'):
-		dic = {
-			'author': self.author,
-			'title': self.title,
-			'url': self.url,
-			'date-p': self.date_p,
-			'date-c': self.date_c,
-			'index': self.inc_index,
-			'br': self.breakline,
-			'id': self.content_id,
-			'media': self.media_stat,
-		}
 
-		return self.sep.join(dic[key](item) for key in self.fstring.split(':'))
+	def keys(self):
+		return self.fstring.split(':')
 
-	def print(self, item, end='\n'):
-		print(self.format(item, end))
+	def set_width(self, items=None):
+		if items:
+			self.width = {
+				k:max(map( zen.display_length, (self.functions[k](i) for i in items) ))
+				for k in self.keys()
+			}
+		else:
+			self.width = {
+				'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
+				'page': max(len(i.split('/')[0]) for i in board.active()),
+			}
+
+
+	def format(self, item):
+		return ptn_endspaces.sub(r'\1',
+			self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
+		)
+
+	def print(self, item, end='\n', encoding=None):
+		term.write_with_encoding(f'{self.format(item)}\n', encoding=encoding)
 
 
 def add_args(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
-		help='formatting specified by a list of  {{ {} }} separated by ":". default "author:title:url".'\
-		.format(', '.join(Formatter.format.__code__.co_consts[1]))
-	)
+		help='format of items. default is "author:title:url"')
 
 	parser.add_argument('--sep', type=str, default=' ',
 		help='separator string.')
@@ -99,6 +130,9 @@ def add_args(parser):
 def make_format(args):
 	f = args.format.strip(':')
 
+	if hasattr(args, 'board') and args.board in {'today'} and 'page' not in f:
+		f = 'page:' + f
+
 	if args.break_urls:
 		f = f.replace('url', 'br:url')
 
@@ -111,5 +145,5 @@ def make_format(args):
 	return f
 
 
-def from_args(args):
-	return Formatter(f=make_format(args), fd=args.date, sep=args.sep)
+def from_args(args, items=None):
+	return Formatter(f=make_format(args), fd=args.date, sep=args.sep, items=items)

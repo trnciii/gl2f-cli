@@ -1,4 +1,5 @@
 from .core import lister, pretty, article
+from .ayame import terminal as term
 
 def name(): return 'cat'
 
@@ -8,14 +9,16 @@ def cat(i, args):
 	if args.dl:
 		save(i, args)
 	fm = pretty.Formatter()
-	fm.print(i)
+	fm.print(i, encoding=args.encoding)
 	for s in article.lines(i, args.style, args.sixel):
-		print(s, end='')
-	print()
+		term.write_with_encoding(s, encoding=args.encoding, errors='ignore')
+	term.write_with_encoding('\n', encoding=args.encoding)
 
 
 def subcommand(args):
-	from .ayame import terminal as term
+	if args.board.startswith('https'):
+		cat(lister.fetch_content(args.board, dump=args.dump), args)
+		return
 
 	items = lister.list_contents(args)
 
@@ -26,7 +29,7 @@ def subcommand(args):
 		for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
 			cat(i, args)
 	else:
-		fm = pretty.from_args(args)
+		fm = pretty.from_args(args, items)
 		selected = term.select([fm.format(i) for i in items])
 		for i in [i for s, i in zip(selected, items) if s]:
 			cat(i, args)
@@ -36,6 +39,8 @@ def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
+
+	parser.add_argument('--encoding')
 
 	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',

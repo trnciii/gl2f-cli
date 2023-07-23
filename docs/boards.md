@@ -26,7 +26,7 @@ gl2f open today
 
 ### `today` 24時間以内の更新
 
-日記、ニュース、ラジオ、Gtube、commercial movie、またライブ期間中は特設ページをチェックし、24時間以内の更新を返します。
+日記、ニュース、ラジオ、Gtube、commercial movie、またイベント期間中は特設ページをチェックし、24時間以内の更新を返します。
 
 24時間以内の更新を全てリストとして表示する
 ```sh
@@ -84,15 +84,18 @@ commercial movie をブラウザで開く
 gl2f ls cm
 ```
 
+### fm
 
-### `shangrila` Girls2 Live Tour 2022 Shangri-la Photo Gallery
+ファンミーティングのフォトギャラリーを取得します。
 
-Shangri-la のフォトギャラリー ( https://girls2-fc.jp/page/ShangrilaPG ) を取得します。
-`pg` を省略できるメインコマンドはありません。
+引数
+* `lucky2-2023` https://girls2-fc.jp/page/L2FanMeetingPG2
+* `girls2-2022` https://girls2-fc.jp/page/G2fcmeetingpg
+* `lucky2-2022` https://girls2-fc.jp/page/L2fcmeetingpg
 
-Shangri-la Photo Gallery の画像をダウンロードする
+Girls2 ファンミーティング2022 の画像をリストする
 ```sh
-gl2f dl shangrila
+gl2f ls fm/girls2-2022
 ```
 
 
@@ -144,6 +147,7 @@ gl2f ls blogs/toa --order name:desc -n 30
 	* `br` 改行。
 	* `id` 記事のID。ダウンロードするフォルダ名などに使っているので、調べたいときに使えます。
 	* `media` 記事に含まれる画像と動画の数。画像が5、動画が1あるときは`i05 v1` のように出力されます。
+	* `page` ページ名
 * `-d, --date` フォーマット指定を指定して記事の公開日時を左側に表示します。デフォルトは月/日(`%m/%d`)。書式については[こちら](https://docs.python.org/ja/3/library/datetime.html#strftime-strptime-behavior)
 * `--break-urls` URLを改行して表示します。 `-f` で `url -> br:url` と置き換えることと同じです。
 * `--enum` リストに番号を振ります。 `-f` に `index` を含めることと同じです。
@@ -157,4 +161,9 @@ gl2f ls news/girls2 --order reservedAt:asc -d '%Y/%m/%d'
 lovely2 スタッフのブログを、投稿日と公開日とともに一覧表示する。日時は秒まで表示する。
 ```sh
 gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
+```
+
+今日の更新をページ名を含め表示する
+```sh
+gl2f ls today -f page:author:title
 ```

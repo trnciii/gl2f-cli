@@ -103,7 +103,7 @@ def get():
 			'group': ['lucky2', 'lovely2'],
 			'fullname': '山口莉愛',
 			'color':{
-				'lucky2': {'foreground': [255, 255, 255], 'background': [0, 190, 243]},
+				'lucky2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]},
 				'lovely2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}
 			},
 			'categoryId': {
@@ -115,7 +115,7 @@ def get():
 			'group': ['lucky2', 'lovely2'],
 			'fullname': '杉浦優來',
 			'color':{
-				'lucky2': {'foreground': [255, 255, 255], 'background': [31, 82, 209]},
+				'lucky2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]},
 				'lovely2': {'foreground': [255, 255, 255], 'background': [247, 117, 0]}
 			},
 			'categoryId': {
@@ -127,7 +127,7 @@ def get():
 		'tsubaki': {
 			'group': ['lucky2'],
 			'fullname': '永山椿',
-			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
+			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [247, 117, 0]}},
 			'categoryId': {
 				'blogs': '540078282813473595',
 				'radio': '562927300052517691',
@@ -136,7 +136,7 @@ def get():
 		'hiro': {
 			'group': ['lucky2'],
 			'fullname': '深澤日彩',
-			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [119, 52, 196]}},
+			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [0, 190, 243]}},
 			'categoryId': {
 				'blogs': '540080651374691131',
 				'radio': '540080651374691131',
@@ -145,7 +145,7 @@ def get():
 		'yuwa': {
 			'group': ['lucky2'],
 			'fullname': '比嘉優和',
-			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 80, 159]}},
+			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 46, 46]}},
 			'categoryId': {
 				'blogs': '540080829989127105',
 				'radio': '540080829989127105',
@@ -154,7 +154,7 @@ def get():
 		'kanna': {
 			'group': ['lucky2'],
 			'fullname': '佐藤栞奈',
-			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [157, 157, 157]}},
+			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [31, 82, 209]}},
 			'categoryId': {
 				'blogs': '540081291836523457',
 				'radio': '540081291836523457',
@@ -163,7 +163,7 @@ def get():
 		'ririka': {
 			'group': ['lucky2'],
 			'fullname': '上村梨々香',
-			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [229, 182, 15]}},
+			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 80, 159]}},
 			'categoryId': {
 				'blogs': '661170107531133993',
 				'radio': '661170107531133993',
@@ -181,7 +181,7 @@ def get():
 		'kiki': {
 			'group': ['lucky2'],
 			'fullname': '佐藤妃希',
-			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [255, 46, 46]}},
+			'color':{'lucky2': {'foreground': [255, 255, 255], 'background': [229, 182, 15]}},
 			'categoryId': {
 				'blogs': '661168410020807520',
 				'radio': '661168410020807520',
@@ -218,15 +218,3 @@ def is_member(member):
 
 def of_group(g):
 	return {k:v for k, v in get().items() if g in v['group']}
-
-
-def name_width():
-	return max(len(i['fullname']) for i in get().values())
-
-
-if __name__ == '__main__':
-	assert is_group('yuzuha') == False
-	assert is_group('girls2') == True
-
-	assert is_member('miyu') == True
-	assert is_member('lovely2') == False

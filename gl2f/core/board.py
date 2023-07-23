@@ -135,17 +135,32 @@ def table():
 		# fan meeting
 		{
 			'id': '613606146413953985',
-			'key': 'fm/girls2',
+			'key': 'fm/girls2-2022',
 			'group': 'girls2',
 			'page': 'G2fcmeetingpg',
 		},
 
 		{
 			'id': '613607790937637825',
-			'key': 'fm/lucky2',
+			'key': 'fm/lucky2-2022',
 			'group': 'lucky2',
 			'page': 'L2fcmeetingpg',
 		},
+
+		{
+			'id': '770515521794737285',
+			'key': 'fm/girls2-2023',
+			'group': 'girls2',
+			'page': 'G2FanMeetingPG2',
+		},
+
+		{
+			'id': '750275859142673638',
+			'key': 'fm/lucky2-2023',
+			'group': 'lucky2',
+			'page': 'L2FanMeetingPG2'
+		},
+
 
 		# enjoy the good days
 		{
@@ -204,11 +219,28 @@ def table():
 			'key': 'wallpaper',
 			'page': 'wallpaper'
 		},
+
+		# ticket
+		{
+			'id': '335268051140216033',
+			'key': 'ticket',
+			'page': 'ticket',
+		},
+
+		# history
+		{
+			'id': '801380069393040517',
+			'key': 'history/girls2',
+			'page': 'Girls2history',
+		}
 	]
 
 
 def get(k, v):
-	return next(x for x in table() if x[k] == v)
+	try:
+		return next(x for x in table() if x[k] == v)
+	except StopIteration:
+		return None
 
 def content_url(item):
 	page = get('id', item['boardId'])['page']
@@ -236,3 +268,15 @@ def tree():
 	tree['radio'] |= (mem_G2 | mem_L2)
 
 	return tree
+
+def active():
+	return [
+		'blogs/girls2',
+		'blogs/lucky2',
+		'news/family',
+		'radio/girls2',
+		'radio/lucky2',
+		'gtube',
+		'cm',
+		'wallpaper'
+	]

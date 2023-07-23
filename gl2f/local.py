@@ -9,9 +9,12 @@ def ls(args):
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
 
-	fm = pretty.from_args(args)
+	if not 'page' in args.format:
+		args.format = 'page:' + args.format
+
+	fm = pretty.from_args(args, items)
 	for i in items:
-		fm.print(i)
+		fm.print(i, encoding=args.encoding)
 
 
 def clear_cache():
@@ -168,16 +171,14 @@ def add_args(parser):
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
-
-	p = sub.add_parser('index')
-	p.add_argument('--full', action='store_true')
-	p.set_defaults(handler=lambda args:index.main(args.full))
+	sub.add_parser('index').set_defaults(handler = lambda _:index.main(full=True))
 	sub.add_parser('install').set_defaults(handler=lambda _:install())
 
 	p = sub.add_parser('ls')
 	p.add_argument('--order', type=str,
 		help='sort order')
 	pretty.add_args(p)
+	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')
 
 	sub.add_parser('stat').set_defaults(handler=lambda _:stat())

@@ -2,7 +2,7 @@ import re, html
 from . import local
 from ..ayame import sixel, terminal as term
 import json, os, datetime
-from .. import auth
+from . import auth
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -58,10 +58,10 @@ class MediaRep:
 			image = Image.open(file)
 		else:
 			_, data = self.dl(mediaId=i)
-			if data:
+			if data.ok:
 				with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
-					f.write(data)
-			image = Image.open(BytesIO(data))
+					f.write(data.content)
+			image = Image.open(BytesIO(data.content))
 
 		image = sixel.limit(image, (1600, 1600))
 		ret = sixel.to_sixel(image)
@@ -94,32 +94,27 @@ def lines(item, style, use_sixel):
 	}[style], item['contentId'], item['boardId']))
 
 	with ThreadPoolExecutor(max_workers=5) as e:
-		futures = [e.submit(f, p.group(1)) for p in ptn_paragraph.finditer(item['values']['body'])]
+		results = e.map(f, (p.group(1) for p in ptn_paragraph.finditer(item['values']['body'])))
 
 		if style == 'full':
-			for f in futures:
-				yield f'{f.result()}\n'
+			yield from (f'{r}\n' for r in results)
 
 		elif style == 'compact':
-			for f in futures:
-				l = f.result()
-				if len(l):
-					yield f'{l}\n'
+			yield from (f'{r}\n' for r in results if len(r))
 
 		elif style == 'compressed':
-			for f in futures:
-				l = f.result()
-				if len(l):
-					yield f'{l} '
+			yield from (f'{r} ' for r in results if len(r))
 			yield '\n'
 
 		elif style == 'plain':
-			for f in futures:
-				yield f.result()
+			yield from results
 
 
-def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None):
+def dl_medium(boardId, contentId, mediaId, head=False, stream=False, streamfile=False, xauth=None):
 	import requests
+
+	class bad_response:
+		ok = False
 
 	response = requests.get(
 		f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
@@ -130,68 +125,15 @@ def dl_medium(boardId, contentId, mediaId, skip=False, stream=False, xauth=None)
 		})
 
 	if not response.ok:
-		return {'error': 'bad response at url query', 'reason': response.reason}, None
+		return response, bad_response
 
-	data = response.json()
+	meta = response.json()
+	url = meta['accessUrl'] if streamfile else meta.get('originalUrl', meta['accessUrl'])
 
-	if skip:
-		return data, None
-
-
-	response = requests.get(
-		data['originalUrl'] if ('originalUrl' in data.keys() and not stream)\
-		else data['accessUrl']
-	)
-
-	if response.ok:
-		return data, response.content
-
+	if head:
+		return meta, requests.head(url)
 	else:
-		return {'error': 'bad response at media download', 'reason': response.reason}, None
-
-
-def save_media(item, out, boardId, contentId,
-	skip=False, stream=False, force=False, dump=False
-):
-	from threading import Lock
-	from concurrent.futures import ThreadPoolExecutor
-
-	li = ptn_media.findall(item['values']['body'])
-	bar = term.Bar(len(li))
-	lock = Lock()
-	xauth = auth.update(auth.load())
-
-	report = lambda:print(f'downloading {contentId} {bar.bar()} {bar.count()}', end='', flush=True)
-	report()
-
-	def dl(mediaId):
-		ptn = re.compile(mediaId + r'\..+')
-		if (not force) and any(map(ptn.search, os.listdir(out))):
-			return 'skipped'
-
-		info, image = dl_medium(boardId, contentId, mediaId, skip, stream, xauth=xauth)
-
-		with lock:
-			bar.inc()
-			term.clean_row()
-			report()
-
-		if image:
-			file = os.path.join(out, f'{info["mediaId"]}.{info["meta"]["ext"]}')
-			with open(file, 'wb') as f:
-				f.write(image)
-
-		return info
-
-
-	with ThreadPoolExecutor() as executor:
-		futures = [executor.submit(dl, i) for i, _ in li]
-
-	if dump:
-		now = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-		with open(os.path.join(dump, f'media-{contentId}-{now}.json'), 'w', encoding='utf-8') as f:
-			json.dump([f.result() for f in futures], f, indent=2, ensure_ascii=False)
-
+		return meta, requests.get(url, stream=stream)
 
 def media_stat(body):
 	types = [t for _, t in  ptn_media.findall(body)]

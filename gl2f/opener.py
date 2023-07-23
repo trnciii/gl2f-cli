@@ -1,4 +1,5 @@
 from .core import lister, pretty
+from .ayame import terminal as term
 
 def name(): return 'open'
 
@@ -9,10 +10,8 @@ def open_url(i):
 
 
 def subcommand(args):
-	from .ayame import terminal as term
-
 	items = lister.list_contents(args)
-	fm = pretty.from_args(args)
+	fm = pretty.from_args(args, items)
 
 	if args.all:
 		for i in items:

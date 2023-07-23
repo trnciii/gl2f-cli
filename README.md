@@ -2,7 +2,7 @@
 
 [GL2 family ファンクラブサイト](https://girls2-fc.jp/) をターミナルから閲覧する非公式アプリです。
 公式サイトではメンバーごとのリストが用意されていなかったり複数の記事を開くのが大変だったり使いづらかったので作りました。
-ブラウザで開くとき以上のやりとりをしていないので大丈夫と思っていますが、このアプリは利用規約に触れる行為を目的とはしていませんので、問題があるかもしれない部分を見つけたら教えてくださると助かります。
+ブラウザで開くとき以上のやりとりをしていないので大丈夫と思っていますが、このアプリは[利用規約](https://girls2-fc.jp/page/term)に触れる行為を目的とはしていませんので、問題があるかもしれない部分を見つけたら教えてくださると助かります。
 
 ![](docs/demo.gif)
 
@@ -52,18 +52,30 @@
 
 ## インストール
 
-二つのインストール方法があります。
+三つのインストール方法があります。
 
 
-### 1. pip を使う
+### 1. pip + git を使う
 
-python3 + pip の環境があればこのリポジトリから直接インストールできます。
+Python3, pip, git の環境があればこのリポジトリから直接インストールできます。
 
 ```sh
-pip install git+https://github.com/trnciii/gl2f-cli
+pip install git+https://github.com/trnciii/gl2f-cli@release
 ```
 
-### 2. 実行ファイルをダウンロードする
+### 2. ソースファイルから pip でインストールする
+
+Gitが無い場合はソースを落としてpipでインストールできます。
+まず[Release](https://github.com/trnciii/gl2f-cli/releases/latest)の `source.zip` をダウンロードます。
+( `Source code (zip), Source code (tar.gz)` ではありません! )
+ファイルを展開し、そのフォルダに対して次のコマンドを実行してください。
+
+```sh
+pip install <path/to/extracted/directory>
+```
+
+
+### 3. 実行ファイルをダウンロードする
 
 Windows と MacOS では、ダウンロードしてすぐ使えるアプリケーションをリリースしています。
 
@@ -145,6 +157,9 @@ gl2f open news/family
 # mirage2 のニュースを表示する
 gl2f cat news/mirage2
 
+# 特定の記事を表示する
+gl2f cat https://girls2-fc.jp/page/lucky2blogs/748008846546437131
+
 # Gtube を開く
 gl2f open gtube
 
@@ -222,11 +237,6 @@ gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
 
 [issues](https://github.com/trnciii/gl2f-cli/issues) を見てください。
 また希望があれば追加してください。
-分類のため、以下のタグを用意しています。
-
-* listing リストする情報や整理について
-* appearance リストや記事の表示・整形について
-
 twitter 等に伝えてもらっても構いません。
 
 

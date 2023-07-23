@@ -1,8 +1,11 @@
 from .core import lister, pretty
+from .ayame import terminal as term
 
 def name(): return 'search'
 
 def merge(ranges):
+	if len(ranges) == 0: return []
+
 	ret = []
 	cur = ranges[0]
 	for j in range(1, len(ranges)):
@@ -16,11 +19,11 @@ def merge(ranges):
 
 
 def subcommand(args):
-	from .ayame import terminal as term
 	from .core import article
 	import re
 
-	keywords = sum((k.split('　') for k in args.keywords), [])
+	keywords = list(filter(len, sum((k.split('　') for k in args.keywords), [])))
+
 
 	fm = pretty.from_args(args)
 	fm.reset_index(digits=len(str(args.number)))
@@ -37,10 +40,10 @@ def subcommand(args):
 	for c, t, i in sorted(zip(counts, texts, items), reverse=True, key=lambda x:x[0]):
 		if c == 0: break
 
-		print(hi.sub(
+		term.write_with_encoding(hi.sub(
 			term.mod(r'\g<match>', term.color('yellow'), term.inv()),
 			fm.format(i)
-		))
+		) + '\n', args.encoding)
 
 		ranges = [(i.start()-20, i.end()+20) for i in hi.finditer(t)]
 		merged = merge(ranges)
@@ -48,12 +51,12 @@ def subcommand(args):
 			merged = merged[:5]
 
 		for begin, end in merged:
-			print('> ' + hi.sub(
+			term.write_with_encoding('> ' + hi.sub(
 				term.mod(r'\g<match>', term.color('yellow')),
 				t[max(0, begin):min(len(t), end)] + term.reset()
-			))
+			) + '\n', args.encoding)
 
-		print()
+		term.write_with_encoding('\n', args.encoding)
 
 
 def add_args(parser):
@@ -63,5 +66,6 @@ def add_args(parser):
 	parser.set_defaults(date='%m/%d', number=30)
 
 	parser.add_argument('keywords', nargs='+')
+	parser.add_argument('--encoding')
 
 	parser.set_defaults(handler=subcommand)

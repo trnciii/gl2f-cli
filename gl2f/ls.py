@@ -3,13 +3,15 @@ from .core import lister, pretty
 def name(): return 'ls'
 
 def subcommand(args):
-	fm = pretty.from_args(args)
-	fm.reset_index(digits=len(str(args.number)))
+	items = lister.list_contents(args)
 
-	for i in lister.list_contents(args):
-		fm.print(i)
+	fm = pretty.from_args(args, items)
+
+	for i in items:
+		fm.print(i, encoding=args.encoding)
 
 def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(handler=subcommand)
+	parser.add_argument('--encoding')
