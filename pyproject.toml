@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools", 'setuptools_scm']
+build-backend = "setuptools.build_meta"
+
+[project]
+name = 'gl2f'
+description = 'CLI tools for GL2 family'
+dynamic = ['version']
+dependencies = [
+	'requests',
+	'libsixel-python',
+	'Pillow',
+	'webdriver_manager',
+	'selenium'
+]
+
+[project.scripts]
+gl2f = 'gl2f.__main__:main'
+
+[tool.setuptools.dynamic]
+version = {attr = 'gl2f._v.version'}
+
+[tool.setuptools_scm]
+write_to = 'gl2f/_v.py'

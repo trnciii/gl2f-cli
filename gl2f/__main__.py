@@ -2,6 +2,12 @@ import argparse
 from . import opener, ls, cat, dl, search, completion
 import sys, time
 
+def version():
+	try:
+		from ._v import __version__
+		return f'gl2f {__version__}'
+	except:
+		return 'No version info found'
 
 def main():
 	from . import auth, local
@@ -10,6 +16,8 @@ def main():
 
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers()
+
+	parser.add_argument('-v', '--version', action='version', version=version())
 
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)

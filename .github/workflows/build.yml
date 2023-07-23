@@ -8,18 +8,6 @@ on:
       - 'build'
 
 jobs:
-  check_version:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-
-      - run: python3 check_version.py ${{ github.ref_name }}
-      - run: echo 'passed!'
-
-
   build:
     strategy:
       matrix:
@@ -51,7 +39,7 @@ jobs:
 
   release:
     if: github.ref_name != 'build'
-    needs: [check_version, build]
+    needs: [build]
 
     runs-on: ubuntu-latest
     steps:
