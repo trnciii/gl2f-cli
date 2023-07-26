@@ -161,7 +161,119 @@ def build(i, view=False):
 	print(f'saved file:///{page}')
 
 
-def export(out):
+def colored_diff_lines(left, right):
+	import difflib
+	from .ayame import terminal as term
+
+	try:
+		with open(left, encoding='utf-8') as l, open(right, encoding='utf-8') as r:
+			return map(lambda l:
+					term.mod(l, term.color('green')) if l.startswith('+')
+					else term.mod(l, term.color('red')) if l.startswith('-')
+					else l,
+				difflib.unified_diff(l.readlines(), r.readlines(), fromfile=left, tofile=right)
+			)
+	except UnicodeDecodeError:
+		return [
+			'Not text files\n',
+			term.mod(f'- {left}\n', term.color('red')),
+			term.mod(f'+ {right}\n', term.color('green')),
+		]
+
+class ImportChecker:
+	def __init__(self, left, right):
+		from filecmp import dircmp, cmpfiles
+
+		self.items = os.listdir(right)
+
+		self.common = [i for i in self.items if os.path.isdir(os.path.join(left, i))]
+		self.right_only = [i for i in self.items if i not in self.common]
+		self.compare = {i:dircmp(os.path.join(left, i), os.path.join(right, i)) for i in self.common}
+
+		self.diff_files = {k:v.diff_files for k, v in self.compare.items() if v.diff_files}
+		self.right_only_files = {k: list(filter(
+			lambda f: os.path.isfile(os.path.join(right, k, f)),
+			v.right_only))
+			for k, v in self.compare.items()
+		}
+		self.unknown = {k: list(filter(
+			lambda i:os.path.isdir(os.path.join(right, k, i)),
+			v.right_list))
+			for k, v in self.compare.items()
+		}
+
+	def report(self):
+		print(f'{len(self.right_only)} new content dirs')
+		if(self.right_only): print(f'\t{self.right_only}')
+
+		print(f'{sum(map(len, self.right_only_files.values()))} new files')
+		print('\n'.join(f'\t{k}\n\t\t{v}' for k, v in self.right_only_files.items() if v))
+
+		print(f'{sum(map(len, self.diff_files.values()))} diff files')
+		print('\n'.join(f'\t{k}\n\t\t{v}' for k, v in self.diff_files.items() if v))
+
+		print(f'{sum(map(len, self.unknown.values()))} unchecked subdirs')
+		print('\n'.join(f'\t{k}\n\t\t{v}' for k, v in self.unknown.items() if v))
+
+
+def import_contents(src):
+	import shutil, tempfile, itertools
+	from .ayame import terminal as term
+
+	left = local.refdir('contents')
+	tempdir = tempfile.TemporaryDirectory()
+	right = tempdir.name
+
+	shutil.unpack_archive(src, extract_dir=right)
+
+	checker = ImportChecker(left, right)
+	checker.report()
+
+	selected = term.select([
+		'copy new contents',
+		'copy new files',
+		'show diff',
+	])
+
+	if selected[0]:
+		for i in checker.right_only:
+			shutil.copytree(os.path.join(right, i), os.path.join(left, i))
+			print(f'copied: {i}')
+
+	if selected[1]:
+		for file in itertools.chain.from_iterable(
+			(os.path.join(k, i) for i in v) for k, v in checker.right_only_files.items()
+		):
+			_left = os.path.join(left, file)
+			if os.path.exists(_left):
+				print(term.mod(f'file already exists {_left}', term.color('red')))
+				continue
+			shutil.copy2(os.path.join(right, file), _left)
+			print(f'copied: {file}')
+
+	if selected[2]:
+		all_files = lambda:itertools.chain.from_iterable(
+			(os.path.join(content, file) for file in files) for content, files in checker.diff_files.items()
+		)
+		for file in all_files():
+			print(''.join(colored_diff_lines(os.path.join(left, file), os.path.join(right, file))))
+
+
+	# print('-'*50)
+	# print('left')
+	# print(os.listdir(left))
+	# print()
+	# print('right')
+	# print(items)
+	# print()
+	# print('right only')
+	# print(right_only)
+	# print()
+	# print('common')
+	# print(common)
+
+
+def export_contents(out):
 	import shutil
 	from datetime import datetime
 
@@ -199,7 +311,11 @@ def add_args(parser):
 
 	p = sub.add_parser('export')
 	p.add_argument('-o', default='.')
-	p.set_defaults(handler=lambda args:export(args.o))
+	p.set_defaults(handler=lambda args:export_contents(args.o))
+
+	p = sub.add_parser('import')
+	p.add_argument('archive')
+	p.set_defaults(handler=lambda args:import_contents(args.archive))
 
 	sub.add_parser('index').set_defaults(handler = lambda _:index.main(full=True))
 	sub.add_parser('install').set_defaults(handler=lambda _:install())
