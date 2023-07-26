@@ -18,7 +18,7 @@ dependencies = [
 gl2f = 'gl2f.__main__:main'
 
 [tool.setuptools.dynamic]
-version = {attr = 'gl2f._v.version'}
+version = {attr = 'gl2f.__version__.version'}
 
 [tool.setuptools_scm]
-write_to = 'gl2f/_v.py'
+write_to = 'gl2f/__version__.py'
