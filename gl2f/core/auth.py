@@ -1,5 +1,15 @@
 import os
 
+class Warn_once:
+	printed = set()
+
+	@staticmethod
+	def print(id, message):
+		from ..ayame import terminal as term
+		if id not in Warn_once.printed:
+			print(term.mod(message, term.color('yellow'), term.inv(), term.bold()))
+			Warn_once.printed.add(id)
+
 def filepath():
 	from . import local
 	return os.path.join(local.home(), 'auth')
@@ -9,7 +19,7 @@ def file():
 	if os.path.exists(path):
 		return path
 	else:
-		print('file not found')
+		Warn_once.print('fileNotFound', 'authorization info not found')
 		return None
 
 def load():
@@ -30,9 +40,10 @@ def remove():
 		os.remove(path)
 
 
+first_unauthorized = True
 def verify(au):
 	import requests
-	return requests.get(
+	res = requests.get(
 		'https://api.fensi.plus/v1/auth/token/verify',
 		cookies={},
 		headers={
@@ -41,15 +52,17 @@ def verify(au):
 	    'x-from': 'https://girls2-fc.jp/page/blogs',
 	    'x-root-origin': 'https://girls2-fc.jp',
 		}).json()
-
+	if res['success']:
+		return res['token']
+	else:
+		Warn_once.print('unauthorized', 'unauthorized')
+		return None
 
 def update(au):
-	res = verify(au)
-	if not res['success']:
-		print('unauthorized')
+	token = verify(au)
+	if not token:
 		return ''
 
-	token = res['token']
 	if token != au:
 		save(token)
 	return token
