@@ -19,7 +19,7 @@ def file():
 	if os.path.exists(path):
 		return path
 	else:
-		print('file not found')
+		Warn_once.print('fileNotFound', 'authorization info not found')
 		return None
 
 def load():
