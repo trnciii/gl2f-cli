@@ -1,5 +1,15 @@
 import os
 
+class Warn_once:
+	printed = set()
+
+	@staticmethod
+	def print(id, message):
+		from ..ayame import terminal as term
+		if id not in Warn_once.printed:
+			print(term.mod(message, term.color('yellow'), term.inv(), term.bold()))
+			Warn_once.printed.add(id)
+
 def filepath():
 	from . import local
 	return os.path.join(local.home(), 'auth')
@@ -30,6 +40,7 @@ def remove():
 		os.remove(path)
 
 
+first_unauthorized = True
 def verify(au):
 	import requests
 	res = requests.get(
@@ -44,7 +55,7 @@ def verify(au):
 	if res['success']:
 		return res['token']
 	else:
-		print('unauthorized')
+		Warn_once.print('unauthorized', 'unauthorized')
 		return None
 
 def update(au):
