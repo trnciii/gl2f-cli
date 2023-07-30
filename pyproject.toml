@@ -10,8 +10,8 @@ dependencies = [
 	'requests',
 	'libsixel-python',
 	'Pillow',
-	'webdriver_manager',
-	'selenium'
+	'webdriver_manager >= 4',
+	'selenium >= 4'
 ]
 
 [project.scripts]
