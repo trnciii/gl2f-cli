@@ -4,7 +4,7 @@ import sys, time
 
 def version():
 	try:
-		from ._v import __version__
+		from .__version__ import __version__
 		return f'gl2f {__version__}'
 	except:
 		return 'No version info found'
