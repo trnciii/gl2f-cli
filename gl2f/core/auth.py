@@ -66,3 +66,33 @@ def update(au):
 	if token != au:
 		save(token)
 	return token
+
+
+def login(email, password):
+	import requests
+	res = requests.post('https://yomo-api.girls2-fc.jp/web/v1/auth/email/signin',
+		headers={
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+			'Referer': 'https://girls2-fc.jp/',
+			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
+			'sec-ch-ua': '"Chromium";v="116", "Not)A;Brand";v="24", "Google Chrome";v="116"',
+			'sec-ch-ua-mobile': '?0',
+			'sec-ch-ua-platform': '"Windows"',
+			'x-from': 'https://girls2-fc.jp/',
+			'x-platform-id': 'web',
+			'x-root-origin': 'https://girls2-fc.jp',
+		},
+		json={
+		'email': email,
+		'password': password,
+		})
+
+	if not res.ok:
+		print('fail:', res.reason)
+		return None
+
+	token = verify(res.json()['token'])
+	if token:
+		save(token)
+	return token

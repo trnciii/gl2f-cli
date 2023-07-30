@@ -245,5 +245,4 @@ twitter 等に伝えてもらっても構いません。
 ## 依存
 
 * requests
-* selenium (`gl2f auth login` で使います)
 * libsixel, libsixel-python, Pillow (画像をターミナル上に表示するため)
