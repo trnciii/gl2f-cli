@@ -232,7 +232,14 @@ def table():
 			'id': '801380069393040517',
 			'key': 'history/girls2',
 			'page': 'Girls2history',
-		}
+		},
+
+		# Happy Summer
+		{
+			'id': '809652098881814530',
+			'key': 'happysummer/pg',
+			'page': 'HappySummerPG',
+		},
 	]
 
 
