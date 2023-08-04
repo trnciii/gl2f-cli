@@ -285,5 +285,6 @@ def active():
 		'radio/lucky2',
 		'gtube',
 		'cm',
-		'wallpaper'
+		'wallpaper',
+		'happysummer/pg'
 	]
