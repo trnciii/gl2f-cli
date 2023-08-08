@@ -2,7 +2,7 @@ import re, html
 from . import local
 from ..ayame import sixel, terminal as term
 import json, os, datetime
-from . import auth
+from . import auth, config
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -63,7 +63,7 @@ class MediaRep:
 					f.write(data.content)
 			image = Image.open(BytesIO(data.content))
 
-		image = sixel.limit(image, (1600, 1600))
+		image = sixel.limit(image, tuple(config.config['image-size']))
 		ret = sixel.to_sixel(image)
 		return ret
 
