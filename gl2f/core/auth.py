@@ -4,11 +4,11 @@ class Warn_once:
 	printed = set()
 
 	@staticmethod
-	def print(id, message):
+	def print(message):
 		from ..ayame import terminal as term
-		if id not in Warn_once.printed:
+		if message not in Warn_once.printed:
 			print(term.mod(message, term.color('yellow'), term.inv(), term.bold()))
-			Warn_once.printed.add(id)
+			Warn_once.printed.add(message)
 
 def filepath():
 	from . import local
@@ -19,7 +19,7 @@ def file():
 	if os.path.exists(path):
 		return path
 	else:
-		Warn_once.print('fileNotFound', 'authorization info not found')
+		Warn_once.print('authorization info not found')
 		return None
 
 def load():
@@ -55,7 +55,7 @@ def verify(au):
 	if res['success']:
 		return res['token']
 	else:
-		Warn_once.print('unauthorized', 'unauthorized')
+		Warn_once.print('unauthorized')
 		return None
 
 def update(au):
