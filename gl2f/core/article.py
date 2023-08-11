@@ -1,8 +1,8 @@
-import re, html
+import re, html, os
 from . import local
 from ..ayame import sixel, terminal as term
-import json, os, datetime
 from . import auth
+from .config import config
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -15,7 +15,7 @@ ptn_http = re.compile(r'(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA
 
 
 class MediaRep:
-	def __init__(self, style, contentId, boardId):
+	def __init__(self, style, contentId, boardId, max_size=None):
 		if style == 'type':
 			self.rep = self.rep_type
 
@@ -26,6 +26,7 @@ class MediaRep:
 			self.contentId = contentId
 			self.dl = partial(dl_medium, boardId, self.contentId, xauth=auth.update(auth.load()))
 			self.rep = self.rep_sixel
+			self.max_size = max_size if max_size else config.get('max-image-size', (1000, 1000))
 
 		elif style == 'none':
 			self.rep = self.rep_none
@@ -45,7 +46,6 @@ class MediaRep:
 	def rep_sixel(self, p):
 		from io import BytesIO
 		from PIL import Image
-		import time
 
 		match = ptn_media.search(p)
 		if not match:
@@ -63,7 +63,7 @@ class MediaRep:
 					f.write(data.content)
 			image = Image.open(BytesIO(data.content))
 
-		image = sixel.limit(image, (1600, 1600))
+		image = sixel.limit(image, self.max_size)
 		ret = sixel.to_sixel(image)
 		return ret
 
@@ -82,7 +82,7 @@ def line_kernel(p, mediarep):
 	return p
 
 
-def lines(item, style, use_sixel):
+def lines(item, style, use_sixel, max_size=None):
 	from concurrent.futures import ThreadPoolExecutor
 	from functools import partial
 
@@ -91,7 +91,7 @@ def lines(item, style, use_sixel):
 		'compact': 'sixel' if use_sixel else 'type_id',
 		'compressed': 'type',
 		'plain': 'none'
-	}[style], item['contentId'], item['boardId']))
+	}[style], item['contentId'], item['boardId'], max_size))
 
 	with ThreadPoolExecutor(max_workers=5) as e:
 		results = e.map(f, (p.group(1) for p in ptn_paragraph.finditer(item['values']['body'])))

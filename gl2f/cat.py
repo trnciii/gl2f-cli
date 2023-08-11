@@ -10,12 +10,14 @@ def cat(i, args):
 		save(i, args)
 	fm = pretty.Formatter()
 	fm.print(i, encoding=args.encoding)
-	for s in article.lines(i, args.style, args.sixel):
+	for s in article.lines(i, args.style, args.sixel, args.max_size):
 		term.write_with_encoding(s, encoding=args.encoding, errors='ignore')
 	term.write_with_encoding('\n', encoding=args.encoding)
 
 
 def subcommand(args):
+	args.max_size = (args.width, args.height) if (args.width or args.height) else None
+
 	if args.board.startswith('https'):
 		cat(lister.fetch_content(args.board, dump=args.dump), args)
 		return
@@ -51,6 +53,10 @@ def add_args(parser):
 		help='select articles to show')
 	parser.add_argument('--dl', action='store_true',
 		help='also downloads the article')
+	parser.add_argument('-W', '--width', type=int,
+		help='set max image width')
+	parser.add_argument('-H', '--height', type=int,
+		help='set max image height')
 
 	# options from dl
 	parser.add_argument('--stream', action='store_true',

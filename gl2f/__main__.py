@@ -10,7 +10,7 @@ def version():
 		return 'No version info found'
 
 def main():
-	from . import auth, local
+	from . import auth, local, config
 	from .core import lister
 	from .ayame import sixel
 
@@ -21,6 +21,8 @@ def main():
 
 	parser_auth = subparsers.add_parser('auth')
 	auth.add_args(parser_auth)
+
+	config.add_args(subparsers.add_parser('config'))
 
 	local.add_args(subparsers.add_parser('local'))
 

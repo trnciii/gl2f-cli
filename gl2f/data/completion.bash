@@ -27,7 +27,7 @@ _gl2f(){
 
   case $cword in
     1)
-      COMPREPLY=( $(compgen -W 'auth cat dl local ls open search completion' -- "$cur") )
+      COMPREPLY=( $(compgen -W 'auth cat dl local ls open search completion config' -- "$cur") )
       ;;
     *)
       case ${words[1]} in
@@ -36,6 +36,9 @@ _gl2f(){
           ;;
         local)
           COMPREPLY=( $(compgen -W 'clear-cache dir index install ls stat open build' -- "$cur") )
+          ;;
+        config)
+          COMPREPLY=( $(compgen -W 'create path view ' -- "$cur") )
           ;;
         cat | dl | ls | open | search)
           __gl2f_complete_boards
