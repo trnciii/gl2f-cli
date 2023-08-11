@@ -38,7 +38,7 @@ _gl2f(){
           COMPREPLY=( $(compgen -W 'clear-cache dir index install ls stat open build' -- "$cur") )
           ;;
         config)
-          COMPREPLY=( $(compgen -W 'create path view ' -- "$cur") )
+          COMPREPLY=( $(compgen -W 'create edit path view' -- "$cur") )
           ;;
         cat | dl | ls | open | search)
           __gl2f_complete_boards
