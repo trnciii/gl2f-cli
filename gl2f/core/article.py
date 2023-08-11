@@ -1,8 +1,8 @@
-import re, html
+import re, html, os
 from . import local
 from ..ayame import sixel, terminal as term
-import json, os, datetime
-from . import auth, config
+from . import auth
+from .config import config
 
 
 ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
@@ -26,6 +26,7 @@ class MediaRep:
 			self.contentId = contentId
 			self.dl = partial(dl_medium, boardId, self.contentId, xauth=auth.update(auth.load()))
 			self.rep = self.rep_sixel
+			self.max_size = config.get('max-image-size', (1000, 1000))
 
 		elif style == 'none':
 			self.rep = self.rep_none
@@ -45,7 +46,6 @@ class MediaRep:
 	def rep_sixel(self, p):
 		from io import BytesIO
 		from PIL import Image
-		import time
 
 		match = ptn_media.search(p)
 		if not match:
@@ -63,7 +63,7 @@ class MediaRep:
 					f.write(data.content)
 			image = Image.open(BytesIO(data.content))
 
-		image = sixel.limit(image, tuple(config.config['image-size']))
+		image = sixel.limit(image, self.max_size)
 		ret = sixel.to_sixel(image)
 		return ret
 

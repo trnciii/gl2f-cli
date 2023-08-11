@@ -5,7 +5,7 @@ from ..__version__ import version
 def default():
 	return {
 		'version': version,
-		'image-size': [1000, 1000]
+		'max-image-size': [1000, 1000]
 	}
 
 file = lambda: os.path.join(local.home(), 'config.json')
