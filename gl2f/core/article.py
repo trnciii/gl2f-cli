@@ -15,7 +15,7 @@ ptn_http = re.compile(r'(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA
 
 
 class MediaRep:
-	def __init__(self, style, contentId, boardId):
+	def __init__(self, style, contentId, boardId, max_size=None):
 		if style == 'type':
 			self.rep = self.rep_type
 
@@ -26,7 +26,7 @@ class MediaRep:
 			self.contentId = contentId
 			self.dl = partial(dl_medium, boardId, self.contentId, xauth=auth.update(auth.load()))
 			self.rep = self.rep_sixel
-			self.max_size = config.get('max-image-size', (1000, 1000))
+			self.max_size = max_size if max_size else config.get('max-image-size', (1000, 1000))
 
 		elif style == 'none':
 			self.rep = self.rep_none
@@ -82,7 +82,7 @@ def line_kernel(p, mediarep):
 	return p
 
 
-def lines(item, style, use_sixel):
+def lines(item, style, use_sixel, max_size=None):
 	from concurrent.futures import ThreadPoolExecutor
 	from functools import partial
 
@@ -91,7 +91,7 @@ def lines(item, style, use_sixel):
 		'compact': 'sixel' if use_sixel else 'type_id',
 		'compressed': 'type',
 		'plain': 'none'
-	}[style], item['contentId'], item['boardId']))
+	}[style], item['contentId'], item['boardId'], max_size))
 
 	with ThreadPoolExecutor(max_workers=5) as e:
 		results = e.map(f, (p.group(1) for p in ptn_paragraph.finditer(item['values']['body'])))
