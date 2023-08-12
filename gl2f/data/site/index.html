@@ -59,6 +59,10 @@ const f = {
 		key:'date',
 		data:(k, v)=>`${new Date(v['date']).toLocaleDateString('ja-JP')}`,
 	},
+	Expired:{
+		key:'expired',
+		data:(k, v)=> v['expired']? new Date(v['expired']).toLocaleDateString('ja-JP') : ""
+	},
 	Page:{
 		key:'board',
 		data:(k, v)=>`<a href='https://girls2-fc.jp/page/${v['board']}' target='_blank'>${v['board']}</a>`,
