@@ -45,7 +45,7 @@ def install():
 	cp(src, dst)
 	print(f'copied site into {dst}')
 
-	index.main()
+	index.main(full=True)
 
 
 class index:
