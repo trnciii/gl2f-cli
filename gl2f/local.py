@@ -264,6 +264,22 @@ def import_contents(src):
 		for diff in diffs:
 			print(diff)
 
+		if 'n' != input('Freeze conflicting files? (Y/n)').lower():
+			default = os.path.splitext(f'diff-{os.path.basename(src)}')[0]
+			o = input(f'Enter output directory name ({default})')
+			if not o:
+				o = default
+
+			os.makedirs(o, exist_ok=True)
+
+			with open(os.path.join(o, 'diff'), 'w', encoding='utf-8') as f:
+				f.write(term.declip('\n'.join(diffs)))
+
+			for file in checker.all_files():
+				src = os.path.join(right, file)
+				dst = os.path.join(o, file)
+				os.makedirs(os.path.dirname(dst), exist_ok=True)
+				shutil.copy(src, dst)
 
 def export_contents(out):
 	import shutil
