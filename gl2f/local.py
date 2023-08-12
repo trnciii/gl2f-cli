@@ -37,7 +37,7 @@ def install():
 	dst = os.path.join(local.home(), file)
 
 	if os.path.exists(dst):
-		print(f'reinstalling {dst} that already exits')
+		print(f'reinstalling {dst} that already exists')
 		rm = shutil.rmtree if os.path.isdir(dst) else os.remove
 		rm(dst)
 
@@ -215,9 +215,17 @@ class ImportChecker:
 		print(f'{sum(map(len, self.unknown.values()))} unchecked subdirs')
 		print('\n'.join(f'\t{k}\n\t\t{v}' for k, v in self.unknown.items() if v))
 
+	def all_files(self):
+		from itertools import chain
+		return chain.from_iterable((os.path.join(c, f) for f in fs) for c, fs in self.diff_files.items())
+
+	def new_files(self):
+		from itertools import chain
+		return chain.from_iterable((os.path.join(k, i) for i in v) for k, v in self.right_only_files.items())
+
 
 def import_contents(src):
-	import shutil, tempfile, itertools
+	import shutil, tempfile
 	from .ayame import terminal as term
 
 	left = local.refdir('contents')
@@ -239,38 +247,22 @@ def import_contents(src):
 		for i in checker.right_only:
 			shutil.copytree(os.path.join(right, i), os.path.join(left, i))
 			print(f'copied: {i}')
+		print()
 
 	if selected[1]:
-		for file in itertools.chain.from_iterable(
-			(os.path.join(k, i) for i in v) for k, v in checker.right_only_files.items()
-		):
+		for file in checker.new_files():
 			_left = os.path.join(left, file)
 			if os.path.exists(_left):
 				print(term.mod(f'file already exists {_left}', term.color('red')))
 				continue
 			shutil.copy2(os.path.join(right, file), _left)
 			print(f'copied: {file}')
+		print()
 
 	if selected[2]:
-		all_files = lambda:itertools.chain.from_iterable(
-			(os.path.join(content, file) for file in files) for content, files in checker.diff_files.items()
-		)
-		for file in all_files():
-			print(''.join(colored_diff_lines(os.path.join(left, file), os.path.join(right, file))))
-
-
-	# print('-'*50)
-	# print('left')
-	# print(os.listdir(left))
-	# print()
-	# print('right')
-	# print(items)
-	# print()
-	# print('right only')
-	# print(right_only)
-	# print()
-	# print('common')
-	# print(common)
+		diffs = [''.join(colored_diff_lines(os.path.join(left, f), os.path.join(right, f))) for f in checker.all_files()]
+		for diff in diffs:
+			print(diff)
 
 
 def export_contents(out):
