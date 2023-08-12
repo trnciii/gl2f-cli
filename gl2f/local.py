@@ -77,7 +77,8 @@ class index:
 					(os.path.splitext(i) for i in local.listdir(os.path.join('contents', i)))
 				),
 				key=lambda x:media.index(x[0])
-			)]
+			)],
+			'expired': item.get('closingAt', None)
 		}
 
 
