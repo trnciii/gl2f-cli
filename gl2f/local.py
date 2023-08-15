@@ -22,12 +22,6 @@ def clear_cache():
 		for i in os.listdir(d):
 			os.remove(os.path.join(d, i))
 
-def stat():
-	for _par in ['contents', 'cache']:
-		if par:=local.refdir_untouch(_par):
-			size = sum(sum( os.path.getsize(os.path.join(p,_f)) for _f in f ) for p,_,f in os.walk(par))
-			print(f'{_par+"/":10} items: {len(os.listdir(par))} size: {size/(1024**3):,.2f} GB')
-
 
 def install():
 	import shutil
@@ -232,6 +226,7 @@ def import_contents(src):
 	tempdir = tempfile.TemporaryDirectory()
 	right = tempdir.name
 
+	print(f'extracting archive ({os.path.getsize(src)/1024**3:.2f} GB).')
 	shutil.unpack_archive(src, extract_dir=right)
 
 	checker = ImportChecker(left, right)
@@ -302,7 +297,8 @@ def export_contents(out):
 
 		base = out
 
-	print('zipping contents into', base)
+	sizeInGb = local.stat()["contents"]["size"]/1024**3
+	print(f'zipping contents into {base}.zip ({sizeInGb:.2f} GB)')
 	shutil.make_archive(base, 'zip', root_dir=contents)
 
 
@@ -335,5 +331,5 @@ def add_args(parser):
 	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')
 
-	sub.add_parser('stat').set_defaults(handler=lambda _:stat())
+	sub.add_parser('stat').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.stat().items())))
 	sub.add_parser('open').set_defaults(handler=lambda _:open_site())
