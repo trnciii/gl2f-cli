@@ -184,6 +184,7 @@ class ImportChecker:
 		self.right_only = [i for i in self.items if i not in self.common]
 		self.compare = {i:dircmp(os.path.join(left, i), os.path.join(right, i)) for i in self.common}
 
+		self.identical = [k for k, v in self.compare.items() if not v.diff_files]
 		self.diff_files = {k:v.diff_files for k, v in self.compare.items() if v.diff_files}
 		self.right_only_files = {k: list(filter(
 			lambda f: os.path.isfile(os.path.join(right, k, f)),
@@ -197,8 +198,14 @@ class ImportChecker:
 		}
 
 	def report(self):
-		print(f'{len(self.right_only)} new content dirs')
-		if(self.right_only): print(f'\t{self.right_only}')
+		print(f'{len(self.items)} total contents')
+		print('\t', ' '.join(self.items))
+
+		print(f'{len(self.identical)} same contents')
+		print('\t', ' '.join(self.identical))
+
+		print(f'{len(self.right_only)} new contents')
+		print(' '.join(self.right_only))
 
 		print(f'{sum(map(len, self.right_only_files.values()))} new files')
 		print('\n'.join(f'\t{k}\n\t\t{v}' for k, v in self.right_only_files.items() if v))
