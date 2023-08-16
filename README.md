@@ -54,7 +54,7 @@
 
 三つのインストール方法があります。
 
-**また、Github Codespaces のターミナルが画像の表示に対応したのでほとんどの機能を簡単に試せるようになりました。**
+また、**Visual Studio Code for web のターミナルで画像を表示できるようになった**ので、 Github Codespaces を使えばブラウザ上でほとんどの機能を簡単に試すことができます。
 Codespace 作成後、 `. install.sh` を実行することでgl2f が使用可能になります。
 
 ### 1. pip + git を使う
