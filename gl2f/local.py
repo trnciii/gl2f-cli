@@ -256,6 +256,7 @@ def import_contents(src):
 		print()
 
 	def show_diff():
+		nonlocal src
 		diffs = [''.join(colored_diff_lines(os.path.join(left, f), os.path.join(right, f))) for f in checker.all_files()]
 		for diff in diffs:
 			print(diff)
