@@ -239,19 +239,13 @@ def import_contents(src):
 	checker = ImportChecker(left, right)
 	checker.report()
 
-	selected = term.select([
-		'copy new contents',
-		'copy new files',
-		'show diff',
-	])
-
-	if selected[0]:
+	def copy_new_contents():
 		for i in checker.right_only:
 			shutil.copytree(os.path.join(right, i), os.path.join(left, i))
 			print(f'copied: {i}')
 		print()
 
-	if selected[1]:
+	def copy_new_files():
 		for file in checker.new_files():
 			_left = os.path.join(left, file)
 			if os.path.exists(_left):
@@ -261,7 +255,7 @@ def import_contents(src):
 			print(f'copied: {file}')
 		print()
 
-	if selected[2]:
+	def show_diff():
 		diffs = [''.join(colored_diff_lines(os.path.join(left, f), os.path.join(right, f))) for f in checker.all_files()]
 		for diff in diffs:
 			print(diff)
@@ -282,6 +276,15 @@ def import_contents(src):
 				dst = os.path.join(o, file)
 				os.makedirs(os.path.dirname(dst), exist_ok=True)
 				shutil.copy(src, dst)
+
+	operations = list(filter(lambda x: x[2](), [
+		('copy new contents', copy_new_contents, lambda: len(checker.right_only)),
+		('copy new files', copy_new_files, lambda: any(checker.new_files())),
+		('show diff', show_diff, lambda: len(checker.diff_files))
+	]))
+	selection = term.select([k for k, _, _ in operations])
+	for s, (_, o, _) in zip(selection, operations):
+		if s: o()
 
 def export_contents(out):
 	import shutil
