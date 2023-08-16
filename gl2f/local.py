@@ -4,7 +4,7 @@ from .core import pretty, local
 
 
 def ls(args):
-	items = [local.load_content(i) for i in local.listdir('contents')]
+	items = [local.load_content(i) for i in sorted(local.listdir('contents'))]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
