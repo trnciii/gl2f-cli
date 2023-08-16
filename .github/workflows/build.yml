@@ -70,9 +70,3 @@ jobs:
             windows.zip
             macos.zip
             source.zip
-
-      - run: |
-          git fetch
-          git switch release
-          git reset --hard ${{ github.ref_name }}
-          git push origin release
