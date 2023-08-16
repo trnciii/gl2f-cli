@@ -61,6 +61,11 @@ def search_media(mediaId, contentId=None):
 	except:
 		return None
 
+def stat():
+	return {os.path.basename(p): {
+		'count': len(os.listdir(p)),
+		'size': sum(sum( os.path.getsize(os.path.join(d,_f)) for _f in f ) for d,_,f in os.walk(p))
+	} for p in filter(lambda x:x, map(refdir_untouch, ['contents', 'cache']))}
 
 def package_data(f=''):
 	import gl2f

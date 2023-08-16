@@ -35,7 +35,15 @@ _gl2f(){
           COMPREPLY=( $(compgen -W 'file load login remove update set-token' -- "$cur") )
           ;;
         local)
-          COMPREPLY=( $(compgen -W 'clear-cache dir index install ls stat open build' -- "$cur") )
+          if [[ $cword == 2 ]]; then
+            COMPREPLY=( $(compgen -W 'clear-cache dir export import index install ls stat open build' -- "$cur") )
+          else
+            case ${words[2]} in
+              import)
+                _filedir
+                ;;
+              esac
+          fi
           ;;
         config)
           COMPREPLY=( $(compgen -W 'create edit path view' -- "$cur") )
