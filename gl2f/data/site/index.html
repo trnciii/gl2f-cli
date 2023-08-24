@@ -53,7 +53,7 @@ tr:nth-child(odd) td{
 <script type="text/javascript">
 const f = {
 	ID:{
-		data:(k, v)=>`<a href='../contents/${k}'>${k}</a>`
+		data:(k, v)=>`<a href='./contents/${k}'>${k}</a>`
 	},
 	Date:{
 		key:'date',
@@ -131,6 +131,7 @@ document.getElementById('columns').innerHTML = keys.map(
 ).join('');
 
 document.getElementById('col_ID').checked = false;
+document.getElementById('col_Expired').checked = false;
 
 keys.map(k=>document.getElementById(`col_${k}`))
 .forEach(b=>b.addEventListener('change', draw));
