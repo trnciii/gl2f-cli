@@ -316,9 +316,19 @@ def export_contents(out):
 	print(f'zipping contents into {base}.zip ({sizeInGb:.2f} GB)')
 	shutil.make_archive(base, 'zip', root_dir=contents)
 
+def get_local_ip():
+	import socket
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	try:
+		s.connect(('8.8.8.8', 80))
+		return s.getsockname()[0]
+	except:
+		return '127.0.0.1'
+	finally:
+		s.close()
 
 def serve():
-	import http.server, socketserver
+	import http.server, socketserver, socket
 
 	site = local.refdir_untouch('site')
 	if not site:
@@ -338,7 +348,8 @@ def serve():
 	port = 8000
 
 	with socketserver.TCPServer(('', port), Handler) as httpd:
-		print(f'serving at http://localhost:{port}')
+		ip = get_local_ip()
+		print(f'serving at http://{ip}:{port}')
 		httpd.serve_forever()
 
 
