@@ -37,9 +37,12 @@ def install():
 
 	cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
 	cp(src, dst)
-	print(f'copied site into {dst}')
+
+	os.symlink(local.refdir('contents'), os.path.join(dst, 'contents'))
 
 	index.main(full=True)
+
+	print(f'installed site into {dst}')
 
 
 class index:
@@ -314,6 +317,31 @@ def export_contents(out):
 	shutil.make_archive(base, 'zip', root_dir=contents)
 
 
+def serve():
+	import http.server, socketserver
+
+	site = local.refdir_untouch('site')
+	if not site:
+		print('site not installed')
+		return
+
+
+	class Handler(http.server.SimpleHTTPRequestHandler):
+		def __init__(self, *args, **kwargs):
+			super().__init__(*args, directory=site, **kwargs)
+
+		def end_headers(self):
+			self.send_header('Cache-Control', 'max-age=0')
+			self.send_header('Expires', '0')
+			super().end_headers()
+
+	port = 8000
+
+	with socketserver.TCPServer(('', port), Handler) as httpd:
+		print(f'serving at http://localhost:{port}')
+		httpd.serve_forever()
+
+
 def add_args(parser):
 	sub = parser.add_subparsers()
 
@@ -343,5 +371,6 @@ def add_args(parser):
 	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')
 
-	sub.add_parser('stat').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.stat().items())))
 	sub.add_parser('open').set_defaults(handler=lambda _:open_site())
+	sub.add_parser('stat').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.stat().items())))
+	sub.add_parser('serve').set_defaults(handler=lambda _:serve())

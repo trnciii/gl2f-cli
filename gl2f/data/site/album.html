@@ -53,10 +53,15 @@
 <script src="index.js"></script>
 <script>
 const contentId = location.search.split("?")[1];
-const dir = `../contents/${contentId}`
+const dir = `contents/${contentId}`
 const media_table = table[contentId]['media'];
-const home = location.href.split('file:///')[1].split('/site/')[0];
-const filepath = `${home}/contents/${contentId}`;
+const filepath = '';
+try{
+  const home = location.href.split('file:///')[1].split('/site/')[0];
+  filepath = `${home}/contents/${contentId}`;
+}
+catch{
+}
 
 document.title = `Album ${table[contentId]['title']}`
 
