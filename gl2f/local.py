@@ -327,7 +327,7 @@ def get_local_ip():
 	finally:
 		s.close()
 
-def serve():
+def serve(port):
 	import http.server, socketserver, socket
 
 	site = local.refdir_untouch('site')
@@ -344,8 +344,6 @@ def serve():
 			self.send_header('Cache-Control', 'max-age=0')
 			self.send_header('Expires', '0')
 			super().end_headers()
-
-	port = 8000
 
 	with socketserver.TCPServer(('', port), Handler) as httpd:
 		ip = get_local_ip()
@@ -384,4 +382,6 @@ def add_args(parser):
 
 	sub.add_parser('open').set_defaults(handler=lambda _:open_site())
 	sub.add_parser('stat').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.stat().items())))
-	sub.add_parser('serve').set_defaults(handler=lambda _:serve())
+	p = sub.add_parser('serve')
+	p.add_argument('-p', '--port', type=int,  default=8000)
+	p.set_defaults(handler=lambda args:serve(args.port))
