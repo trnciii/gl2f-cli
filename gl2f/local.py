@@ -346,10 +346,13 @@ def serve(port):
 			super().end_headers()
 
 	with socketserver.TCPServer(('', port), Handler) as httpd:
-		ip = get_local_ip()
-		print(f'serving at http://{ip}:{port}')
-		httpd.serve_forever()
-
+		print(f'serving at http://{get_local_ip()}:{port}')
+		try:
+			httpd.serve_forever()
+		except  KeyboardInterrupt:
+			pass
+		finally:
+			httpd.server_close()
 
 def add_args(parser):
 	sub = parser.add_subparsers()
