@@ -1,0 +1,37 @@
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
+<style>
+img, video{
+  display: flex;
+  margin: auto;
+  max-width: 100%;
+  max-height: 90vh;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div style="display:block;width:820px;margin:auto;">
+    <a id=title href={board.content_url(item)} style="margin:0;font-size:20;font-weight:bold;"></a>
+    <div id=meta style="font-size:14;margin:0;"/>
+  </div>
+</header>
+
+<main><div style="max-width:800px;margin:auto;">
+  <span id='body'/>
+</div></main>
+
+<script src="index.js"></script>
+<script>
+const contentId = location.search.split('?')[1];
+const content = table[contentId]
+
+document.getElementById('title').innerHTML = `<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} style="margin:0;font-size:20;font-weight:bold;">${content['title']}</a>`;
+document.getElementById('meta').innerHTML = `${content['author']}&nbsp;${new Date(content['date']).toLocaleDateString('ja-JP')}&ensp;<a href=album.html?${contentId}>Album</a>`;
+document.getElementById('body').innerHTML = content['body'];
+</script>
+
+</body>

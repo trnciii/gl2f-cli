@@ -33,6 +33,8 @@
 <header>
   <div style="display: flex; margin-right: auto;">
     <a class="buttonlike item" href=./index.html>home</a>
+    &nbsp;/&nbsp;
+    <span id=toArticle></span>
     &nbsp;/
     <label class='buttonlike'><input id='list' class=buttonlike type='checkbox' onchange='draw()'>list</label>
   </div>
@@ -64,6 +66,8 @@ catch{
 }
 
 document.title = `Album ${table[contentId]['title']}`
+
+document.getElementById('toArticle').innerHTML = `<a href=article.html?${contentId}>article</a>`;
 
 document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page/${table[contentId]['board']}/${contentId}' target='blank'>${table[contentId]['title']}</a>`;
 
