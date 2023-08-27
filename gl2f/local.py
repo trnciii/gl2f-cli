@@ -216,7 +216,7 @@ class ImportChecker:
 		print(f'{sum(map(len, self.unknown.values()))} unchecked subdirs')
 		print('\n'.join(f'\t{k}\n\t\t{v}' for k, v in self.unknown.items() if v))
 
-	def all_files(self):
+	def all_diff_files(self):
 		from itertools import chain
 		return chain.from_iterable((os.path.join(c, f) for f in fs) for c, fs in self.diff_files.items())
 
@@ -239,6 +239,13 @@ def import_contents(src):
 	checker = ImportChecker(left, right)
 	checker.report()
 
+	def view():
+		fm = pretty.Formatter(f='id:date-p:author:title', fd='%m/%d')
+		for i in os.listdir(right):
+			filepath = os.path.join(right, i, f'{i}.json')
+			with open(filepath, encoding='utf-8') as f:
+				fm.print(json.load(f))
+
 	def copy_new_contents():
 		for i in checker.right_only:
 			shutil.copytree(os.path.join(right, i), os.path.join(left, i))
@@ -257,7 +264,7 @@ def import_contents(src):
 
 	def show_diff():
 		nonlocal src
-		diffs = [''.join(colored_diff_lines(os.path.join(left, f), os.path.join(right, f))) for f in checker.all_files()]
+		diffs = [''.join(colored_diff_lines(os.path.join(left, f), os.path.join(right, f))) for f in checker.all_diff_files()]
 		for diff in diffs:
 			print(diff)
 
@@ -272,13 +279,14 @@ def import_contents(src):
 			with open(os.path.join(o, 'diff'), 'w', encoding='utf-8') as f:
 				f.write(term.declip('\n'.join(diffs)))
 
-			for file in checker.all_files():
+			for file in checker.all_diff_files():
 				src = os.path.join(right, file)
 				dst = os.path.join(o, file)
 				os.makedirs(os.path.dirname(dst), exist_ok=True)
 				shutil.copy(src, dst)
 
 	operations = list(filter(lambda x: x[2](), [
+		('view all contents', view, lambda: True),
 		('copy new contents', copy_new_contents, lambda: len(checker.right_only)),
 		('copy new files', copy_new_files, lambda: any(checker.new_files())),
 		('show diff', show_diff, lambda: len(checker.diff_files))
