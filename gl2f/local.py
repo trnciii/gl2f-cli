@@ -125,38 +125,56 @@ def open_site():
 	webbrowser.open(f'file://{html}')
 
 
-def create_html(item):
-	from .core import article
+def build(i):
+	from .core import article, board
 
-	i = item['contentId']
-	body = item['values']['body']
-	contents = local.refdir_untouch('contents')
-	li = local.listdir(f'contents/{i}')
+	item = local.load_content(i)
+	media_list = local.listdir(f'contents/{i}')
 
 	def up(match):
 		m, t = match.groups()
 		try:
-			p = next(p for p in li if p.startswith(m))
+			p = next(p for p in media_list if p.startswith(m))
 		except:
 			return ''
 
 		if t == 'image':
-			return f'<img src={contents}/{i}/{p} width=100%></img>'
+			return f'<img src=../contents/{i}/{p}></img>'
 		elif t == 'video':
-			return f'<video controls autoplay muted loop src={contents}/{i}/{p} width=100%></video>'
+			return f'<video controls autoplay muted loop src=../contents/{i}/{p}></video>'
 		else:
 			return ''
 
-	return article.ptn_media.sub(up, body)
+	body = article.ptn_media.sub(up, item['values']['body'])
 
+	fm = pretty.Formatter(fd='%Y/%m/%d')
+	encoding = 'utf-8'
+	html = f'''<head>
+<meta charset="{encoding}">
+<link rel="stylesheet" href="../style.css">
+<style>
+img, video{{
+  display: flex;
+  margin: auto;
+  max-width: 100%;
+  max-height: 90vh;
+}}
+</style>
+</head>
+<body>
+<header><div style="display:block;width:820px;margin:auto;">
+<a href={board.content_url(item)} style="margin:0;font-size:20;font-weight:bold;">{item['values']['title']}</a>
+<div style="font-size:14;margin:0;">{fm.author(item, nomod=True)}&nbsp;{fm.date_p(item)}</div>
+</div></header>
+<main><div style="max-width:800px;margin:auto;">{body}</div></main>
+</body>
+'''
 
-def build(i, view=False):
-	page = os.path.join(local.refdir('site/pages'), f'{i}.html')
-	body = create_html(local.load_content(i))
-	with open(page, 'w', encoding='utf-8') as f:
-		f.write(body)
+	page_path = os.path.join(local.refdir('site/pages'), f'{i}.html')
+	with open(page_path, 'w', encoding=encoding) as f:
+		f.write(html)
 
-	print(f'saved file:///{page}')
+	print(f'saved file:///{page_path}')
 
 
 def colored_diff_lines(left, right):
@@ -359,8 +377,7 @@ def add_args(parser):
 
 	p = sub.add_parser('build')
 	p.add_argument('content_id')
-	p.add_argument('--view', action='store_true')
-	p.set_defaults(handler=lambda args: build(args.content_id, args.view))
+	p.set_defaults(handler=lambda args: build(args.content_id))
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
