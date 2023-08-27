@@ -29,7 +29,6 @@
 
 <body>
 
-<header id='filepath' style="padding: 0 4; font-size: 11;"></header>
 <header>
   <div style="display: flex; margin-right: auto;">
     <a class="buttonlike item" href=./index.html>home</a>
@@ -57,23 +56,12 @@
 const contentId = location.search.split("?")[1];
 const dir = `contents/${contentId}`
 const media_table = table[contentId]['media'];
-const filepath = '';
-try{
-  const home = location.href.split('file:///')[1].split('/site/')[0];
-  filepath = `${home}/contents/${contentId}`;
-}
-catch{
-}
 
 document.title = `Album ${table[contentId]['title']}`
 
 document.getElementById('toArticle').innerHTML = `<a href=article.html?${contentId}>article</a>`;
 
 document.getElementById('title').innerHTML = `<a href='https://girls2-fc.jp/page/${table[contentId]['board']}/${contentId}' target='blank'>${table[contentId]['title']}</a>`;
-
-document.getElementById('filepath').innerHTML = `<a href=${filepath}>${filepath}</a>`
-  + '&ensp;'
-  + `<button class='buttonlike item' id='copy_path' onclick='navigator.clipboard.writeText("${filepath}");' style='padding: 0 1; font-size: 11;'>copy</button>`;
 
 const cols = document.getElementById('cols');
 cols.value = Math.min(
