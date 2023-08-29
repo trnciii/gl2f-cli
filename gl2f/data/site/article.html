@@ -1,23 +1,49 @@
 <head>
 <meta charset="utf-8">
+
 <link rel="stylesheet" href="style.css">
+
 <style>
 img, video{
   display: flex;
-  margin: auto;
+  margin: 8px;
   max-width: 100%;
-  max-height: 90vh;
+  max-height: calc(100vh - 150px);
+}
+
+
+.header-title{
+  width: 820px;
+}
+
+/* Media query for narrow screens (adjust the max-width as needed) */
+@media screen and (max-width: 960px) {
+  .blog-header {
+    flex-direction: column; /* Stack sections vertically on narrow screens */
+    align-items: stretch; /* Stretch sections to full width */
+  }
+
+  .header-links,
+  .header-title{
+    width: 100%; /* Take full width on narrow screens */
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div style="display:block;width:820px;margin:auto;">
+<header class="blog-header">
+    <nav id=links class="header-links"></nav>
+
+  <div class="header-title">
     <div id=title></div>
-    <div id=meta style="font-size:14;margin:0;"></div>
+    <div id=meta class=title-meta></div>
   </div>
+
+  <div class="header-controls">
+  </div>
+
 </header>
 
 <main><div style="max-width:800px;margin:auto;">
@@ -29,8 +55,29 @@ img, video{
 const contentId = location.search.split('?')[1];
 const content = table[contentId]
 
-document.getElementById('title').innerHTML = `<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} style="margin:0;font-size:20;font-weight:bold;">${content['title']}</a>`;
-document.getElementById('meta').innerHTML = `${content['author']}&nbsp;${new Date(content['date']).toLocaleDateString('ja-JP')}&ensp;<a href=album.html?${contentId}>Album</a>`;
+document.title = content['title']
+
+document.getElementById('links').innerHTML = [
+  {
+    label: 'home',
+    href: 'index.html',
+  },
+  {
+    label: 'album',
+    href: `album.html?${contentId}`,
+  },
+]
+.map(i => `<a href=${i['href']}>${i['label']}</a>`)
+.join('');
+
+
+document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
+document.getElementById('meta').innerHTML = [
+ content['author'],
+ new Date(content['date']).toLocaleDateString('ja-JP'),
+ `<a href=https://girls2-fc.jp/page/${content['board']}/${contentId}>${content['board']}</a>`
+].join('&nbsp;');
+
 document.getElementById('body').innerHTML = content['body'];
 </script>
 

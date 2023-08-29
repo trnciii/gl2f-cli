@@ -6,7 +6,7 @@
 <style>
 
 table{
-	margin-top:10px;
+	margin:0;
 	border-collapse:collapse;
 }
 
@@ -34,7 +34,7 @@ tr:nth-child(odd) td{
 
 <body>
 
-<header>
+<header style="justify-content: left;">
 	<span id='columns'></span>
 	<div style='margin-left:8px;'>
 		<select id=filter_board onchange="draw()"></select>
@@ -74,7 +74,9 @@ const f = {
 	},
 	Title:{
 		key:'title',
-		data:(k, v)=>`<a href=article.html?${k}>${v['title']}</a>&nbsp;/&nbsp;<a href=album.html?${k}>Album</a>`,
+		data:(k, v)=>['girls2radio', 'lucky2radio'].includes(v['board'])?
+			`<a href=album.html?${k}>${v['title']}</a>`
+			: `<a href=article.html?${k}>${v['title']}</a>&nbsp;/&nbsp;<a href=album.html?${k}>Album</a>`,
 	},
 };
 
