@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = 'gl2f'
 description = 'CLI tools for GL2 family'
 license = { text = 'PolyForm-Noncommercial-1.0.0' }
+readme = "README.md"
 dynamic = ['version']
 dependencies = [
 	'requests',
@@ -25,3 +26,6 @@ version = {attr = 'gl2f.__version__.version'}
 
 [tool.setuptools_scm]
 write_to = 'gl2f/__version__.py'
+
+[project.urls]
+"Homepage" = "https://github.com/trnciii/gl2f-cli"
