@@ -57,32 +57,28 @@
 また、**Visual Studio Code for web のターミナルで画像を表示できるようになった**ので、 Github Codespaces を使えばブラウザ上でほとんどの機能を簡単に試すことができます。
 Codespace 作成後、 `. install.sh` を実行することでgl2f が使用可能になります。
 
-### 1. pip + git を使う
 
-Python3, pip, git の環境があればこのリポジトリから直接インストールできます。
+### 1. pip を使う
 
-```sh
-pip install git+https://github.com/trnciii/gl2f-cli@release
-```
-
-### 2. ソースファイルから pip でインストールする
-
-Gitが無い場合はソースを落としてpipでインストールできます。
-まず[Release](https://github.com/trnciii/gl2f-cli/releases/latest)の `source.zip` をダウンロードます。
-( `Source code (zip), Source code (tar.gz)` ではありません! )
-ファイルを展開し、そのフォルダに対して次のコマンドを実行してください。
+Python3, pip の環境があれば [PyPI](https://pypi.org/project/gl2f/) に公開されているパッケージからインストールできます。
 
 ```sh
-pip install <path/to/extracted/directory>
+pip install gl2f
 ```
 
-
-### 3. 実行ファイルをダウンロードする
+### 2. 実行ファイルをダウンロードする
 
 Windows と MacOS では、ダウンロードしてすぐ使えるアプリケーションをリリースしています。
 
 https://github.com/trnciii/gl2f-cli/releases
 
+### 3. このリポジトリから直接インストールする
+
+Python3, pip, git の環境があればこのリポジトリから直接インストールできます。
+
+```sh
+pip install git+https://github.com/trnciii/gl2f-cli
+```
 
 いま配布しているアプリケーションには署名ができていないため、システムのセキュリティによってマルウェアの判定を食らいます。
 作者を信用していただける場合は、以下の方法で動作を許可してください。
@@ -98,7 +94,7 @@ https://github.com/trnciii/gl2f-cli/releases
 
 ターミナルを開き、以下のコマンドでファイルの権限を変更します。
 ```sh
-chmod 755 path/to/gl2f
+chmod +x <path/to/gl2f>
 ```
 
 ### コマンドの補完スクリプト
