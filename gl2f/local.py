@@ -316,8 +316,9 @@ def get_local_ip():
 	finally:
 		s.close()
 
-def serve(port):
+def serve(port, browse=False):
 	import http.server, socketserver, socket
+	import webbrowser
 
 	site = local.refdir_untouch('site')
 	if not site:
@@ -334,9 +335,12 @@ def serve(port):
 			self.send_header('Expires', '0')
 			super().end_headers()
 
+	url = f'http://{get_local_ip()}:{port}'
 	with socketserver.TCPServer(('', port), Handler) as httpd:
-		print(f'serving at http://{get_local_ip()}:{port}')
+		print(f'serving at {url}')
 		try:
+			if browse:
+				webbrowser.open(url)
 			httpd.serve_forever()
 		except  KeyboardInterrupt:
 			pass
@@ -371,4 +375,5 @@ def add_args(parser):
 	sub.add_parser('stat').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.stat().items())))
 	p = sub.add_parser('serve')
 	p.add_argument('-p', '--port', type=int,  default=8000)
-	p.set_defaults(handler=lambda args:serve(args.port))
+	p.add_argument('--open', action='store_true')
+	p.set_defaults(handler=lambda args:serve(args.port, args.open))
