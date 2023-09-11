@@ -8,7 +8,7 @@ on:
       - 'build'
 
 jobs:
-  build:
+  pyinstaller:
     strategy:
       matrix:
         target:
@@ -30,7 +30,7 @@ jobs:
           python-version: 3.x
       - run: pip install . pyinstaller
 
-      - run: . bin/build.bash
+      - run: . bin/build-pyinstaller.bash
         shell: bash
 
       - uses: actions/upload-artifact@v3
@@ -40,7 +40,7 @@ jobs:
 
   release:
     if: github.ref_name != 'build'
-    needs: [build]
+    needs: [pyinstaller]
 
     runs-on: ubuntu-latest
     steps:
