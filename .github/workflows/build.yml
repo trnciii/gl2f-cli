@@ -58,10 +58,6 @@ jobs:
           name: macos
       - run: zip macos.zip macos/*
 
-      # source
-      - run: git submodule update --init --recursive
-      - run: zip -r source.zip gl2f/* setup.py
-
       - name: Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -70,4 +66,3 @@ jobs:
           files: |
             windows.zip
             macos.zip
-            source.zip
