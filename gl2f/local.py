@@ -23,12 +23,10 @@ def clear_cache():
 			os.remove(os.path.join(d, i))
 
 
-def install():
+def install_to(dst):
 	import shutil
 
-	file = 'site'
-	src = local.package_data(file)
-	dst = os.path.join(local.home(), file)
+	src = local.package_data('site')
 
 	if os.path.exists(dst):
 		print(f'reinstalling {dst} that already exists')
@@ -40,7 +38,7 @@ def install():
 
 	os.symlink(local.refdir('contents'), os.path.join(dst, 'contents'))
 
-	index.main(full=True)
+	index.main(site=dst, full=True)
 
 	print(f'installed site into {dst}')
 
@@ -89,13 +87,13 @@ class index:
 
 
 	@staticmethod
-	def main(full=False):
-		site = local.refdir_untouch('site')
+	def main(site=None, full=False):
 		if not site:
-			if 'n' != input('site not found. install now? (Y/n)').lower():
-				install()
-			return
+			site = local.refdir_untouch('site')
 
+		if not site:
+			print('site not installed. return')
+			return
 
 		if full:
 			table = index.create_table(local.listdir('contents'))
@@ -117,12 +115,13 @@ def open_site():
 	html = os.path.join(local.home(), 'site', 'index.html')
 
 	if not os.path.exists(html):
-		if 'n' != input('could not find site. install now? (Y/n)').lower():
-			install()
+		if 'n' != input('site not installed. install now? (Y/n)').lower():
+			install_to(os.path.join(local.home(), 'site'))
 		else:
 			return
+	else:
+		index.main()
 
-	index.main()
 	webbrowser.open(f'file://{html}')
 
 def build_body(item):
@@ -319,33 +318,34 @@ def get_local_ip():
 def serve(port, browse=False):
 	import http.server, socketserver, socket
 	import webbrowser
+	import tempfile
 
-	site = local.refdir_untouch('site')
-	if not site:
-		print('site not installed')
-		return
+	with tempfile.TemporaryDirectory() as tmp:
+		site = os.path.join(tmp, 'site')
+		print(site)
+		install_to(site)
+
+		class Handler(http.server.SimpleHTTPRequestHandler):
+			def __init__(self, *args, **kwargs):
+				super().__init__(*args, directory=site, **kwargs)
+
+			def end_headers(self):
+				self.send_header('Cache-Control', 'max-age=0')
+				self.send_header('Expires', '0')
+				super().end_headers()
 
 
-	class Handler(http.server.SimpleHTTPRequestHandler):
-		def __init__(self, *args, **kwargs):
-			super().__init__(*args, directory=site, **kwargs)
-
-		def end_headers(self):
-			self.send_header('Cache-Control', 'max-age=0')
-			self.send_header('Expires', '0')
-			super().end_headers()
-
-	url = f'http://{get_local_ip()}:{port}'
-	with socketserver.TCPServer(('', port), Handler) as httpd:
-		print(f'serving at {url}')
-		try:
-			if browse:
-				webbrowser.open(url)
-			httpd.serve_forever()
-		except  KeyboardInterrupt:
-			pass
-		finally:
-			httpd.server_close()
+		url = f'http://{get_local_ip()}:{port}'
+		with socketserver.TCPServer(('', port), Handler) as httpd:
+			print(f'serving at {url}')
+			try:
+				if browse:
+					webbrowser.open(url)
+				httpd.serve_forever()
+			except  KeyboardInterrupt:
+				pass
+			finally:
+				httpd.server_close()
 
 def add_args(parser):
 	sub = parser.add_subparsers()
@@ -362,7 +362,7 @@ def add_args(parser):
 	p.set_defaults(handler=lambda args:import_contents(args.archive))
 
 	sub.add_parser('index').set_defaults(handler = lambda _:index.main(full=True))
-	sub.add_parser('install').set_defaults(handler=lambda _:install())
+	sub.add_parser('install').set_defaults(handler=lambda _:install_to(os.path.join(local.home(), 'site')))
 
 	p = sub.add_parser('ls')
 	p.add_argument('--order', type=str,
