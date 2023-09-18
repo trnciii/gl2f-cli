@@ -1,6 +1,7 @@
 <head>
 <meta charset="utf-8">
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="style.css">
 
 <style>
@@ -59,11 +60,11 @@ document.title = content['title']
 
 document.getElementById('links').innerHTML = [
   {
-    label: 'home',
+    label: 'Home',
     href: 'index.html',
   },
   {
-    label: 'album',
+    label: 'Album',
     href: `album.html?${contentId}`,
   },
 ]
@@ -75,7 +76,7 @@ document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
 document.getElementById('meta').innerHTML = [
  content['author'],
  new Date(content['date']).toLocaleDateString('ja-JP'),
- `<a href=https://girls2-fc.jp/page/${content['board']}/${contentId}>${content['board']}</a>`
+ `<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link"></a>`
 ].join('&nbsp;');
 
 document.getElementById('body').innerHTML = content['body'];

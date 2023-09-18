@@ -18,6 +18,11 @@ header {
   margin-bottom: 8px;
 }
 
+header a{
+  color: #0066b2;
+  text-decoration: none;
+}
+
 .header-links{
   display: flex;
   flex-wrap: wrap;
@@ -26,9 +31,7 @@ header {
 }
 
 .header-links a {
-  text-decoration: none;
   margin: 0 6px 0px 0;
-  color: navy;
 }
 
 
