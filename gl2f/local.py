@@ -329,10 +329,10 @@ def serve(port, browse=False):
 			def __init__(self, *args, **kwargs):
 				super().__init__(*args, directory=site, **kwargs)
 
-			def end_headers(self):
-				self.send_header('Cache-Control', 'max-age=0')
-				self.send_header('Expires', '0')
-				super().end_headers()
+			# def end_headers(self):
+			# 	self.send_header('Cache-Control', 'max-age=0')
+			# 	self.send_header('Expires', '0')
+			# 	super().end_headers()
 
 
 		url = f'http://{get_local_ip()}:{port}'
