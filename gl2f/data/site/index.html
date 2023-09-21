@@ -74,7 +74,7 @@ const f = {
 	},
 	Title:{
 		key:'title',
-		data:(k, v)=>['girls2radio', 'lucky2radio'].includes(v['board'])?
+		data:(k, v)=>['girls2radio', 'lucky2radio', 'wallpaper', 'commercialmovie', 'gtube'].includes(v['board'])?
 			`<a href=album.html?${k}>${v['title']}</a>`
 			: `<a href=article.html?${k}>${v['title']}</a>&nbsp;/&nbsp;<a href=album.html?${k}>Album</a>`,
 	},
