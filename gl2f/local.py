@@ -316,7 +316,7 @@ def get_local_ip():
 		s.close()
 
 def serve(port, browse=False):
-	import http.server, socketserver, socket
+	import http.server, socketserver, socket, threading
 	import webbrowser
 	import tempfile
 
@@ -334,18 +334,21 @@ def serve(port, browse=False):
 			# 	self.send_header('Expires', '0')
 			# 	super().end_headers()
 
-
 		url = f'http://{get_local_ip()}:{port}'
-		with socketserver.TCPServer(('', port), Handler) as httpd:
+		with socketserver.ThreadingTCPServer(('0.0.0.0', port), Handler) as httpd:
 			print(f'serving at {url}')
+
+			server_thread = threading.Thread(target=httpd.serve_forever)
+			server_thread.daemon = True
+			server_thread.start()
+
 			try:
 				if browse:
 					webbrowser.open(url)
-				httpd.serve_forever()
+				server_thread.join()
 			except  KeyboardInterrupt:
 				pass
-			finally:
-				httpd.server_close()
+
 
 def add_args(parser):
 	sub = parser.add_subparsers()
