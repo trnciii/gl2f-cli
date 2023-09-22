@@ -1,6 +1,7 @@
 import re
 import os, json
 from .core import pretty, local
+from .core.config import config
 
 
 def ls(args):
@@ -376,6 +377,6 @@ def add_args(parser):
 	sub.add_parser('open').set_defaults(handler=lambda _:open_site())
 	sub.add_parser('stat').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.stat().items())))
 	p = sub.add_parser('serve')
-	p.add_argument('-p', '--port', type=int,  default=8000)
+	p.add_argument('-p', '--port', type=int,  default=config['serve-port'])
 	p.add_argument('--open', action='store_true')
 	p.set_defaults(handler=lambda args:serve(args.port, args.open))

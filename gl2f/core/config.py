@@ -5,7 +5,8 @@ from ..__version__ import version
 def default():
 	return {
 		'version': version,
-		'max-image-size': [1000, 1000]
+		'max-image-size': [1000, 1000],
+		'serve-port': 7999,
 	}
 
 file = lambda: os.path.join(local.home(), 'config.json')
@@ -14,7 +15,7 @@ def load():
 	import json
 	if os.path.isfile(file()):
 		with open(file(), encoding='utf-8') as f:
-			return json.loads(f.read())
+			return {**default(), **json.loads(f.read())}
 	else:
 		return default()
 
