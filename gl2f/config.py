@@ -32,7 +32,7 @@ def edit():
 	data = config.load()
 
 	keys = list(editors.keys())
-	selected = term.select([f'{k}: {data.get(k, "")}' for k in keys])
+	selected = term.select([f'{k}: {data.get(k, f"{str(config.config[k])} (default)")}' for k in keys])
 
 	for key in [k for k, s in zip(keys, selected) if s]:
 		try:
