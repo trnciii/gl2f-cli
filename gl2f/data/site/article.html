@@ -51,12 +51,13 @@ img, video{
   <span id='body'/>
 </div></main>
 
+<script src="constants.js"></script>
 <script src="index.js"></script>
 <script>
 const contentId = location.search.split('?')[1];
 const content = table[contentId]
 
-document.title = content['title']
+document.title = `${hostname}/${content['title']}`;
 
 document.getElementById('links').innerHTML = [
   {

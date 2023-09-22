@@ -25,7 +25,7 @@ def clear_cache():
 
 
 def install_to(dst):
-	import shutil
+	import shutil, socket
 
 	src = local.package_data('site')
 
@@ -40,6 +40,9 @@ def install_to(dst):
 	os.symlink(local.refdir('contents'), os.path.join(dst, 'contents'))
 
 	index.main(site=dst, full=True)
+
+	with open(os.path.join(dst, 'constants.js'), 'w', encoding='utf-8') as f:
+		f.write(f'const hostname = "{socket.gethostname()}";')
 
 	print(f'installed site into {dst}')
 
