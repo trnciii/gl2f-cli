@@ -9,19 +9,20 @@ def default():
 		'serve-port': 7999,
 	}
 
-file = lambda: os.path.join(local.home(), 'config.json')
+def filepath():
+	return os.path.join(local.home(), 'config.json')
 
 def load():
 	import json
-	if os.path.isfile(file()):
-		with open(file(), encoding='utf-8') as f:
-			return {**default(), **json.loads(f.read())}
-	else:
-		return default()
+	path = filepath()
+	if os.path.isfile(path):
+		with open(path, encoding='utf-8') as f:
+			return json.loads(f.read())
+	return {}
 
 def save(data):
 	import json
-	with open(file(), 'w', encoding='utf-8') as f:
+	with open(filepath(), 'w', encoding='utf-8') as f:
 		f.write(json.dumps(data, indent=2, ensure_ascii=False))
 
-config = load()
+config = {**default(), **load()}
