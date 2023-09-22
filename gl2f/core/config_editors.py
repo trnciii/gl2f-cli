@@ -5,8 +5,12 @@ def max_image_size():
 def serve_port():
 	return int(input('port: ').split(maxsplit=1)[0])
 
+def host_name():
+	return input('host name: ')
+
 def get():
 	return {
 		'max-image-size': max_image_size,
 		'serve-port': serve_port,
+		'host-name': host_name,
 	}

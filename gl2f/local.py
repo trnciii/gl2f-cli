@@ -42,7 +42,7 @@ def install_to(dst):
 	index.main(site=dst, full=True)
 
 	with open(os.path.join(dst, 'constants.js'), 'w', encoding='utf-8') as f:
-		f.write(f'const hostname = "{socket.gethostname()}";')
+		f.write(f'const hostname = "{(config["host-name"])}";')
 
 	print(f'installed site into {dst}')
 

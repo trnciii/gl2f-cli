@@ -3,8 +3,10 @@ import os
 from ..__version__ import version
 
 def default():
+	import socket
 	return {
 		'version': version,
+		'host-name': socket.gethostname(),
 		'max-image-size': [1000, 1000],
 		'serve-port': 7999,
 	}
@@ -23,6 +25,10 @@ def load():
 def save(data):
 	import json
 	with open(filepath(), 'w', encoding='utf-8') as f:
-		f.write(json.dumps(data, indent=2, ensure_ascii=False))
+		f.write(json.dumps(sanitize(data), indent=2, ensure_ascii=False))
+
+def sanitize(data):
+	return {k:data[k] for k in data.keys() & default().keys()}
+
 
 config = {**default(), **load()}
