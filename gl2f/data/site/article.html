@@ -60,16 +60,9 @@ const content = table[contentId]
 document.title = `${hostname}/${content['title']}`;
 
 document.getElementById('links').innerHTML = [
-  {
-    label: 'Home',
-    href: 'index.html',
-  },
-  {
-    label: 'Album',
-    href: `album.html?${contentId}`,
-  },
+  `<a href=index.html title=${hostname}>Home</a>`,
+  `<a href=album.html?${contentId}>Album</a>`
 ]
-.map(i => `<a href=${i['href']}>${i['label']}</a>`)
 .join('');
 
 

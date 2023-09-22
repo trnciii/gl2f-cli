@@ -77,9 +77,9 @@
   <div class=header-controls>
     <div>
       <input type="checkbox" id="list-checkbox" onchange="draw()">
-      <label class="list-checkbox" for="list-checkbox">List</label>
+      <label class="list-checkbox" for="list-checkbox" title='on/off file list'>List</label>
 
-      <input type="range" id="cols" min="1" max="7" step="1" oninput="draw()">
+      <input type="range" id="cols" min="1" max="7" step="1" title='adjust number of colmuns' oninput="draw()">
     </div>
   </div>
 </header>
@@ -99,16 +99,9 @@ const media_table = content['media'];
 document.title = `${hostname}/Album - ${content['title']}`;
 
 document.getElementById('links').innerHTML = [
-  {
-    label: 'Home',
-    href: 'index.html',
-  },
-  {
-    label: 'Article',
-    href: `article.html?${contentId}`,
-  },
+  `<a href=index.html title=${hostname}>Home</a>`,
+  `<a href=article.html?${contentId}>Article</a>`
 ]
-.map(i => `<a href=${i['href']}>${i['label']}</a>`)
 .join('');
 
 
