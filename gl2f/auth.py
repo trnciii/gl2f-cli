@@ -48,6 +48,9 @@ def login(dump=False):
 			for i in range(timeout):
 				time.sleep(1)
 
+				if not driver.window_handles:
+					raise Exception('Browser closed')
+
 				log = driver.get_log('performance')
 				log_all.append([json.loads(e['message']) for e in log])
 
