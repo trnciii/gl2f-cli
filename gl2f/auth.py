@@ -11,6 +11,8 @@ def set_token(token=None):
 
 def update_cli():
 	before = auth.load()
+	if not before:
+		return
 	after = auth.update(before)
 
 	if after == '':
