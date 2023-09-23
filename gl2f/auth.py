@@ -23,7 +23,7 @@ def update_cli():
 		print('token updated')
 
 
-def login():
+def login(dump=False):
 	import json
 
 	def find_token(log):
@@ -66,8 +66,9 @@ def login():
 
 		token, log = wait_for_login_with_browser(120)
 
-		with open('login.json', 'w') as f:
-			json.dump(log, f, indent=2)
+		if dump:
+			with open('login.json', 'w') as f:
+				json.dump(log, f, indent=2)
 
 	except Exception as e:
 		print(e)
@@ -76,20 +77,20 @@ def login():
 	set_token(token)
 
 
-def commands():
-	return {
-		'remove': auth.remove,
-		'file': lambda: print(auth.file()),
-		'load': lambda: print(auth.load()),
-		'set-token': set_token,
-		'update': update_cli,
-		'login': login
-	}
-
-
 def add_args(parser):
-	parser.add_argument('command', type=str, choices=list(commands().keys()))
-	parser.add_argument('args', nargs='*')
-	parser.set_defaults(
-		handler = lambda args:commands()[args.command](*args.args)
-	)
+	sub = parser.add_subparsers()
+
+	sub.add_parser('file').set_defaults(handler=lambda _:print(auth.file()))
+
+	p = sub.add_parser('login')
+	p.add_argument('--dump', action='store_true')
+	p.set_defaults(handler=lambda args: login(dump=args.dump))
+
+	sub.add_parser('load').set_defaults(handler=lambda _:print(auth.load()))
+	sub.add_parser('remove').set_defaults(handler=lambda _:auth.remove())
+
+	p = sub.add_parser('set-token')
+	p.add_argument('token', nargs='?', type=str)
+	p.set_defaults(handler=lambda args:set_token(args.token))
+
+	sub.add_parser('update').set_defaults(handler=lambda _:update_cli())
