@@ -36,7 +36,7 @@ _gl2f(){
           ;;
         local)
           if [[ $cword == 2 ]]; then
-            COMPREPLY=( $(compgen -W 'clear-cache dir export import index install ls stat open build' -- "$cur") )
+            COMPREPLY=( $(compgen -W 'clear-cache dir export import index install ls stat open build serve' -- "$cur") )
           else
             case ${words[2]} in
               import)

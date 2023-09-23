@@ -3,24 +3,25 @@ import os
 
 def view():
 	import json
-	path = config.file()
+	path = config.filepath()
 	if not os.path.isfile(path):
 		print('file does not exist.')
 		return
 
-	with open(config.file(), encoding='utf-8') as f:
+	with open(path, encoding='utf-8') as f:
 		print(f.read())
 
 def create():
-	if os.path.isfile(config.file()):
+	path = config.filepath()
+	if os.path.isfile(path):
 		print('file already exits. abort.')
 		return
 
 	config.save(config.default())
-	print(f'created "{config.file()}".')
+	print(f'created "{path}".')
 
 def path():
-	path = config.file()
+	path = config.filepath()
 	print(path if os.path.isfile(path) else 'file does not exist')
 
 def edit():
@@ -31,7 +32,7 @@ def edit():
 	data = config.load()
 
 	keys = list(editors.keys())
-	selected = term.select([f'{k}: {data.get(k, "")}' for k in keys])
+	selected = term.select([f'{k}: {data.get(k, f"{str(config.config[k])} (default)")}' for k in keys])
 
 	for key in [k for k, s in zip(keys, selected) if s]:
 		try:

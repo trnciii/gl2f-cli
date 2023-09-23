@@ -1,6 +1,7 @@
 import re
 import os, json
 from .core import pretty, local
+from .core.config import config
 
 
 def ls(args):
@@ -23,12 +24,10 @@ def clear_cache():
 			os.remove(os.path.join(d, i))
 
 
-def install():
-	import shutil
+def install_to(dst):
+	import shutil, socket
 
-	file = 'site'
-	src = local.package_data(file)
-	dst = os.path.join(local.home(), file)
+	src = local.package_data('site')
 
 	if os.path.exists(dst):
 		print(f'reinstalling {dst} that already exists')
@@ -37,9 +36,15 @@ def install():
 
 	cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
 	cp(src, dst)
-	print(f'copied site into {dst}')
 
-	index.main(full=True)
+	os.symlink(local.refdir('contents'), os.path.join(dst, 'contents'))
+
+	index.main(site=dst, full=True)
+
+	with open(os.path.join(dst, 'constants.js'), 'w', encoding='utf-8') as f:
+		f.write(f'const hostname = "{(config["host-name"])}";')
+
+	print(f'installed site into {dst}')
 
 
 class index:
@@ -72,7 +77,8 @@ class index:
 				),
 				key=lambda x:media.index(x[0])
 			)],
-			'expired': item.get('closingAt', None)
+			'expired': item.get('closingAt', None),
+			'body': build_body(item)
 		}
 
 
@@ -85,13 +91,13 @@ class index:
 
 
 	@staticmethod
-	def main(full=False):
-		site = local.refdir_untouch('site')
+	def main(site=None, full=False):
 		if not site:
-			if 'n' != input('site not found. install now? (Y/n)').lower():
-				install()
-			return
+			site = local.refdir_untouch('site')
 
+		if not site:
+			print('site not installed. return')
+			return
 
 		if full:
 			table = index.create_table(local.listdir('contents'))
@@ -113,47 +119,36 @@ def open_site():
 	html = os.path.join(local.home(), 'site', 'index.html')
 
 	if not os.path.exists(html):
-		if 'n' != input('could not find site. install now? (Y/n)').lower():
-			install()
+		if 'n' != input('site not installed. install now? (Y/n)').lower():
+			install_to(os.path.join(local.home(), 'site'))
 		else:
 			return
+	else:
+		index.main()
 
-	index.main()
 	webbrowser.open(f'file://{html}')
 
-
-def create_html(item):
+def build_body(item):
 	from .core import article
 
 	i = item['contentId']
-	body = item['values']['body']
-	contents = local.refdir_untouch('contents')
-	li = local.listdir(f'contents/{i}')
+	media_list = local.listdir(f'contents/{i}')
 
 	def up(match):
 		m, t = match.groups()
 		try:
-			p = next(p for p in li if p.startswith(m))
+			p = next(p for p in media_list if p.startswith(m))
 		except:
 			return ''
 
 		if t == 'image':
-			return f'<img src={contents}/{i}/{p} width=100%></img>'
+			return f'<img src=../contents/{i}/{p}></img>'
 		elif t == 'video':
-			return f'<video controls autoplay muted loop src={contents}/{i}/{p} width=100%></video>'
+			return f'<video controls autoplay muted loop src=../contents/{i}/{p}></video>'
 		else:
 			return ''
 
-	return article.ptn_media.sub(up, body)
-
-
-def build(i, view=False):
-	page = os.path.join(local.refdir('site/pages'), f'{i}.html')
-	body = create_html(local.load_content(i))
-	with open(page, 'w', encoding='utf-8') as f:
-		f.write(body)
-
-	print(f'saved file:///{page}')
+	return article.ptn_media.sub(up, item['values']['body'])
 
 
 def colored_diff_lines(left, right):
@@ -321,14 +316,53 @@ def export_contents(out):
 	print(f'zipping contents into {base}.zip ({sizeInGb:.2f} GB)')
 	shutil.make_archive(base, 'zip', root_dir=contents)
 
+def get_local_ip():
+	import socket
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	try:
+		s.connect(('8.8.8.8', 80))
+		return s.getsockname()[0]
+	except:
+		return 'localhost'
+	finally:
+		s.close()
+
+def serve(port, browse=False):
+	import http.server, socketserver, socket, threading
+	import webbrowser
+	import tempfile
+
+	with tempfile.TemporaryDirectory() as tmp:
+		site = os.path.join(tmp, 'site')
+		print(site)
+		install_to(site)
+
+		class Handler(http.server.SimpleHTTPRequestHandler):
+			def __init__(self, *args, **kwargs):
+				super().__init__(*args, directory=site, **kwargs)
+
+			def end_headers(self):
+				self.send_header('Accept-Ranges', 'bytes')
+				super().end_headers()
+
+		url = f'http://{get_local_ip()}:{port}'
+		with socketserver.ThreadingTCPServer(('0.0.0.0', port), Handler) as httpd:
+			print(f'serving at {url}')
+
+			server_thread = threading.Thread(target=httpd.serve_forever)
+			server_thread.daemon = True
+			server_thread.start()
+
+			try:
+				if browse:
+					webbrowser.open(url)
+				server_thread.join()
+			except  KeyboardInterrupt:
+				pass
+
 
 def add_args(parser):
 	sub = parser.add_subparsers()
-
-	p = sub.add_parser('build')
-	p.add_argument('content_id')
-	p.add_argument('--view', action='store_true')
-	p.set_defaults(handler=lambda args: build(args.content_id, args.view))
 
 	sub.add_parser('clear-cache').set_defaults(handler=lambda _:clear_cache())
 	sub.add_parser('dir').set_defaults(handler=lambda _:print(local.home()))
@@ -342,7 +376,7 @@ def add_args(parser):
 	p.set_defaults(handler=lambda args:import_contents(args.archive))
 
 	sub.add_parser('index').set_defaults(handler = lambda _:index.main(full=True))
-	sub.add_parser('install').set_defaults(handler=lambda _:install())
+	sub.add_parser('install').set_defaults(handler=lambda _:install_to(os.path.join(local.home(), 'site')))
 
 	p = sub.add_parser('ls')
 	p.add_argument('--order', type=str,
@@ -351,5 +385,9 @@ def add_args(parser):
 	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')
 
-	sub.add_parser('stat').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.stat().items())))
 	sub.add_parser('open').set_defaults(handler=lambda _:open_site())
+	sub.add_parser('stat').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.stat().items())))
+	p = sub.add_parser('serve')
+	p.add_argument('-p', '--port', type=int,  default=config['serve-port'])
+	p.add_argument('--open', action='store_true')
+	p.set_defaults(handler=lambda args:serve(args.port, args.open))
