@@ -37,12 +37,10 @@ def login():
 	def wait_for_login_with_browser(timeout):
 		from selenium import webdriver
 		from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-		from webdriver_manager.chrome import ChromeDriverManager
 		import time
 
-		d = DesiredCapabilities.CHROME
-		d['goog:loggingPrefs'] = {'performance':'ALL'}
-		driver = webdriver.Chrome(ChromeDriverManager().install(), desired_capabilities=d)
+		DesiredCapabilities.CHROME['goog:loggingPrefs'] = {'performance':'ALL'}
+		driver = webdriver.Chrome()
 
 		log_all = []
 		try:
