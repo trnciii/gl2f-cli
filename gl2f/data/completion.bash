@@ -32,7 +32,7 @@ _gl2f(){
     *)
       case ${words[1]} in
         auth)
-          COMPREPLY=( $(compgen -W 'file load login remove update set-token' -- "$cur") )
+          COMPREPLY=( $(compgen -W 'login remove set-token update' -- "$cur") )
           ;;
         local)
           if [[ $cword == 2 ]]; then
