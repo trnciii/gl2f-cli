@@ -37,14 +37,11 @@ def login(email, password):
 def add_args(parser):
 	sub = parser.add_subparsers()
 
-	sub.add_parser('file').set_defaults(handler=lambda _:print(auth.file()))
-
 	p = sub.add_parser('login')
 	p.add_argument('-u', '--email', type=str, default=None)
 	p.add_argument('-p', '--password', type=str, default=None)
 	p.set_defaults(handler=lambda args: login(args.email, args.password))
 
-	sub.add_parser('load').set_defaults(handler=lambda _:print(auth.load()))
 	sub.add_parser('remove').set_defaults(handler=lambda _:auth.remove())
 
 	p = sub.add_parser('set-token')
