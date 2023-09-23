@@ -2,10 +2,9 @@ name: build
 
 on:
   push:
-    tags:
-      - 'v*'
     branches:
-      - 'build'
+      - build
+      - main
 
 jobs:
   build-pyinstaller:
@@ -43,6 +42,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - run: git submodule update --init
 
       - uses: actions/setup-python@v4
@@ -58,25 +59,31 @@ jobs:
           path: dist/
 
   publish-to-pypi:
-    if: github.ref_name != 'build'
-    needs: [build-dist]
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+    - build-dist
 
     runs-on: ubuntu-latest
+
     environment:
       name: pypi
-      url: https://pypi.org/p/gl2f  # Replace <package-name> with your PyPI project name
+      url: https://pypi.org/p/gl2f
+
     permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
+      id-token: write
 
     steps:
       - uses: actions/download-artifact@v3
         with:
           name: dist
-      - uses: pypa/gh-acitions-pypi-publish@release/v1
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
 
   release:
-    if: github.ref_name != 'build'
-    needs: [build-pyinstaller, publish-to-pypi]
+    if: startsWith(github.ref, 'refs/tags')
+    needs:
+    - build-pyinstaller
+    - publish-to-pypi
 
     runs-on: ubuntu-latest
     permissions:
