@@ -5,6 +5,8 @@ on:
     branches:
       - build
       - main
+    tags:
+      - '*'
 
 jobs:
   build-pyinstaller:
