@@ -11,8 +11,7 @@ dependencies = [
 	'requests',
 	'libsixel-python',
 	'Pillow',
-	'webdriver_manager',
-	'selenium'
+	'selenium>=4.6'
 ]
 
 [tool.setuptools]
