@@ -1,10 +1,8 @@
 name: build
 
 on:
+  pull_request:
   push:
-    branches:
-      - build
-      - main
     tags:
       - '*'
 
