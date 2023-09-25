@@ -286,5 +286,4 @@ def active():
 		'gtube',
 		'cm',
 		'wallpaper',
-		'happysummer/pg'
 	]
