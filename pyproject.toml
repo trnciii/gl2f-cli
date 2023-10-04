@@ -28,3 +28,11 @@ write_to = 'gl2f/__version__.py'
 
 [project.urls]
 "Homepage" = "https://github.com/trnciii/gl2f-cli"
+
+[project.optional-dependencies]
+dev = [
+	'pytest',
+	'pyinstaller',
+	'pipdeptree',
+	'pip-licenses',
+]
