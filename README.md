@@ -59,7 +59,7 @@ Codespace 作成後、 `. install.sh` を実行することでgl2f が使用可�
 
 ### 1. pip を使う
 
-Python3, pip の環境があれば [PyPI](https://pypi.org/project/gl2f/) に公開されているパッケージからインストールできます。
+Python3.8 or later と pip の環境があれば [PyPI](https://pypi.org/project/gl2f/) に公開されているパッケージからインストールできます。
 
 ```sh
 pip install gl2f
@@ -73,7 +73,7 @@ https://github.com/trnciii/gl2f-cli/releases
 
 ### 3. このリポジトリから直接インストールする
 
-Python3, pip, git の環境があればこのリポジトリから直接インストールできます。
+Python3.8 or later, pip, git の環境があればこのリポジトリから直接インストールできます。
 
 ```sh
 pip install git+https://github.com/trnciii/gl2f-cli
