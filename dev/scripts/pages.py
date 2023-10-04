@@ -41,6 +41,17 @@ def pages():
 			return results
 		page += 1
 
+def boardId(pageId):
+	response = requests.get(f'https://girls2-fc.jp/page-data/page/{pageId}/page-data.json')
+
+	if not response.ok:
+		return
+
+	data = response.json()
+	for component in data['result']['pageContext']['def']['components']:
+		attr = component['attributes']
+		print(attr)
+
 
 def print_pages():
 	results = pages()
