@@ -240,6 +240,13 @@ def table():
 			'key': 'happysummer/pg',
 			'page': 'HappySummerPG',
 		},
+
+		# activate
+		{
+			'id': '836873836174508033',
+			'key': 'activate/pg',
+			'page': 'activatePG',
+		},
 	]
 
 
