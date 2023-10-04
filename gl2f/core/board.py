@@ -293,4 +293,5 @@ def active():
 		'gtube',
 		'cm',
 		'wallpaper',
+		'activate/pg',
 	]
