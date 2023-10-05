@@ -1,0 +1,54 @@
+name: test
+
+on:
+  pull_request:
+  push:
+    branches:
+    - main
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [ubuntu-latest, windows-latest, macos-latest]
+        python:
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+
+    name: ${{ matrix.python }} • ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.runs-on }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - run: git submodule update --init
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+
+    - run: pip install .[dev]
+
+    - run: python3 -m pytest --junit-xml results/pytest.xml
+      continue-on-error: true
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: test results ${{ matrix.python }} ${{ matrix.runs-on }}
+        path: results/*.xml
+
+  summary:
+    needs:
+    - test
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        path: artifacts
+
+    - uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        junit_files: artifacts/**/*.xml
