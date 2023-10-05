@@ -155,6 +155,13 @@ def table():
 		},
 
 		{
+			'id': '789417493352416266',
+			'key': 'fm/girls2-open',
+			'group': 'girls2',
+			'page': 'G2OpenFanMeetingPG'
+		},
+
+		{
 			'id': '750275859142673638',
 			'key': 'fm/lucky2-2023',
 			'group': 'lucky2',
@@ -247,6 +254,25 @@ def table():
 			'key': 'activate/pg',
 			'page': 'activatePG',
 		},
+
+		# not a post found
+		# {
+		# 	'id': '385773910110503958',
+		# 	'key': 'information',
+		# 	'page': 'information'
+		# },
+
+		{
+			'id': '289220886836282449',
+			'key': 'pass',
+			'page': 'miraclepass'
+		},
+
+		{
+			'id': '570095770410156859',
+			'key': 'checkin',
+			'page': 'CheckInPhoto'
+		},
 	]
 
 
@@ -293,5 +319,7 @@ def active():
 		'gtube',
 		'cm',
 		'wallpaper',
+		'pass',
+		'checkin',
 		'activate/pg',
 	]
