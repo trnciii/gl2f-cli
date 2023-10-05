@@ -1,6 +1,8 @@
 #!/bin python3
 
 import requests
+import gl2f
+import json
 
 def pages():
 	size = 99
@@ -45,20 +47,78 @@ def boardId(pageId):
 	response = requests.get(f'https://girls2-fc.jp/page-data/page/{pageId}/page-data.json')
 
 	if not response.ok:
-		return
+		return {
+			'name': pageId,
+			'status': 'bad response',
+		}
 
-	data = response.json()
-	for component in data['result']['pageContext']['def']['components']:
-		attr = component['attributes']
-		print(attr)
-
+	try:
+		data = response.json()
+		return {
+			'name': pageId,
+			'status': 'success',
+			'components': data['result']['pageContext']['def']['components']
+		}
+	except Exception as e:
+		return {
+			'name': pageId,
+			'status': str(e),
+		}
 
 def print_pages():
-	results = pages()
-	for r in results:
-		print(r['label'])
-		print(r['pageId'])
+	all_pages = pages()
+
+	results = [boardId(i) for i in map(lambda i:i['pageId'], all_pages)]
+	print(json.dumps(results, indent=2))
+
+def load():
+	with open('pages.json') as f:
+		return json.load(f)
+
+def view_hbs():
+	table = gl2f.board.table()
+	data = load()
+
+	keys = [i['page'] for i in table]
+	intersection = [i for i in data if i['name'] in keys]
+
+	print(json.dumps(intersection, indent=2))
+	print()
+	print({i['hbs']for i in sum((i['components'] for i in intersection), [])})
+
+def filter_list(components):
+	return [i for i in components if 'list' in i['hbs']]
+
+
+
+def missing():
+	table = gl2f.board.table()
+	data = load()
+
+	ids = [i['id'] for i in table]
+
+	with_list = list(filter(lambda i: filter_list(i.get('components', [])), data))
+	for i in with_list:
+		print(i['name'])
+		for j in i['components']:
+			print(j)
+		print()
+
+	print('-'*10)
+
+	diff = filter(lambda i: i['attr'], [
+		{
+			'name': i['name'],
+			'attr': [j['attributes']  for j in i['components'] if 'list' in j['hbs'] and j['attributes']['board-id'] not in ids]
+		}
+		for i in with_list
+	])
+
+	for i in diff:
+		print(i['name'])
+		for j in i['attr']:
+			print(j['board-id'])
 		print()
 
 if __name__ == '__main__':
-	print_pages()
+	missing()
