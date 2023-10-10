@@ -38,6 +38,7 @@ def install_to(dst):
 	cp(src, dst)
 
 	os.symlink(local.refdir('contents'), os.path.join(dst, 'contents'))
+	os.symlink(os.path.join(local.home(), 'index.js'), os.path.join(dst, 'index.js'))
 
 	index.main(site=dst, full=True)
 
@@ -106,7 +107,7 @@ class index:
 			contents = list(set(local.listdir('contents')).difference(prev.keys()))
 			table = prev | index.create_table(contents)
 
-		out = os.path.join(site, 'index.js')
+		out = os.path.join(local.home(), 'index.js')
 		with open(out, 'w', encoding='utf-8') as f:
 			print(f'const table={json.dumps(table, separators=(",", ":"), ensure_ascii=False)}', file=f)
 
