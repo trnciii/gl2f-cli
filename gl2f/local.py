@@ -332,6 +332,8 @@ def serve(port, browse=False):
 	import webbrowser
 	import tempfile
 
+	webbrowser.register("termux-open '%s'", None)
+
 	with tempfile.TemporaryDirectory() as tmp:
 		site = os.path.join(tmp, 'site')
 		print(site)
