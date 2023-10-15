@@ -42,7 +42,7 @@ _gl2f(){
               import)
                 _filedir
                 ;;
-              esac
+            esac
           fi
           ;;
         config)
@@ -51,9 +51,13 @@ _gl2f(){
         cat | dl | ls | open | search)
           __gl2f_complete_boards
           ;;
-        esac
+      esac
       ;;
   esac
 }
 
-complete -F _gl2f gl2f
+if declare -F _init_completion >/dev/null 2>&1; then
+  complete -F _gl2f gl2f
+else
+  complete -o nospace -F _gl2f gl2f
+fi
