@@ -12,7 +12,8 @@ ptn_link = re.compile(r'<a href="(.+?)".*?>.+?</a>')
 ptn_strong = re.compile(r'<strong.*?>(.*?)</strong>')
 ptn_span = re.compile(r'<span.*?>(.*?)</span>')
 ptn_http = re.compile(r'(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
-
+ptn_ignore = re.compile(r'￼|&nbsp;|<br>')
+ptn_hashtag = re.compile(r'(?P<tag>\B#\w+)')
 
 class MediaRep:
 	def __init__(self, style, contentId, boardId, max_size=None):
@@ -73,10 +74,11 @@ def line_kernel(p, mediarep):
 	p = ptn_strong.sub(term.mod('\\1', term.color('white', 'fl'), term.bold(), term.underline()), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
-	p = ptn_break.sub('', p)
+	p = ptn_ignore.sub('', p)
 
 	# after processing tags
 	p = html.unescape(p)
+	p = ptn_hashtag.sub(term.mod(r'\g<tag>', term.color('blue', 'fl')), p)
 	p = ptn_http.sub(term.mod(r' \1 ', term.color('blue', 'fl')), p)
 
 	return p
