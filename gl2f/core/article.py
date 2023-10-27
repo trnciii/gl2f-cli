@@ -52,8 +52,6 @@ class MediaRep:
 		if not match:
 			return p
 		i, t = match.group(1, 2)
-		if t != 'image':
-			return self.rep_type_id(p)
 
 		if file:=local.search_media(i, self.contentId):
 			image = Image.open(file)
@@ -66,6 +64,8 @@ class MediaRep:
 
 		image = sixel.limit(image, self.max_size)
 		ret = sixel.to_sixel(image)
+		if t == 'video':
+			ret += self.rep_type_id(p)
 		return ret
 
 
