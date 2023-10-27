@@ -70,17 +70,17 @@ class MediaRep:
 
 
 def line_kernel(p, mediarep):
-	p = mediarep.rep(p)
 	p = ptn_strong.sub(term.mod('\\1', term.color('white', 'fl'), term.bold(), term.underline()), p)
 	p = ptn_link.sub(r'\1 ', p)
 	p = ptn_span.sub(r'\1', p)
 	p = ptn_ignore.sub('', p)
 
-	# after processing tags
+	# after processing text tags
 	p = html.unescape(p)
 	p = ptn_hashtag.sub(term.mod(r'\g<tag>', term.color('blue', 'fl')), p)
 	p = ptn_http.sub(term.mod(r' \1 ', term.color('blue', 'fl')), p)
 
+	p = mediarep.rep(p)
 	return p
 
 
