@@ -51,7 +51,7 @@ def search_image_in_cache(mediaId):
 def search_image_in_content(mediaId, contentId):
 	if not contentId:
 		return None
-	content_dir = refdir_untouch(f'contents/{contentId}')
+	content_dir = refdir_untouch(os.path.join('contents', contentId))
 	if not content_dir:
 		return None
 
