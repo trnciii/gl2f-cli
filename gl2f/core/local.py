@@ -64,13 +64,16 @@ def search_image_in_content(mediaId, contentId):
 		return None
 
 def search_image_all_contents(mediaId):
-		import glob
-		exclude = ['.mp4', '.mov']
-		try:
-			files = glob.iglob(f'contents/*/{mediaId}.*', root_dir=home())
-			return os.path.join(home(), next(f for f in files if not any(f.endswith(e) for e in exclude)))
-		except:
-			return None
+	import glob
+	exclude = ['.mp4', '.mov']
+	try:
+		files = glob.iglob(f'{os.path.abspath(home())}/contents/*/{mediaId}.*')
+		return os.path.relpath(next(f for f in files if not any(f.endswith(e) for e in exclude)))
+	except StopIteration:
+		return None
+	except Exception as e:
+		print(e)
+		raise RuntimeError()
 
 
 def stat():
