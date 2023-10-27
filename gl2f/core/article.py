@@ -53,7 +53,7 @@ class MediaRep:
 			return p
 		i, t = match.group(1, 2)
 
-		if file:=local.search_media(i, self.contentId):
+		if file:=local.search_image(i, self.contentId):
 			image = Image.open(file)
 		else:
 			_, data = self.dl(mediaId=i)
