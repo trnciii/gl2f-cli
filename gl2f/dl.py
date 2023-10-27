@@ -69,7 +69,7 @@ def save(item, args):
 				return 'skipped'
 
 			meta, response = article.dl_medium(boardId, contentId, mediaId,
-				head=args.skip, stream=True, streamfile=args.stream, xauth=xauth)
+				head=args.skip, request_as_stream=True, streamfile=args.stream, xauth=xauth)
 
 			bar.progress[mediaId]['length'] = int(response.headers['content-length'])
 

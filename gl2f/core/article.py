@@ -112,7 +112,7 @@ def lines(item, style, use_sixel, max_size=None):
 			yield from results
 
 
-def dl_medium(boardId, contentId, mediaId, head=False, stream=False, streamfile=False, xauth=None):
+def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, streamfile=False, xauth=None):
 	import requests
 
 	class bad_response:
@@ -135,7 +135,7 @@ def dl_medium(boardId, contentId, mediaId, head=False, stream=False, streamfile=
 	if head:
 		return meta, requests.head(url)
 	else:
-		return meta, requests.get(url, stream=stream)
+		return meta, requests.get(url, stream=request_as_stream)
 
 def media_stat(body):
 	types = [t for _, t in  ptn_media.findall(body)]
