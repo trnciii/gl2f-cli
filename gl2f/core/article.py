@@ -25,7 +25,7 @@ class MediaRep:
 
 			local.refdir('cache')
 			self.contentId = contentId
-			self.dl = partial(dl_medium, boardId, self.contentId, xauth=auth.update(auth.load()))
+			self.dl = partial(dl_medium, boardId, self.contentId, url_key='thumbnailAccessUrl', xauth=auth.update(auth.load()))
 			self.rep = self.rep_sixel
 			self.max_size = max_size if max_size else config.get('max-image-size', (1000, 1000))
 
@@ -112,7 +112,7 @@ def lines(item, style, use_sixel, max_size=None):
 			yield from results
 
 
-def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, streamfile=False, xauth=None):
+def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, url_key='originalUrl', xauth=None):
 	import requests
 
 	class bad_response:
@@ -130,7 +130,7 @@ def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, 
 		return response, bad_response
 
 	meta = response.json()
-	url = meta['accessUrl'] if streamfile else meta.get('originalUrl', meta['accessUrl'])
+	url = meta.get(url_key, meta['accessUrl'])
 
 	if head:
 		return meta, requests.head(url)

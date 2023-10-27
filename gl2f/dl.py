@@ -62,14 +62,14 @@ def save(item, args):
 		bar.print()
 
 		xauth = auth.update(auth.load())
-
+		url_key = 'accessUrl' if args.stream else 'originalUrl'
 		def dl(mediaId):
 			ptn = re.compile(mediaId + r'\..+')
 			if (not args.force) and any(map(ptn.search, os.listdir(out))):
 				return 'skipped'
 
 			meta, response = article.dl_medium(boardId, contentId, mediaId,
-				head=args.skip, request_as_stream=True, streamfile=args.stream, xauth=xauth)
+				head=args.skip, request_as_stream=True, url_key=url_key, xauth=xauth)
 
 			bar.progress[mediaId]['length'] = int(response.headers['content-length'])
 
