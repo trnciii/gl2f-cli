@@ -6,7 +6,6 @@ from .config import config
 
 ptn_paragraph = re.compile(r'<p.*?>(?P<paragraph>.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(?P<id>.+?)".*?type="(?P<type>.+?)".*?></fns-media>')
-ptn_break = re.compile(r'<br>')
 ptn_link = re.compile(r'<a href="(?P<url>.+?)".*?>(?P<text>.+?)</a>')
 ptn_strong = re.compile(r'<strong.*?>(?P<content>.*?)</strong>')
 ptn_span = re.compile(r'<span.*?>(?P<content>.*?)</span>')
