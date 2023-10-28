@@ -6,8 +6,7 @@ from .config import config
 
 ptn_paragraph = re.compile(r'<p.*?>(?P<paragraph>.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(?P<id>.+?)".*?type="(?P<type>.+?)".*?></fns-media>')
-ptn_break = re.compile(r'<br>')
-ptn_link = re.compile(r'<a href="(?P<url>.+?)".*?>.+?</a>')
+ptn_link = re.compile(r'<a href="(?P<url>.+?)".*?>(?P<text>.+?)</a>')
 ptn_strong = re.compile(r'<strong.*?>(?P<content>.*?)</strong>')
 ptn_span = re.compile(r'<span.*?>(?P<content>.*?)</span>')
 ptn_http = re.compile(r'(?P<url>https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
@@ -75,16 +74,23 @@ def to_media_style(article_style, boardId, contentId, use_sixel, max_size=None):
 
 	return rep_type
 
+def anchor(p):
+	ma = ptn_link.search(p)
+	if not ma:
+		return p
+	text, url = ma.group('text', 'url')
+	return ptn_link.sub(url, p) if text == url else ptn_link.sub(f'[{term.mod(text, term.bold())}]( {url} )', p)
+
 def line_kernel(p, mediarep):
 	p = ptn_strong.sub(term.mod(r'\g<content>', term.color('white', 'fl'), term.bold(), term.underline()), p)
-	p = ptn_link.sub(r'\g<url> ', p)
+	p = anchor(p)
 	p = ptn_span.sub(r'\g<content>', p)
 	p = ptn_ignore.sub('', p)
 
 	# after processing text tags
 	p = html.unescape(p)
 	p = ptn_hashtag.sub(term.mod(r'\g<tag>', term.color('blue', 'fl')), p)
-	p = ptn_http.sub(term.mod(r' \g<url> ', term.color('blue', 'fl')), p)
+	p = ptn_http.sub(term.mod(r'\g<url>', term.color('blue', 'fl')), p)
 
 	p = mediarep(p)
 	return p
