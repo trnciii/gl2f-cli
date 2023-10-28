@@ -8,16 +8,14 @@ def generate():
 	boards = board.tree()
 	_, commands = command_builder.build(command_builder.builtin + command_builder.get_addon_registrars())
 
-	source = source.replace('## REPLACE_PAGES_FIRST',
-			f'''COMPREPLY=( $(compgen -W "{' '.join({k + ('/' if len(v)>0 else '') for k, v in boards.items()})}" -- ${{cur}}) )'''
-		).replace('## REPLACE_PAGES_SECOND', ''.join(f'''
+	return source.replace('## REPLACE_PAGES_FIRST',
+		f'''COMPREPLY=( $(compgen -W "{' '.join({k + ('/' if len(v)>0 else '') for k, v in boards.items()})}" -- ${{cur}}) )'''
+	).replace('## REPLACE_PAGES_SECOND', ''.join(f'''
 		  {k})
         COMPREPLY=( $(compgen -W "{' '.join(set(v))}" -P "${{prefix}}/" -- ${{realcur}}) )
         ;;'''
 			for k, v in sorted(boards.items()) if len(v)>0)
-		).replace('## REPLACE_COMMAND_TREE', gen_tree('gl2f'))
-
-	return source
+	).replace('## REPLACE_COMMAND_TREE', gen_tree('gl2f'))
 
 def gen_tree(current_parent):
 	commands = command_builder.builtin + command_builder.get_addon_registrars()
