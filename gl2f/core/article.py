@@ -4,14 +4,13 @@ from ..ayame import sixel, terminal as term
 from . import auth
 from .config import config
 
-
-ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
-ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
+ptn_paragraph = re.compile(r'<p.*?>(?P<paragraph>.*?)</p>')
+ptn_media = re.compile(r'<fns-media.*?media-id="(?P<id>.+?)".*?type="(?P<type>.+?)".*?></fns-media>')
 ptn_break = re.compile(r'<br>')
-ptn_link = re.compile(r'<a href="(.+?)".*?>.+?</a>')
-ptn_strong = re.compile(r'<strong.*?>(.*?)</strong>')
-ptn_span = re.compile(r'<span.*?>(.*?)</span>')
-ptn_http = re.compile(r'(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
+ptn_link = re.compile(r'<a href="(?P<url>.+?)".*?>.+?</a>')
+ptn_strong = re.compile(r'<strong.*?>(?P<content>.*?)</strong>')
+ptn_span = re.compile(r'<span.*?>(?P<content>.*?)</span>')
+ptn_http = re.compile(r'(?P<url>https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
 ptn_ignore = re.compile(r'￼|&nbsp;|<br>')
 ptn_hashtag = re.compile(r'(?P<tag>\B#\w+)')
 
@@ -19,16 +18,16 @@ def rep_none(p):
 	return ptn_media.sub('', p)
 
 def rep_type(p):
-	return ptn_media.sub(term.mod('[\\2]', term.dim()), p)
+	return ptn_media.sub(term.mod(r'[\g<type>]', term.dim()), p)
 
 def rep_type_id(p):
-	return ptn_media.sub(term.mod('[\\2](\\1)', term.dim()), p)
+	return ptn_media.sub(term.mod(r'[\g<type>](\g<id>)', term.dim()), p)
 
 def rep_type_url(p, boardId, contentId, xauth):
 	ma = ptn_media.search(p)
 	if not ma:
 		return p
-	i, t = ma.group(1, 2)
+	i, t = ma.group('id', 'type')
 	meta, _ = dl_medium(boardId, contentId, i, head=True, xauth=xauth)
 	url = meta['originalUrl'] if t == 'video' else meta['accessUrl']
 	return term.mod(f'[{t}] {url}', term.dim())
@@ -40,7 +39,7 @@ def rep_sixel(p, boardId, contentId, max_size, xauth):
 	match = ptn_media.search(p)
 	if not match:
 		return p
-	i, t = match.group(1, 2)
+	i, t = match.group('id', 'type')
 
 	if file:=local.search_image(i, contentId):
 		image = Image.open(file)
@@ -77,15 +76,15 @@ def to_media_style(article_style, boardId, contentId, use_sixel, max_size=None):
 	return rep_type
 
 def line_kernel(p, mediarep):
-	p = ptn_strong.sub(term.mod('\\1', term.color('white', 'fl'), term.bold(), term.underline()), p)
-	p = ptn_link.sub(r'\1 ', p)
-	p = ptn_span.sub(r'\1', p)
+	p = ptn_strong.sub(term.mod(r'\g<content>', term.color('white', 'fl'), term.bold(), term.underline()), p)
+	p = ptn_link.sub(r'\g<url> ', p)
+	p = ptn_span.sub(r'\g<content>', p)
 	p = ptn_ignore.sub('', p)
 
 	# after processing text tags
 	p = html.unescape(p)
 	p = ptn_hashtag.sub(term.mod(r'\g<tag>', term.color('blue', 'fl')), p)
-	p = ptn_http.sub(term.mod(r' \1 ', term.color('blue', 'fl')), p)
+	p = ptn_http.sub(term.mod(r' \g<url> ', term.color('blue', 'fl')), p)
 
 	p = mediarep(p)
 	return p
@@ -98,7 +97,7 @@ def lines(item, style, use_sixel, max_size=None):
 	f = partial(line_kernel, mediarep=to_media_style(style, item['boardId'], item['contentId'], use_sixel, max_size))
 
 	with ThreadPoolExecutor(max_workers=5) as e:
-		results = e.map(f, (p.group(1) for p in ptn_paragraph.finditer(item['values']['body'])))
+		results = e.map(f, (p.group('paragraph') for p in ptn_paragraph.finditer(item['values']['body'])))
 
 		if style == 'full':
 			yield from (f'{r}\n' for r in results)

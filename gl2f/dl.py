@@ -55,7 +55,7 @@ def save(item, args):
 		f.write(json.dumps(item, indent=2, ensure_ascii=False))
 
 
-	li = [i.group(1) for i in article.ptn_media.finditer(item['values']['body'])]
+	li = [i.group('id') for i in article.ptn_media.finditer(item['values']['body'])]
 
 	if len(li) > 0:
 		bar = Bar(li, contentId)
