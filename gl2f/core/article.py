@@ -24,6 +24,15 @@ def rep_type(p):
 def rep_type_id(p):
 	return ptn_media.sub(term.mod('[\\2](\\1)', term.dim()), p)
 
+def rep_type_url(p, boardId, contentId, xauth):
+	ma = ptn_media.search(p)
+	if not ma:
+		return p
+	i, t = ma.group(1, 2)
+	meta, _ = dl_medium(boardId, contentId, i, head=True, xauth=xauth)
+	url = meta['originalUrl'] if t == 'video' else meta['accessUrl']
+	return term.mod(f'[{t}] {url}', term.dim())
+
 def rep_sixel(p, boardId, contentId, max_size, xauth):
 	from io import BytesIO
 	from PIL import Image
@@ -62,8 +71,10 @@ def to_media_style(article_style, boardId, contentId, use_sixel, max_size=None):
 		max_size = max_size if max_size else config.get('max-image-size', (1000, 1000))
 		return partial(rep_sixel, boardId=boardId, contentId=contentId, max_size=max_size, xauth=auth.update(auth.load()))
 
-	return rep_type_id
+	if article_style == 'full':
+		return partial(rep_type_url, boardId=boardId, contentId=contentId, xauth=auth.update(auth.load()))
 
+	return rep_type_id
 
 def line_kernel(p, mediarep):
 	p = ptn_strong.sub(term.mod('\\1', term.color('white', 'fl'), term.bold(), term.underline()), p)
