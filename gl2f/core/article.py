@@ -54,7 +54,7 @@ def rep_sixel(p, boardId, contentId, max_size, xauth):
 	image = sixel.limit(image, max_size)
 	ret = sixel.to_sixel(image)
 	if t == 'video':
-		ret += rep_type_id(p)
+		ret += rep_type_url(p, boardId, contentId, xauth)
 	return ret
 
 def to_media_style(article_style, boardId, contentId, use_sixel, max_size=None):
@@ -74,7 +74,7 @@ def to_media_style(article_style, boardId, contentId, use_sixel, max_size=None):
 	if article_style == 'full':
 		return partial(rep_type_url, boardId=boardId, contentId=contentId, xauth=auth.update(auth.load()))
 
-	return rep_type_id
+	return rep_type
 
 def line_kernel(p, mediarep):
 	p = ptn_strong.sub(term.mod('\\1', term.color('white', 'fl'), term.bold(), term.underline()), p)
