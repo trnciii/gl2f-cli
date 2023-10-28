@@ -4,83 +4,89 @@ from ..ayame import sixel, terminal as term
 from . import auth
 from .config import config
 
-
-ptn_paragraph = re.compile(r'<p.*?>(.*?)</p>')
-ptn_media = re.compile(r'<fns-media.*?media-id="(.+?)".*?type="(.+?)".*?></fns-media>')
+ptn_paragraph = re.compile(r'<p.*?>(?P<paragraph>.*?)</p>')
+ptn_media = re.compile(r'<fns-media.*?media-id="(?P<id>.+?)".*?type="(?P<type>.+?)".*?></fns-media>')
 ptn_break = re.compile(r'<br>')
-ptn_link = re.compile(r'<a href="(.+?)".*?>.+?</a>')
-ptn_strong = re.compile(r'<strong.*?>(.*?)</strong>')
-ptn_span = re.compile(r'<span.*?>(.*?)</span>')
-ptn_http = re.compile(r'(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
+ptn_link = re.compile(r'<a href="(?P<url>.+?)".*?>.+?</a>')
+ptn_strong = re.compile(r'<strong.*?>(?P<content>.*?)</strong>')
+ptn_span = re.compile(r'<span.*?>(?P<content>.*?)</span>')
+ptn_http = re.compile(r'(?P<url>https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
 ptn_ignore = re.compile(r'￼|&nbsp;|<br>')
 ptn_hashtag = re.compile(r'(?P<tag>\B#\w+)')
 
-class MediaRep:
-	def __init__(self, style, contentId, boardId, max_size=None):
-		if style == 'type':
-			self.rep = self.rep_type
+def rep_none(p):
+	return ptn_media.sub('', p)
 
-		elif style == 'sixel' and sixel.init():
-			from functools import partial
+def rep_type(p):
+	return ptn_media.sub(term.mod(r'[\g<type>]', term.dim()), p)
 
-			local.refdir('cache')
-			self.contentId = contentId
-			self.dl = partial(dl_medium, boardId, self.contentId, xauth=auth.update(auth.load()))
-			self.rep = self.rep_sixel
-			self.max_size = max_size if max_size else config.get('max-image-size', (1000, 1000))
+def rep_type_id(p):
+	return ptn_media.sub(term.mod(r'[\g<type>](\g<id>)', term.dim()), p)
 
-		elif style == 'none':
-			self.rep = self.rep_none
+def rep_type_url(p, boardId, contentId, xauth):
+	ma = ptn_media.search(p)
+	if not ma:
+		return p
+	i, t = ma.group('id', 'type')
+	meta, _ = dl_medium(boardId, contentId, i, head=True, xauth=xauth)
+	url = meta['originalUrl'] if t == 'video' else meta['accessUrl']
+	return term.mod(f'[{t}] {url}', term.dim())
 
-		else:
-			self.rep = self.rep_type_id
+def rep_sixel(p, boardId, contentId, max_size, xauth):
+	from io import BytesIO
+	from PIL import Image
 
-	def rep_none(self, p):
-		return ptn_media.sub('', p)
+	match = ptn_media.search(p)
+	if not match:
+		return p
+	i, t = match.group('id', 'type')
 
-	def rep_type(self, p):
-		return ptn_media.sub(term.mod('[\\2]', term.dim()), p)
+	if file:=local.search_image(i, contentId):
+		image = Image.open(file)
+	else:
+		_, data = dl_medium(boardId, contentId, i, url_key='thumbnailAccessUrl', xauth=xauth)
+		if data.ok:
+			with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
+				f.write(data.content)
+		image = Image.open(BytesIO(data.content))
 
-	def rep_type_id(self, p):
-		return ptn_media.sub(term.mod('[\\2](\\1)', term.dim()), p)
+	image = sixel.limit(image, max_size)
+	ret = sixel.to_sixel(image)
+	if t == 'video':
+		ret += rep_type_url(p, boardId, contentId, xauth)
+	return ret
 
-	def rep_sixel(self, p):
-		from io import BytesIO
-		from PIL import Image
+def to_media_style(article_style, boardId, contentId, use_sixel, max_size=None):
+	from functools import partial
 
-		match = ptn_media.search(p)
-		if not match:
-			return p
-		i, t = match.group(1, 2)
-		if t != 'image':
-			return self.rep_type_id(p)
+	if article_style == 'compressed':
+		return rep_type
 
-		if file:=local.search_media(i, self.contentId):
-			image = Image.open(file)
-		else:
-			_, data = self.dl(mediaId=i)
-			if data.ok:
-				with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
-					f.write(data.content)
-			image = Image.open(BytesIO(data.content))
+	if article_style == 'plain':
+		return rep_none
 
-		image = sixel.limit(image, self.max_size)
-		ret = sixel.to_sixel(image)
-		return ret
+	if use_sixel and sixel.init():
+		local.refdir('cache')
+		max_size = max_size if max_size else config.get('max-image-size', (1000, 1000))
+		return partial(rep_sixel, boardId=boardId, contentId=contentId, max_size=max_size, xauth=auth.update(auth.load()))
 
+	if article_style == 'full':
+		return partial(rep_type_url, boardId=boardId, contentId=contentId, xauth=auth.update(auth.load()))
+
+	return rep_type
 
 def line_kernel(p, mediarep):
-	p = ptn_strong.sub(term.mod('\\1', term.color('white', 'fl'), term.bold(), term.underline()), p)
-	p = ptn_link.sub(r'\1 ', p)
-	p = ptn_span.sub(r'\1', p)
+	p = ptn_strong.sub(term.mod(r'\g<content>', term.color('white', 'fl'), term.bold(), term.underline()), p)
+	p = ptn_link.sub(r'\g<url> ', p)
+	p = ptn_span.sub(r'\g<content>', p)
 	p = ptn_ignore.sub('', p)
 
 	# after processing text tags
 	p = html.unescape(p)
 	p = ptn_hashtag.sub(term.mod(r'\g<tag>', term.color('blue', 'fl')), p)
-	p = ptn_http.sub(term.mod(r' \1 ', term.color('blue', 'fl')), p)
+	p = ptn_http.sub(term.mod(r' \g<url> ', term.color('blue', 'fl')), p)
 
-	p = mediarep.rep(p)
+	p = mediarep(p)
 	return p
 
 
@@ -88,15 +94,10 @@ def lines(item, style, use_sixel, max_size=None):
 	from concurrent.futures import ThreadPoolExecutor
 	from functools import partial
 
-	f = partial(line_kernel, mediarep=MediaRep({
-		'full': 'sixel' if use_sixel else 'type_id',
-		'compact': 'sixel' if use_sixel else 'type_id',
-		'compressed': 'type',
-		'plain': 'none'
-	}[style], item['contentId'], item['boardId'], max_size))
+	f = partial(line_kernel, mediarep=to_media_style(style, item['boardId'], item['contentId'], use_sixel, max_size))
 
 	with ThreadPoolExecutor(max_workers=5) as e:
-		results = e.map(f, (p.group(1) for p in ptn_paragraph.finditer(item['values']['body'])))
+		results = e.map(f, (p.group('paragraph') for p in ptn_paragraph.finditer(item['values']['body'])))
 
 		if style == 'full':
 			yield from (f'{r}\n' for r in results)
@@ -112,7 +113,7 @@ def lines(item, style, use_sixel, max_size=None):
 			yield from results
 
 
-def dl_medium(boardId, contentId, mediaId, head=False, stream=False, streamfile=False, xauth=None):
+def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, url_key='originalUrl', xauth=None):
 	import requests
 
 	class bad_response:
@@ -130,12 +131,12 @@ def dl_medium(boardId, contentId, mediaId, head=False, stream=False, streamfile=
 		return response, bad_response
 
 	meta = response.json()
-	url = meta['accessUrl'] if streamfile else meta.get('originalUrl', meta['accessUrl'])
+	url = meta.get(url_key, meta['accessUrl'])
 
 	if head:
 		return meta, requests.head(url)
 	else:
-		return meta, requests.get(url, stream=stream)
+		return meta, requests.get(url, stream=request_as_stream)
 
 def media_stat(body):
 	types = [t for _, t in  ptn_media.findall(body)]

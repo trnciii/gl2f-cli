@@ -55,21 +55,21 @@ def save(item, args):
 		f.write(json.dumps(item, indent=2, ensure_ascii=False))
 
 
-	li = [i.group(1) for i in article.ptn_media.finditer(item['values']['body'])]
+	li = [i.group('id') for i in article.ptn_media.finditer(item['values']['body'])]
 
 	if len(li) > 0:
 		bar = Bar(li, contentId)
 		bar.print()
 
 		xauth = auth.update(auth.load())
-
+		url_key = 'accessUrl' if args.stream else 'originalUrl'
 		def dl(mediaId):
 			ptn = re.compile(mediaId + r'\..+')
 			if (not args.force) and any(map(ptn.search, os.listdir(out))):
 				return 'skipped'
 
 			meta, response = article.dl_medium(boardId, contentId, mediaId,
-				head=args.skip, stream=True, streamfile=args.stream, xauth=xauth)
+				head=args.skip, request_as_stream=True, url_key=url_key, xauth=xauth)
 
 			bar.progress[mediaId]['length'] = int(response.headers['content-length'])
 
