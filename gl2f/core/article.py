@@ -44,7 +44,7 @@ def rep_sixel(p, boardId, contentId, max_size, xauth):
 	if file:=local.search_image(i, contentId):
 		image = Image.open(file)
 	else:
-		_, data = dl_medium(boardId, contentId, i, url_key='thumbnailAccessUrl', xauth=xauth)
+		_, data = dl_medium(boardId, contentId, i, video_url_key='thumbnailAccessUrl', xauth=xauth)
 		if data.ok:
 			with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
 				f.write(data.content)
@@ -113,7 +113,7 @@ def lines(item, style, use_sixel, max_size=None):
 			yield from results
 
 
-def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, url_key='originalUrl', xauth=None):
+def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, video_url_key='originalUrl', xauth=None):
 	import requests
 
 	class bad_response:
@@ -131,7 +131,7 @@ def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, 
 		return response, bad_response
 
 	meta = response.json()
-	url = meta.get(url_key, meta['accessUrl'])
+	url = meta[video_url_key] if meta['type'] == 'video' else meta['accessUrl']
 
 	if head:
 		return meta, requests.head(url)
