@@ -34,6 +34,9 @@ jobs:
     - run: python3 -m pytest --junit-xml results/pytest.xml
       continue-on-error: true
 
+    - run: py.test --pylint --pylint-error-types=EF --pylint-ignore-patterns=gl2f.ayame --junit-xml=results/pytest-pylint.xml
+      continue-on-error: true
+
     - uses: actions/upload-artifact@v3
       with:
         name: test results ${{ matrix.python }} ${{ matrix.runs-on }}
