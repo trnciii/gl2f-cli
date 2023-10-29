@@ -47,7 +47,7 @@ def save(item, args):
 		out = os.path.join(args.o, contentId)
 		os.makedirs(out, exist_ok=True)
 	else:
-		out = local.refdir(os.path.join('contents', contentId))
+		out = local.fs.refdir(os.path.join('contents', contentId))
 
 	with open(os.path.join(out, f'{contentId}.json'), 'w', encoding='utf-8') as f:
 		f.write(json.dumps(item, indent=2, ensure_ascii=False))
@@ -96,7 +96,7 @@ def save(item, args):
 
 
 def subcommand(args):
-	from .core.local import refdir_untouch
+	from .core.local.fs import refdir_untouch
 	from .local import index
 
 	if args.board.startswith('https'):
