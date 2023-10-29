@@ -75,7 +75,7 @@ def import_contents(src):
 	import shutil, tempfile
 	from ..ayame import terminal as term
 
-	left = local.refdir('contents')
+	left = local.fs.refdir('contents')
 	tempdir = tempfile.TemporaryDirectory()
 	right = tempdir.name
 
@@ -145,7 +145,7 @@ def export_contents(out):
 	import shutil
 	from datetime import datetime
 
-	contents = local.refdir_untouch('contents')
+	contents = local.fs.refdir_untouch('contents')
 	if not contents:
 		print('contents not found')
 		return
@@ -162,6 +162,6 @@ def export_contents(out):
 
 		base = out
 
-	sizeInGb = local.stat()["contents"]["size"]/1024**3
+	sizeInGb = local.data.stat()["contents"]["size"]/1024**3
 	print(f'zipping contents into {base}.zip ({sizeInGb:.2f} GB)')
 	shutil.make_archive(base, 'zip', root_dir=contents)

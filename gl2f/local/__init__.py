@@ -5,7 +5,7 @@ from ..core.config import data as config
 
 
 def ls(args):
-	items = [local.load_content(i) for i in sorted(local.listdir('contents'))]
+	items = [local.data.load(i) for i in sorted(local.fs.listdir('contents'))]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
@@ -19,7 +19,7 @@ def ls(args):
 
 
 def clear_cache():
-	if d:=local.refdir_untouch('cache'):
+	if d:=local.fs.refdir_untouch('cache'):
 		for i in os.listdir(d):
 			os.remove(os.path.join(d, i))
 
@@ -29,7 +29,7 @@ def declare_js_string_constant(name, value):
 def install_to(dst, link_type):
 	import shutil, socket
 
-	src = local.package_data('site')
+	src = local.fs.package_data('site')
 
 	if os.path.exists(dst):
 		print(f'reinstalling {dst} that already exists')
@@ -39,12 +39,11 @@ def install_to(dst, link_type):
 	cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
 	cp(src, dst)
 
-
 	if link_type == 'symbolic':
 		contents_path = 'contents'
 		index_path = 'index.js'
-		os.symlink(local.refdir('contents'), os.path.join(dst, 'contents'))
-		os.symlink(os.path.join(local.home(), 'index.js'), os.path.join(dst, 'index.js'))
+		os.symlink(local.fs.refdir('contents'), os.path.join(dst, 'contents'))
+		os.symlink(os.path.join(local.fs.home(), 'index.js'), os.path.join(dst, 'index.js'))
 	elif link_type == 'relative':
 		contents_path = '../contents'
 		index_path = '../index.js'
@@ -67,7 +66,7 @@ class index:
 	@staticmethod
 	def load():
 		try:
-			path = os.path.join(local.refdir_untouch('site'), 'index.js')
+			path = os.path.join(local.fs.refdir_untouch('site'), 'index.js')
 			with open(path, encoding='utf-8') as f:
 				raw = f.read()
 			return json.loads(re.sub(r'^.+?=', '', raw))
@@ -80,7 +79,7 @@ class index:
 	def value(i):
 		from ..core import board, article
 
-		item = local.load_content(i)
+		item = local.data.load(i)
 		media = [i for i, _ in article.ptn_media.findall(item['values']['body'])]
 		return {
 			'title': item['values']['title'],
@@ -89,7 +88,7 @@ class index:
 			'date': item['openingAt'],
 			'media': [''.join(x) for x in sorted(
 				filter(lambda x:x[0] in media,
-					(os.path.splitext(i) for i in local.listdir(os.path.join('contents', i)))
+					(os.path.splitext(i) for i in local.fs.listdir(os.path.join('contents', i)))
 				),
 				key=lambda x:media.index(x[0])
 			)],
@@ -109,20 +108,20 @@ class index:
 	@staticmethod
 	def main(site=None, full=False):
 		if not site:
-			site = local.refdir_untouch('site')
+			site = local.fs.refdir_untouch('site')
 
 		if not site:
 			print('site not installed. return')
 			return
 
 		if full:
-			table = index.create_table(local.listdir('contents'))
+			table = index.create_table(local.fs.listdir('contents'))
 		else:
 			prev = index.load()
-			contents = list(set(local.listdir('contents')).difference(prev.keys()))
+			contents = list(set(local.fs.listdir('contents')).difference(prev.keys()))
 			table = prev | index.create_table(contents)
 
-		out = os.path.join(local.home(), 'index.js')
+		out = os.path.join(local.fs.home(), 'index.js')
 		with open(out, 'w', encoding='utf-8') as f:
 			print(f'const table={json.dumps(table, separators=(",", ":"), ensure_ascii=False)}', file=f)
 
@@ -132,11 +131,11 @@ class index:
 def open_site():
 	import webbrowser
 
-	html = os.path.join(local.home(), 'site', 'index.html')
+	html = os.path.join(local.fs.home(), 'site', 'index.html')
 
 	if not os.path.exists(html):
 		if 'n' != input('site not installed. install now? (Y/n)').lower():
-			install_to(os.path.join(local.home(), 'site'), 'relative')
+			install_to(os.path.join(local.fs.home(), 'site'), 'relative')
 		else:
 			return
 	else:
@@ -148,7 +147,7 @@ def build_body(item):
 	from ..core import article
 
 	i = item['contentId']
-	media_list = local.listdir(f'contents/{i}')
+	media_list = local.fs.listdir(f'contents/{i}')
 
 	def up(match):
 		m, t = match.groups()
@@ -224,7 +223,7 @@ def add_args(parser):
 	sub = parser.add_subparsers()
 
 	sub.add_parser('clear-cache', description='remove media cache').set_defaults(handler=lambda _:clear_cache())
-	sub.add_parser('dir', description='Path of gl2f directory').set_defaults(handler=lambda _:print(local.home()))
+	sub.add_parser('dir', description='Path of gl2f directory').set_defaults(handler=lambda _:print(local.fs.home()))
 
 	p = sub.add_parser('export', description='Export saved contents to an archive')
 	p.add_argument('-o', default='.')
@@ -235,7 +234,7 @@ def add_args(parser):
 	p.set_defaults(handler=lambda args:archive.import_contents(args.archive))
 
 	sub.add_parser('index', description='Create index of contents for web viewer').set_defaults(handler = lambda _:index.main(full=True))
-	sub.add_parser('install', description='Install static web viewer').set_defaults(handler=lambda _:install_to(os.path.join(local.home(), 'site'), 'relative'))
+	sub.add_parser('install', description='Install static web viewer').set_defaults(handler=lambda _:install_to(os.path.join(local.fs.home(), 'site'), 'relative'))
 
 	p = sub.add_parser('ls', description='List all local contents')
 	p.add_argument('--order', type=str,
@@ -245,7 +244,7 @@ def add_args(parser):
 	p.set_defaults(handler=ls, format='author:title')
 
 	sub.add_parser('open', description='Open local static web viewer in the browser').set_defaults(handler=lambda _:open_site())
-	sub.add_parser('stat', description='Show storage statistics').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.stat().items())))
+	sub.add_parser('stat', description='Show storage statistics').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.data.stat().items())))
 
 	p = sub.add_parser('serve', description='Serve web viewer')
 	p.add_argument('-p', '--port', type=int,  default=config['serve-port'],

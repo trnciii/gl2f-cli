@@ -44,7 +44,7 @@ def make_case(key, process):
 
 
 def generate():
-	with open(local.package_data('completion.bash')) as f:
+	with open(local.fs.package_data('completion.bash')) as f:
 		source = f.read()
 
 	boards = board.tree()
