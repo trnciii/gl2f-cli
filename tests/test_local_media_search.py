@@ -3,10 +3,9 @@ import os, shutil
 from gl2f.core import local
 
 def home():
-	return local.return_dir(os.path.join('tests', 'gl2f.test'))
+	return local.return_dir(os.path.join('tests', 'data'))
 
 local.home = home
-shutil.rmtree(local.home())
 print(f'home: {local.home()}')
 
 cache_dir = local.refdir('cache')
@@ -35,9 +34,6 @@ paths = [
 	os.path.join(content1_dir, 'first_mov.mov'),
 	os.path.join(content1_dir, 'first_unknown_type.xxx')
 ]
-
-for path in paths:
-	open(path, 'w').close()
 
 
 def test_fallback():

@@ -7,4 +7,3 @@ dist/
 *.spec
 venv
 gl2f/__version__.py
-tests/gl2f.test
