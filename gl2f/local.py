@@ -23,8 +23,10 @@ def clear_cache():
 		for i in os.listdir(d):
 			os.remove(os.path.join(d, i))
 
+def declare_js_string_constant(name, value):
+	return f'const {name} = "{value}";\n'
 
-def install_to(dst):
+def install_to(dst, link_type):
 	import shutil, socket
 
 	src = local.package_data('site')
@@ -37,13 +39,26 @@ def install_to(dst):
 	cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
 	cp(src, dst)
 
-	os.symlink(local.refdir('contents'), os.path.join(dst, 'contents'))
-	os.symlink(os.path.join(local.home(), 'index.js'), os.path.join(dst, 'index.js'))
+
+	if link_type == 'symbolic':
+		contents_path = 'contents'
+		index_path = 'index.js'
+		os.symlink(local.refdir('contents'), os.path.join(dst, 'contents'))
+		os.symlink(os.path.join(local.home(), 'index.js'), os.path.join(dst, 'index.js'))
+	elif link_type == 'relative':
+		contents_path = '../contents'
+		index_path = '../index.js'
+
+	else:
+		raise RuntimeError('unknown path type')
 
 	index.main(site=dst, full=True)
 
 	with open(os.path.join(dst, 'constants.js'), 'w', encoding='utf-8') as f:
-		f.write(f'const hostname = "{(config["host-name"])}";')
+		f.write(declare_js_string_constant('hostname', config['host-name']))
+		f.write(declare_js_string_constant('contentsPath', contents_path))
+		f.write(declare_js_string_constant('indexPath', index_path))
+
 
 	print(f'installed site into {dst}')
 
@@ -121,7 +136,7 @@ def open_site():
 
 	if not os.path.exists(html):
 		if 'n' != input('site not installed. install now? (Y/n)').lower():
-			install_to(os.path.join(local.home(), 'site'))
+			install_to(os.path.join(local.home(), 'site'), 'relative')
 		else:
 			return
 	else:
@@ -338,7 +353,7 @@ def serve(port, browse=False):
 	with tempfile.TemporaryDirectory() as tmp:
 		site = os.path.join(tmp, 'site')
 		print(site)
-		install_to(site)
+		install_to(site, 'symbolic')
 
 		class Handler(http.server.SimpleHTTPRequestHandler):
 			def __init__(self, *args, **kwargs):
@@ -379,7 +394,7 @@ def add_args(parser):
 	p.set_defaults(handler=lambda args:import_contents(args.archive))
 
 	sub.add_parser('index').set_defaults(handler = lambda _:index.main(full=True))
-	sub.add_parser('install').set_defaults(handler=lambda _:install_to(os.path.join(local.home(), 'site')))
+	sub.add_parser('install').set_defaults(handler=lambda _:install_to(os.path.join(local.home(), 'site'), 'relative'))
 
 	p = sub.add_parser('ls')
 	p.add_argument('--order', type=str,

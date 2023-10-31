@@ -89,36 +89,11 @@
 </main>
 
 <script src="constants.js"></script>
-<script src="index.js"></script>
 <script>
 const contentId = location.search.split("?")[1];
-const content = table[contentId];
-const dir = `contents/${contentId}`
-const media_table = content['media'];
+const dir = `${contentsPath}/${contentId}`
 
-document.title = `${hostname}/Album - ${content['title']}`;
-
-document.getElementById('links').innerHTML = [
-  `<a href=index.html title=${hostname}>Home</a>`,
-  `<a href=article.html?${contentId}>Article</a>`
-]
-.join('');
-
-
-document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
-document.getElementById('meta').innerHTML = [
- content['author'],
- new Date(content['date']).toLocaleDateString('ja-JP'),
- `<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link"></i></i></a>`
-].join('&nbsp;');
-const cols = document.getElementById('cols');
-cols.value = Math.min(
-  Math.ceil(Math.sqrt(media_table.length * window.innerWidth/window.innerHeight)),
-  media_table.length
-);
-
-
-function list(size){
+function list(size, media_table){
   const min = 250;
   return `<div class="tile" style="width:${Math.max(min, size)}; margin-top:20px; margin-bottom:20px;">`
   + '<div style="width:fit-content; padding:20px; background: pink;text-align:left;">'
@@ -128,11 +103,12 @@ function list(size){
   + ((size<min)?'<br>':'');
 }
 
-const media = document.getElementById('media');
 function draw(){
+  const content = table[contentId];
+  const media_table = content['media'];
   const size = (window.innerWidth-100)/cols.value;
 
-  media.innerHTML = (document.getElementById('list-checkbox').checked?list(size):'')
+  media.innerHTML = (document.getElementById('list-checkbox').checked?list(size, media_table):'')
     + media_table.map(function(e){
       const src = `${dir}/${e}`;
       const ext = src.slice(src.lastIndexOf('.'));
@@ -162,8 +138,35 @@ function draw(){
   });
 }
 
-draw();
+document.getElementById('links').innerHTML = [
+  `<a href=index.html title=${hostname}>Home</a>`,
+  `<a href=article.html?${contentId}>Article</a>`
+]
+.join('');
 
+var element = document.createElement('script');
+element.src = indexPath;
+element.onload = () =>{
+  const content = table[contentId];
+  const media_table = content['media'];
+
+  document.title = `${hostname}/Album - ${content['title']}`;
+
+  document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
+  document.getElementById('meta').innerHTML = [
+   content['author'],
+   new Date(content['date']).toLocaleDateString('ja-JP'),
+   `<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link"></i></i></a>`
+  ].join('&nbsp;');
+  const cols = document.getElementById('cols');
+  cols.value = Math.min(
+    Math.ceil(Math.sqrt(media_table.length * window.innerWidth/window.innerHeight)),
+    media_table.length
+  );
+
+  draw();
+}
+document.body.appendChild(element);
 </script>
 
 </body>
