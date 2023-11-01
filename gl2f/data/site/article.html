@@ -52,28 +52,29 @@ img, video{
 </div></main>
 
 <script src="constants.js"></script>
-<script src="index.js"></script>
 <script>
 const contentId = location.search.split('?')[1];
-const content = table[contentId]
 
-document.title = `${hostname}/${content['title']}`;
+var element = document.createElement('script');
+element.src = indexPath;
+element.onload = () =>{
+  const content = table[contentId]
 
-document.getElementById('links').innerHTML = [
-  `<a href=index.html title=${hostname}>Home</a>`,
-  `<a href=album.html?${contentId}>Album</a>`
-]
-.join('');
+  document.title = `${hostname}/${content['title']}`;
 
+  document.getElementById('links').innerHTML = `
+<a href=index.html title=${hostname}>Home</a>
+<a href=album.html?${contentId}>Album</a>`;
 
-document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
-document.getElementById('meta').innerHTML = [
- content['author'],
- new Date(content['date']).toLocaleDateString('ja-JP'),
- `<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link"></a>`
-].join('&nbsp;');
+  document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
+  document.getElementById('meta').innerHTML = `
+${content['author']}&nbsp;
+${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
+<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link" /></a>`;
 
-document.getElementById('body').innerHTML = content['body'];
+  document.getElementById('body').innerHTML = content['body'];
+}
+document.body.appendChild(element);
 </script>
 
 </body>
