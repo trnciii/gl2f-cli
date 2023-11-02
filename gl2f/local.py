@@ -1,8 +1,8 @@
 import re
 import os, json
-from ..core import pretty, local
-from ..core.config import data as config
-from ..core.local import site, archive
+from .core import pretty, local
+from .core.config import data as config
+from .core.local import site, archive
 
 def ls(args):
 	items = [local.data.load(i) for i in sorted(local.fs.listdir('contents'))]
@@ -44,7 +44,6 @@ def add_to():
 
 def add_args(parser):
 	parser.description = 'Manage local data'
-	from . import archive
 
 	sub = parser.add_subparsers()
 
@@ -82,7 +81,7 @@ def add_args(parser):
 	return sub
 
 def set_compreplies():
-	from ..completion import if_else
+	from .completion import if_else
 	return {
 		'import': '_filedir',
 		'export': if_else('$prev == -o', '_filedir'),
