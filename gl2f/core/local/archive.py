@@ -1,9 +1,10 @@
 import os, json
-from ..core import pretty, local
+from . import fs, data
+from .. import pretty
 
 def colored_diff_lines(left, right):
 	import difflib
-	from ..ayame import terminal as term
+	from ...ayame import terminal as term
 
 	try:
 		with open(left, encoding='utf-8') as l, open(right, encoding='utf-8') as r:
@@ -64,7 +65,7 @@ class ImportChecker:
 
 	def all_diff_files(self):
 		from itertools import chain
-		return chain.from_iterable((os.path.join(c, f) for f in fs) for c, fs in self.diff_files.items())
+		return chain.from_iterable((os.path.join(c, f) for f in files) for c, files in self.diff_files.items())
 
 	def new_files(self):
 		from itertools import chain
@@ -73,9 +74,9 @@ class ImportChecker:
 
 def import_contents(src):
 	import shutil, tempfile
-	from ..ayame import terminal as term
+	from ...ayame import terminal as term
 
-	left = local.fs.refdir('contents')
+	left = fs.refdir('contents')
 	tempdir = tempfile.TemporaryDirectory()
 	right = tempdir.name
 
@@ -145,7 +146,7 @@ def export_contents(out):
 	import shutil
 	from datetime import datetime
 
-	contents = local.fs.refdir_untouch('contents')
+	contents = fs.refdir_untouch('contents')
 	if not contents:
 		print('contents not found')
 		return
@@ -162,6 +163,6 @@ def export_contents(out):
 
 		base = out
 
-	sizeInGb = local.data.stat()["contents"]["size"]/1024**3
+	sizeInGb = data.stat()["contents"]["size"]/1024**3
 	print(f'zipping contents into {base}.zip ({sizeInGb:.2f} GB)')
 	shutil.make_archive(base, 'zip', root_dir=contents)

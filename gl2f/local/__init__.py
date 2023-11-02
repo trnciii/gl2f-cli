@@ -2,7 +2,7 @@ import re
 import os, json
 from ..core import pretty, local
 from ..core.config import data as config
-
+from ..core.local import site, archive
 
 def ls(args):
 	items = [local.data.load(i) for i in sorted(local.fs.listdir('contents'))]
@@ -30,11 +30,11 @@ def open_site():
 
 	if not os.path.exists(html):
 		if 'n' != input('site not installed. install now? (Y/n)').lower():
-			local.site.install_to(os.path.join(local.fs.home(), 'site'), 'relative')
+			site.install_to(os.path.join(local.fs.home(), 'site'), 'relative')
 		else:
 			return
 	else:
-		local.site.index.main()
+		site.index.main()
 
 	webbrowser.open(f'file://{html}')
 
@@ -59,8 +59,8 @@ def add_args(parser):
 	p.add_argument('archive')
 	p.set_defaults(handler=lambda args:archive.import_contents(args.archive))
 
-	sub.add_parser('index', description='Create index of contents for web viewer').set_defaults(handler = lambda _:local.site.index.main(full=True))
-	sub.add_parser('install', description='Install static web viewer').set_defaults(handler=lambda _:local.site.install_to(os.path.join(local.fs.home(), 'site'), 'relative'))
+	sub.add_parser('index', description='Create index of contents for web viewer').set_defaults(handler = lambda _:site.index.main(full=True))
+	sub.add_parser('install', description='Install static web viewer').set_defaults(handler=lambda _:site.install_to(os.path.join(local.fs.home(), 'site'), 'relative'))
 
 	p = sub.add_parser('ls', description='List all local contents')
 	p.add_argument('--order', type=str,
@@ -77,7 +77,7 @@ def add_args(parser):
 		help='Set port to host on')
 	p.add_argument('--open', action='store_true',
 		help='Also open in the browser')
-	p.set_defaults(handler=lambda args:local.site.serve(args.port, args.open))
+	p.set_defaults(handler=lambda args:site.serve(args.port, args.open))
 
 	return sub
 
