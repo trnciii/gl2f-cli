@@ -1,6 +1,11 @@
 from .core import local, board, pretty
 from . import command_builder
 
+def generate_compreply(words, cur, prefix=None):
+	w = ' '.join(words)
+	p = '' if prefix == None else f'-P "{prefix}"'
+	return f'COMPREPLY=( $(compgen -W "{w}" {p} -- "{cur}") )'
+
 def generate():
 	with open(local.package_data('completion.bash')) as f:
 		source = f.read()
@@ -10,14 +15,14 @@ def generate():
 	fm = pretty.Formatter()
 
 	return source.replace('## REPLACE_PAGES_FIRST',
-		f'''COMPREPLY=( $(compgen -W "{' '.join({k + ('/' if len(v)>0 else '') for k, v in boards.items()})}" -- ${{cur}}) )'''
+		generate_compreply({k + ('/' if len(v)>0 else '') for k, v in boards.items()}, '$cur')
 	).replace('## REPLACE_PAGES_SECOND', ''.join(f'''
 		  {k})
-        COMPREPLY=( $(compgen -W "{' '.join(set(v))}" -P "${{prefix}}/" -- ${{realcur}}) )
+		  	{generate_compreply(set(v), '$realcur', prefix='$prefix/')}
         ;;'''
 			for k, v in sorted(boards.items()) if len(v)>0)
 	).replace('## REPLACE_FORMAT',
-		f'COMPREPLY=( $(compgen -W "{" ".join(fm.functions.keys())}" -- "$realcur" ) )'
+		generate_compreply(fm.functions.keys(), '$realcur')
 	).replace('## REPLACE_COMMAND_TREE', gen_tree('gl2f'))
 
 def gen_tree(current_parent):
@@ -52,7 +57,7 @@ def gen_tree(current_parent):
       ;;''' for k, v in command.set_compreplies().items()]
 
 	depth = current_parent.count('.') + 1
-	reply = f'''COMPREPLY=( $(compgen -W '{' '.join(tree[current_parent].choices.keys())}' -- "$cur") )'''
+	reply = generate_compreply(tree[current_parent].choices.keys(), '$cur')
 	ret = f'''if [[ $cword == {depth} ]]; then
 	{reply}
 else
