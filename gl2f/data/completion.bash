@@ -3,7 +3,7 @@ __gl2f_complete_boards(){
     local realcur=${cur##*/}
     local prefix=${cur%/*}
     case ${prefix} in
-    ## REPLACE_PAGES_SECOND
+      ## REPLACE_PAGES_SECOND
     esac
   else
     ## REPLACE_PAGES_FIRST
@@ -20,7 +20,7 @@ __gl2f_complete_format(){
     realcur=${cur##*:}
   fi
 
-  COMPREPLY=( $(compgen -W "author title url date-p date-c index br media page" -- "$realcur" ) )
+  ## REPLACE_FORMAT
 
   if declare -F _init_completion >/dev/null 2>&1; then
     compopt -o nospace
