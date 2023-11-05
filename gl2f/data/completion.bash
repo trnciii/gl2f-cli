@@ -14,6 +14,19 @@ __gl2f_complete_boards(){
   fi
 }
 
+__gl2f_complete_format(){
+  local realcur=$cur
+  if [[ "$cur" == *:* ]]; then
+    realcur=${cur##*:}
+  fi
+
+  COMPREPLY=( $(compgen -W "author title url date-p date-c index br media page" -- "$realcur" ) )
+
+  if declare -F _init_completion >/dev/null 2>&1; then
+    compopt -o nospace
+  fi
+}
+
 _gl2f(){
   local cur prev words cword split
   if declare -F _init_completion >/dev/null 2>&1; then

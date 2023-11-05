@@ -1,6 +1,6 @@
+import os
 from .core import lister, pretty, util
 from .ayame import terminal as term
-import os
 
 def name(): return 'dl'
 
@@ -148,4 +148,8 @@ def add_args(parser):
 	parser.set_defaults(handler=subcommand)
 
 def set_compreply():
-	return '__gl2f_complete_boards'
+	return '''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
+        __gl2f_complete_format
+      else
+        __gl2f_complete_boards
+      fi'''
