@@ -2,7 +2,7 @@ from . import board, member, util
 from ..ayame import terminal as term, zen
 import re
 
-ptn_endspaces = re.compile(r'\s+(?P<newline>\n|$)')
+ptn_endspaces = re.compile(r'\s+(?P<end>\n|$)')
 
 class Formatter:
 	def __init__(self, f='author:title:url', fd=None, sep=' ', items=None):
@@ -105,7 +105,7 @@ class Formatter:
 
 
 	def format(self, item):
-		return ptn_endspaces.sub(r'\g<newline>',
+		return ptn_endspaces.sub(r'\g<end>',
 			self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
 		)
 
