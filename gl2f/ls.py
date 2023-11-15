@@ -10,6 +10,9 @@ def subcommand(args):
 	for i in items:
 		fm.print(i, encoding=args.encoding)
 
+def add_to():
+	return 'gl2f', 'ls'
+
 def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)

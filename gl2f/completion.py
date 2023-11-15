@@ -21,6 +21,8 @@ def generate():
 
 	return source
 
+def add_to():
+	return 'gl2f', 'completion'
 
 def add_args(parser):
 	parser.set_defaults(handler=lambda _:print(generate()))

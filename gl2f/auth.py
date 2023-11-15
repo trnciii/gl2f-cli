@@ -34,6 +34,9 @@ def login(email, password):
 		print('success')
 
 
+def add_to():
+	return 'gl2f', 'auth'
+
 def add_args(parser):
 	sub = parser.add_subparsers()
 
@@ -49,3 +52,5 @@ def add_args(parser):
 	p.set_defaults(handler=lambda args:set_token(args.token))
 
 	sub.add_parser('update').set_defaults(handler=lambda _:update_cli())
+
+	return sub

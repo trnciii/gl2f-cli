@@ -9,6 +9,7 @@ def default():
 		'host-name': socket.gethostname(),
 		'max-image-size': [1000, 1000],
 		'serve-port': 7999,
+		'addons': []
 	}
 
 def filepath():

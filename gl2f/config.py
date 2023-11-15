@@ -39,6 +39,9 @@ def edit():
 
 	config.save(data)
 
+def add_to():
+	return 'gl2f', 'config'
+
 def add_args(parser):
 	sub = parser.add_subparsers()
 
@@ -46,3 +49,5 @@ def add_args(parser):
 	sub.add_parser('path').set_defaults(handler=lambda _:path())
 	sub.add_parser('view').set_defaults(handler=lambda _:view())
 	sub.add_parser('edit').set_defaults(handler=lambda _:edit())
+
+	return sub

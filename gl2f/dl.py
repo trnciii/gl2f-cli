@@ -118,6 +118,8 @@ def subcommand(args):
 	if refdir_untouch('site'):
 		index.main(full=args.force)
 
+def add_to():
+	return 'gl2f', 'dl'
 
 def add_args(parser):
 	lister.add_args(parser)

@@ -59,6 +59,9 @@ def subcommand(args):
 		term.write_with_encoding('\n', args.encoding)
 
 
+def add_to():
+	return 'gl2f', 'search'
+
 def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
