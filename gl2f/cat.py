@@ -32,8 +32,7 @@ def subcommand(args):
 			cat(i, args)
 	else:
 		fm = pretty.from_args(args, items)
-		selected = term.select([fm.format(i) for i in items])
-		for i in [i for s, i in zip(selected, items) if s]:
+		for i in term.selected(items, fm.format):
 			cat(i, args)
 
 

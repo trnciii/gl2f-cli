@@ -110,9 +110,7 @@ def subcommand(args):
 		items = (li[i-1] for i in args.pick if 0<i<=len(li))
 	else:
 		li = lister.list_contents(args)
-		fm = pretty.from_args(args, li)
-		selected = term.select([fm.format(i) for i in li])
-		items = (i for s, i in zip(selected, li) if s)
+		items = term.selected(li, pretty.from_args(args, li).format)
 
 	for i in items:
 		save(i, args)
