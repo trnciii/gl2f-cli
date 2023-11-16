@@ -23,8 +23,7 @@ def subcommand(args):
 			fm.print(i)
 			open_url(i)
 	else:
-		selected = term.select([fm.format(i) for i in items])
-		for i in [i for s, i in zip(selected, items) if s]:
+		for i in term.selected(items, fm.format):
 			open_url(i)
 
 
