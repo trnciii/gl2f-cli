@@ -26,7 +26,7 @@ def load():
 def save(data):
 	import json
 	with open(filepath(), 'w', encoding='utf-8') as f:
-		f.write(json.dumps(sanitize(data), indent=2, ensure_ascii=False))
+		f.write(json.dumps(data, indent=2, ensure_ascii=False))
 
 def sanitize(data):
 	return {k:data[k] for k in data.keys() & default().keys()}
