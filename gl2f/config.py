@@ -31,10 +31,7 @@ def edit():
 	editors = config_editors.get()
 	data = config.load()
 
-	keys = list(editors.keys())
-	selected = term.select([f'{k}: {data.get(k, f"{str(config.config[k])} (default)")}' for k in keys])
-
-	for key in [k for k, s in zip(keys, selected) if s]:
+	for key in term.selected(list(editors.keys()), lambda k:f'{k}: {data.get(k, f"{str(config.config[k])} (default)")}'):
 		try:
 			data[key] = editors[key]()
 		except Exception as e:
