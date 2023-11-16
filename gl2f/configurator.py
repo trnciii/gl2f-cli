@@ -3,28 +3,33 @@ import os
 
 # editors
 def make_string_editor(message):
-	return lambda _:input(f'{message}: ')
+	return lambda _=None:input(f'{message}: ')
 
 def make_strings_editor(message, sep=' '):
-	return lambda _:input(f'{message}: ').split(sep)
+	return lambda _=None:input(f'{message}: ').split(sep)
 
 def make_numbers_editor(message, length=1):
-	return lambda _:tuple(map(int, input(f'{message}: ').split(maxsplit=length)[:length]))
+	return lambda _=None:tuple(map(int, input(f'{message}: ').split(maxsplit=length)[:length]))
 
 def make_number_editor(message):
-	return lambda _:int(input(f'{message}: ').split(maxsplit=1)[0])
+	return lambda _=None:int(input(f'{message}: ').split(maxsplit=1)[0])
 
 def addons_editor(addons):
 	from .ayame import terminal as term
 
 	addons = set(addons)
 
-	todo = term.selected(['add', 'remove'])
+	todo = term.selected(['add', 'remove', 'fix'])
 
 	if 'add' in todo:
-		addons |= set(make_strings_editor('Addons to add (separated by space)?')(None))
+		addons |= set(make_strings_editor('Addons to add (separated by space)?')())
+	if 'fix' in todo:
+		for before in term.selected(sorted(addons)):
+			after = make_string_editor(f'update {before}')()
+			addons.remove(before)
+			addons.add(after)
 	if 'remove' in todo:
-		addons -= set(term.selected(addons))
+		addons -= set(term.selected(sorted(addons)))
 
 	valid, error = config.validate_addons(addons)
 	if error:
@@ -32,7 +37,7 @@ def addons_editor(addons):
 		for a, e in error:
 			print(f'{term.mod(a, term.color("red"))}: {type(e)} {e}')
 
-	return list(addons)
+	return sorted(addons)
 
 def get_editors():
 	return {
