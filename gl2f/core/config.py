@@ -1,5 +1,5 @@
+import os, importlib
 from . import local
-import os
 from ..__version__ import version
 
 def default():
@@ -31,5 +31,15 @@ def save(data):
 def sanitize(data):
 	return {k:data[k] for k in data.keys() & default().keys()}
 
+def validate_addons(addons):
+	valid = []
+	error = []
+	for addon in addons:
+		try:
+			importlib.import_module(addon)
+			valid.append(addon)
+		except Exception as e:
+			error.append((addon, e))
+	return valid, error
 
 data = {**default(), **load()}
