@@ -1,9 +1,9 @@
 import argparse
 import importlib
-from . import auth, cat, completion, config, dl, local, ls, opener, search
+from . import auth, cat, completion, configurator, dl, local, ls, opener, search
 from .ayame import sixel
 
-builtin = [auth, cat, completion, config, dl, local, ls, opener, search]
+builtin = [auth, cat, completion, configurator, dl, local, ls, opener, search]
 
 def version():
 	try:
@@ -13,7 +13,7 @@ def version():
 		return 'No version info found'
 
 def get_addon_registrars():
-	from .core.config import config
+	from .core.config import data as config
 	ret = []
 	for addon in config['addons']:
 		try:

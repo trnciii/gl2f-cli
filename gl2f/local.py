@@ -1,7 +1,7 @@
 import re
 import os, json
 from .core import pretty, local
-from .core.config import config
+from .core.config import data as config
 
 
 def ls(args):

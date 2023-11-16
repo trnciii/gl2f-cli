@@ -2,7 +2,7 @@ import re, html, os
 from . import local
 from ..ayame import sixel, terminal as term
 from . import auth
-from .config import config
+from .config import data as config
 
 ptn_paragraph = re.compile(r'<p.*?>(?P<paragraph>.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(?P<id>.+?)".*?type="(?P<type>.+?)".*?></fns-media>')

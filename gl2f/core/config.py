@@ -32,4 +32,4 @@ def sanitize(data):
 	return {k:data[k] for k in data.keys() & default().keys()}
 
 
-config = {**default(), **load()}
+data = {**default(), **load()}
