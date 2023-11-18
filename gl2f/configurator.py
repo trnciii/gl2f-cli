@@ -99,3 +99,6 @@ def add_args(parser):
 	sub.add_parser('edit').set_defaults(handler=lambda _:edit())
 
 	return sub
+
+def set_compreplies():
+	return {}

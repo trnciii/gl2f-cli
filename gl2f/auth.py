@@ -54,3 +54,6 @@ def add_args(parser):
 	sub.add_parser('update').set_defaults(handler=lambda _:update_cli())
 
 	return sub
+
+def set_compreplies():
+	return {}

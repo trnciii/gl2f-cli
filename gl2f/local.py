@@ -414,3 +414,8 @@ def add_args(parser):
 	p.set_defaults(handler=lambda args:serve(args.port, args.open))
 
 	return sub
+
+def set_compreplies():
+	return {
+		'import': '_filedir',
+	}

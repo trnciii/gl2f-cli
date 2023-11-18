@@ -18,3 +18,6 @@ def add_args(parser):
 	pretty.add_args(parser)
 	parser.set_defaults(handler=subcommand)
 	parser.add_argument('--encoding')
+
+def set_compreply():
+	return '__gl2f_complete_boards'

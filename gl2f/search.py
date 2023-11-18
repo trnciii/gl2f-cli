@@ -72,3 +72,6 @@ def add_args(parser):
 	parser.add_argument('--encoding')
 
 	parser.set_defaults(handler=subcommand)
+
+def set_compreply():
+	return '__gl2f_complete_boards'
