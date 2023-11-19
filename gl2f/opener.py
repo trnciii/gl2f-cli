@@ -26,6 +26,8 @@ def subcommand(args):
 		for i in term.selected(items, fm.format):
 			open_url(i)
 
+def add_to():
+	return 'gl2f', 'open'
 
 def add_args(parser):
 	lister.add_args(parser)
@@ -37,3 +39,6 @@ def add_args(parser):
 		help='select articles to show')
 
 	parser.set_defaults(handler=subcommand)
+
+def set_compreply():
+	return '__gl2f_complete_boards'

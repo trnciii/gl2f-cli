@@ -1,7 +1,7 @@
 import re
 import os, json
 from .core import pretty, local
-from .core.config import config
+from .core.config import data as config
 
 
 def ls(args):
@@ -379,6 +379,9 @@ def serve(port, browse=False):
 				pass
 
 
+def add_to():
+	return 'gl2f', 'local'
+
 def add_args(parser):
 	sub = parser.add_subparsers()
 
@@ -409,3 +412,10 @@ def add_args(parser):
 	p.add_argument('-p', '--port', type=int,  default=config['serve-port'])
 	p.add_argument('--open', action='store_true')
 	p.set_defaults(handler=lambda args:serve(args.port, args.open))
+
+	return sub
+
+def set_compreplies():
+	return {
+		'import': '_filedir',
+	}
