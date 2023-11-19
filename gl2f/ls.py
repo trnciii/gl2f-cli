@@ -1,7 +1,5 @@
 from .core import lister, pretty
 
-def name(): return 'ls'
-
 def subcommand(args):
 	items = lister.list_contents(args)
 

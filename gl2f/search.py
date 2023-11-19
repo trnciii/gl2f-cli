@@ -1,8 +1,6 @@
 from .core import lister, pretty
 from .ayame import terminal as term
 
-def name(): return 'search'
-
 def merge(ranges):
 	if len(ranges) == 0: return []
 

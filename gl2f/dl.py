@@ -2,8 +2,6 @@ import os
 from .core import lister, pretty, util
 from .ayame import terminal as term
 
-def name(): return 'dl'
-
 class Bar:
 	def __init__(self, li, contentId):
 		from threading import Lock

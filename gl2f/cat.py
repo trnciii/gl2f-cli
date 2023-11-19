@@ -1,8 +1,6 @@
 from .core import lister, pretty, article
 from .ayame import terminal as term
 
-def name(): return 'cat'
-
 def cat(i, args):
 	from .dl import save
 
