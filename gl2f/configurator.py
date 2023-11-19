@@ -63,6 +63,10 @@ def edit():
 
 	config.save(data)
 
+def edit_with_text_editor():
+	path = config.filepath()
+	print('opening', path)
+	os.system(path)
 
 def view():
 	import json
@@ -96,7 +100,9 @@ def add_args(parser):
 	sub.add_parser('create').set_defaults(handler=lambda _:create())
 	sub.add_parser('path').set_defaults(handler=lambda _:path())
 	sub.add_parser('view').set_defaults(handler=lambda _:view())
-	sub.add_parser('edit').set_defaults(handler=lambda _:edit())
+	edit = sub.add_parser('edit')
+	edit.add_argument('--as-text', action='store_true')
+	edit.set_defaults(handler=lambda a:edit_with_text_editor() if a else edit())
 
 	return sub
 
