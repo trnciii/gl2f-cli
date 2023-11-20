@@ -3,7 +3,13 @@
 gl2f はpython パッケージとして配布されたアドオンを追加し、新しいコマンドを登録することができます。
 インストールされたアドオンの名前をconfig の addons リストに追加することでコマンドが使用可能になります。
 
-`~/gl2f/config.json` の設定例
+`gl2f-share` パッケージをインストールする
+
+```sh
+pip install git+https://github.com/trnciii/gl2f-share
+```
+
+`~/gl2f/config.json` のaddons を追加する
 ```json
 {
   "addons": [
@@ -53,7 +59,7 @@ class ShakeShakeShake:
 registrars = [LoveGenic, ShakeShakeShake] # 各コマンドの登録関数リスト
 ```
 
-`~/gl2f/config.json` に `gl2f-intro` アドオンを追加します。
+このファイルをpython パッケージとしてインストールしたあと、`~/gl2f/config.json` に `gl2f-intro` アドオンを追加します。
 ```json
 {
   "addons": [
