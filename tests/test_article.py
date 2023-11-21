@@ -57,8 +57,12 @@ def test_strong_span():
 
 def test_hashtag():
 	tags = '#Girls2 の#小田柚葉 様 #ｷｮｳﾉﾐｻｷﾓｼﾞ　#鶴屋美咲 さん　#ﾄﾂｹﾞｷﾕｳﾜ#比嘉優和 ちゃん ＃Lucky2'
-	expected = '\x1b[94m#Girls2\x1b[m の#小田柚葉 様 \x1b[94m#ｷｮｳﾉﾐｻｷﾓｼﾞ\x1b[m　\x1b[94m#鶴屋美咲\x1b[m さん　\x1b[94m#ﾄﾂｹﾞｷﾕｳﾜ\x1b[m#比嘉優和 ちゃん ＃Lucky2'
+	expected = '\x1b[94m#Girls2\x1b[m の\x1b[94m#小田柚葉\x1b[m 様 \x1b[94m#ｷｮｳﾉﾐｻｷﾓｼﾞ\x1b[m　\x1b[94m#鶴屋美咲\x1b[m さん　\x1b[94m#ﾄﾂｹﾞｷﾕｳﾜ\x1b[m\x1b[94m#比嘉優和\x1b[m ちゃん ＃Lucky2'
 	assert expected == kernel(tags)
+
+	tags_not_in_url = f'{sample_url} only #hashtags {sample_url} in plain text {sample_url} match and also#tagwithoutspace match {sample_url}'
+	expected_only_plain = f'\x1b[94m{sample_url}\x1b[m only \x1b[94m#hashtags\x1b[m \x1b[94m{sample_url}\x1b[m in plain text \x1b[94m{sample_url}\x1b[m match and also\x1b[94m#tagwithoutspace\x1b[m match \x1b[94m{sample_url}\x1b[m'
+	assert expected_only_plain == kernel(tags_not_in_url)
 
 def test_paragraph():
 	body_source = [

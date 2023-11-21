@@ -11,7 +11,7 @@ ptn_strong = re.compile(r'<strong.*?>(?P<content>.*?)</strong>')
 ptn_span = re.compile(r'<span.*?>(?P<content>.*?)</span>')
 ptn_http = re.compile(r'(?P<url>https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
 ptn_ignore = re.compile(r'￼|&nbsp;|<br>')
-ptn_hashtag = re.compile(r'(?P<tag>\B#\w+)')
+ptn_hashtag = re.compile(r'(?P<tag>#[^\s.,#]+)')
 
 def rep_none(p):
 	return ptn_media.sub('', p)
@@ -89,8 +89,12 @@ def line_kernel(p, mediarep):
 
 	# after processing text tags
 	p = html.unescape(p)
-	p = ptn_hashtag.sub(term.mod(r'\g<tag>', term.color('blue', 'fl')), p)
 	p = ptn_http.sub(term.mod(r'\g<url>', term.color('blue', 'fl')), p)
+	url_spans = [ma.span() for ma in ptn_http.finditer(p)]
+	starts = [0] + [end for _, end in url_spans]
+	ends = [start for start, _ in url_spans] + [len(p)]
+	replaced = [ptn_hashtag.sub(term.mod(r'\g<tag>', term.color('blue', 'fl')), p[start:end]) for start, end in zip(starts, ends)]
+	p = ''.join(f+s for f, s in zip(replaced, (p[start:end] for start, end in url_spans))) + replaced[-1]
 
 	p = mediarep(p)
 	return p
