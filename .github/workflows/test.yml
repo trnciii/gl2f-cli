@@ -55,7 +55,8 @@ jobs:
 
 
   publish:
-    needs: 'summary'
+    needs: test
+    if: matrix.success()
 
     runs-on: ubuntu-latest
     steps:
