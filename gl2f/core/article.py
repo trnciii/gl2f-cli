@@ -10,7 +10,7 @@ ptn_link = re.compile(r'<a href="(?P<url>.+?)".*?>(?P<text>.+?)</a>')
 ptn_strong = re.compile(r'<strong.*?>(?P<content>.*?)</strong>')
 ptn_span = re.compile(r'<span.*?>(?P<content>.*?)</span>')
 ptn_http = re.compile(r'(?P<url>https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))')
-ptn_ignore = re.compile(r'￼|&nbsp;|<br>')
+ptn_ignore = re.compile(r'￼|&nbsp;|<br.*?>')
 ptn_hashtag = re.compile(r'(?P<tag>#[^\s.,#]+)')
 
 def rep_none(p):
