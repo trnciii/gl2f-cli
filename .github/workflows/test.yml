@@ -52,3 +52,11 @@ jobs:
     - uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         junit_files: artifacts/**/*.xml
+
+
+  publish:
+    needs: 'summary'
+
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo Running

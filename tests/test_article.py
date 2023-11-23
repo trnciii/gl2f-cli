@@ -108,3 +108,6 @@ def test_paragraph():
 	matches = list(ma for ma in article.ptn_paragraph.finditer(body) if ma)
 	assert len(body_source) == len(matches)
 	assert all(a == b.group('paragraph') for a, b in zip( paragraph_contents, matches))
+
+def test_to_fail():
+	assert False
