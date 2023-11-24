@@ -6,6 +6,9 @@ def generate_compreply(words, cur, prefix=None):
 	p = '' if prefix == None else f'-P "{prefix}"'
 	return f'COMPREPLY=( $(compgen -W "{w}" {p} -- "{cur}") )'
 
+def indent(string, level):
+	return '\n'.join(f'{"  "*level}{line}' for line in string.splitlines())
+
 def generate():
 	with open(local.package_data('completion.bash')) as f:
 		source = f.read()
@@ -44,7 +47,7 @@ def gen_tree(current_parent):
 		elif hasattr(command, 'set_compreply') and command.set_compreply():
 			cases.append(f'''
     {name})
-      {command.set_compreply()}
+{indent(command.set_compreply(), 3)}
       ;;''')
 
 
@@ -64,7 +67,7 @@ else
 	case ${{words[{depth}]}} in{''.join(cases)}
 	esac
 fi''' if cases else reply
-	return '\n'.join(f'{"      " if depth>1 else "  "}{l}' for l in ret.splitlines())
+	return indent(ret, 3 if depth>1 else 1)
 
 
 def add_to():
