@@ -1,7 +1,7 @@
 from .core import local, board, pretty
 from . import command_builder
 
-def generate_compreply(words, cur, prefix=None):
+def generate_compreply(words, cur='$cur', prefix=None):
 	w = ' '.join(words)
 	p = '' if prefix == None else f'-P "{prefix}"'
 	return f'COMPREPLY=( $(compgen -W "{w}" {p} -- "{cur}") )'
@@ -14,60 +14,85 @@ def generate():
 		source = f.read()
 
 	boards = board.tree()
-	_, commands = command_builder.build(command_builder.builtin + command_builder.get_addon_registrars())
+	parser, commands = command_builder.build(command_builder.builtin + command_builder.get_addon_registrars())
 	fm = pretty.Formatter()
 
 	return source.replace('## REPLACE_PAGES_FIRST',
-		generate_compreply({k + ('/' if len(v)>0 else '') for k, v in boards.items()}, '$cur')
+		generate_compreply({k + ('/' if len(v)>0 else '') for k, v in boards.items()})
 	).replace('## REPLACE_PAGES_SECOND', ''.join(f'''
-		  {k})
-		  	{generate_compreply(set(v), '$realcur', prefix='$prefix/')}
+      {k})
+        {generate_compreply(set(v), '$realcur', prefix='$prefix/')}
         ;;'''
 			for k, v in sorted(boards.items()) if len(v)>0)
 	).replace('## REPLACE_FORMAT',
 		generate_compreply(fm.functions.keys(), '$realcur')
-	).replace('## REPLACE_COMMAND_TREE', gen_tree('gl2f'))
+	).replace('## REPLACE_COMMAND_TREE', indent(gen_tree('gl2f', parser, commands), 1))
 
-def gen_tree(current_parent):
+def get_options(parser):
+	return sum((a.option_strings for a in parser._actions), [])
+
+def gen_leaf(name, parser, reply):
+	if reply:
+		return f'''
+    {name})
+      if [[ $cur == -* ]]; then
+        {generate_compreply(get_options(parser))}
+      else
+{indent(reply, 4)}
+      fi
+      ;;'''
+	else:
+		return f'''
+    {name})
+      if [[ $cur == -* ]]; then
+        {generate_compreply(get_options(parser))}
+      fi
+      ;;'''
+
+def gen_tree(current_parent, parent_parser, tree):
 	commands = command_builder.builtin + command_builder.get_addon_registrars()
-	_, tree = command_builder.build(commands)
 
+	# cases (1 or 2) and 3 are supposed to be exclusive
 	cases = []
-	for command in commands:
-		parent, name = command.add_to()
-		if parent != current_parent:
-			continue
+	for command, (parent, name) in filter(lambda t:t[1][0] == current_parent, zip(commands, (c.add_to() for c in commands))):
+		current_name = f'{parent}.{name}'
+		current_parser = tree[parent].choices[name]
 
-		if f'{parent}.{name}' in tree.keys():
+		if current_name in tree.keys():
+			# 1 an explicitly registered sub-parser
 			cases.append(f'''
     {name})
-{gen_tree(f'{parent}.{name}')}
+{indent(gen_tree(current_name, current_parser, tree), 3)}
       ;;''')
 
-		elif hasattr(command, 'set_compreply') and command.set_compreply():
-			cases.append(f'''
-    {name})
-{indent(command.set_compreply(), 3)}
-      ;;''')
+		else:
+			# 2 an explicitly registered leaf
+			cases.append(gen_leaf(name, current_parser, command.set_compreply() if hasattr(command, 'set_compreply') else None))
 
-
-	if current_parent != 'gl2f':
+	if not any(k.startswith(f'{current_parent}.') for k in tree.keys()):
+		# 3 leaves in registered sub-parsers that cannot be found in commands
 		command = next(c for c in commands if current_parent == '.'.join(c.add_to()))
-		if hasattr(command, 'set_compreplies'):
-			cases += [f'''
-    {k})
-      {v}
-      ;;''' for k, v in command.set_compreplies().items()]
+		custom_replies = command.set_compreplies() if hasattr(command, 'set_compreplies') else {}
+		for k, v in tree[current_parent].choices.items():
+			cases.append(gen_leaf(k, v, custom_replies.get(k)))
 
-	depth = current_parent.count('.') + 1
-	reply = generate_compreply(tree[current_parent].choices.keys(), '$cur')
-	ret = f'''if [[ $cword == {depth} ]]; then
-	{reply}
+
+	reply = f'''if [[ $cur == -* ]]; then
+  {generate_compreply(get_options(parent_parser))}
 else
-	case ${{words[{depth}]}} in{''.join(cases)}
-	esac
-fi''' if cases else reply
-	return indent(ret, 3 if depth>1 else 1)
+  {generate_compreply(tree[current_parent].choices.keys())}
+fi'''
+
+	if cases:
+		depth = current_parent.count('.') + 1
+		return f'''if [[ $cword == {depth} ]]; then
+{indent(reply, 1)}
+else
+  case ${{words[{depth}]}} in{''.join(cases)}
+  esac
+fi'''
+	else:
+		return reply
 
 
 def add_to():
