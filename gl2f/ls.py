@@ -18,8 +18,4 @@ def add_args(parser):
 	parser.add_argument('--encoding')
 
 def set_compreply():
-	return '''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
-  __gl2f_complete_format
-else
-  __gl2f_complete_boards
-fi'''
+	return '__gl2f_complete_list_args'

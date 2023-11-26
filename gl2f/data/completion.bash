@@ -27,6 +27,30 @@ __gl2f_complete_format(){
   fi
 }
 
+__gl2f_complete_order(){
+  if [[ "$cur" == *:* ]]; then
+    local realcur=${cur##*:}
+    COMPREPLY=( $(compgen -W "asc desc" -- $realcur) )
+  else
+    COMPREPLY=( $(compgen -W "name: reservedAt:" -- $cur) )
+    if declare -F _init_completion >/dev/null 2>&1; then
+      compopt -o nospace
+    fi
+  fi
+}
+
+__gl2f_complete_list_args(){
+  if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
+    __gl2f_complete_format
+  elif [ $prev == --order ]; then
+    __gl2f_complete_order
+  elif [ $prev == --dump ]; then
+    _filedir
+  else
+    __gl2f_complete_boards
+  fi
+}
+
 _gl2f(){
   local cur prev words cword split
   if declare -F _init_completion >/dev/null 2>&1; then
