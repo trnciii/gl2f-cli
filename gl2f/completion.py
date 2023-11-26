@@ -44,8 +44,10 @@ def generate():
 		generate_compreply(fm.functions.keys(), '$realcur')
 	).replace('## REPLACE_COMMAND_TREE', indent(gen_tree('gl2f', parser, commands), 1))
 
-def get_options(parser):
-	return sum((a.option_strings for a in parser._actions), [])
+def prepend_option_completion(parser, body):
+	return if_else('$cur == -*',
+		generate_compreply(sum((a.option_strings for a in parser._actions), [])),
+		body)
 
 def gen_tree(current_parent, parent_parser, tree):
 	commands = command_builder.builtin + command_builder.get_addon_registrars()
@@ -62,20 +64,17 @@ def gen_tree(current_parent, parent_parser, tree):
 
 		else:
 			# 2 an explicitly registered leaf
-			cases.append(make_case(name, if_else(
-				'$cur == -*',
-				generate_compreply(get_options(current_parser)),
-				command.set_compreply() if hasattr(command, 'set_compreply') else None)))
+			body = command.set_compreply() if hasattr(command, 'set_compreply') else None
+			cases.append(make_case(name, prepend_option_completion(current_parser, body)))
 
 	if not any(k.startswith(f'{current_parent}.') for k in tree.keys()):
 		# 3 leaves in registered sub-parsers that cannot be found in commands
 		command = next(c for c in commands if current_parent == '.'.join(c.add_to()))
 		custom_replies = command.set_compreplies() if hasattr(command, 'set_compreplies') else {}
-		for k, v in tree[current_parent].choices.items():
-			cases.append(make_case(k, if_else('$cur == -*', generate_compreply(get_options(v)), custom_replies.get(k))))
+		cases += [make_case(k, prepend_option_completion(v, custom_replies.get(k))) for k, v in tree[current_parent].choices.items()]
 
 
-	reply = if_else('$cur == -*', generate_compreply(get_options(parent_parser)), generate_compreply(tree[current_parent].choices.keys()))
+	reply = prepend_option_completion(parent_parser, generate_compreply(tree[current_parent].choices.keys()))
 	if cases:
 		depth = current_parent.count('.') + 1
 		return if_else(f'$cword == {depth}', reply, f'case ${{words[{depth}]}} in\n{indent("".join(cases), 1)}\nesac')
