@@ -64,7 +64,16 @@ def gen_tree(current_parent, parent_parser, tree):
 
 		else:
 			# 2 an explicitly registered leaf
-			body = command.set_compreply() if hasattr(command, 'set_compreply') else None
+			choice_cases = [make_case(' | '.join(a.option_strings), generate_compreply(a.choices)) for a in current_parser._actions if a.choices]
+			custom_reply = command.set_compreply() if hasattr(command, 'set_compreply') else ''
+
+			if choice_cases:
+				if custom_reply:
+					choice_cases.append(make_case('*', custom_reply))
+				body = f'case $prev in\n{indent("".join(choice_cases), 1)}\nesac'
+			else:
+				body = custom_reply
+
 			cases.append(make_case(name, prepend_option_completion(current_parser, body)))
 
 	if not any(k.startswith(f'{current_parent}.') for k in tree.keys()):
