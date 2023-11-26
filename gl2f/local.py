@@ -416,6 +416,8 @@ def add_args(parser):
 	return sub
 
 def set_compreplies():
+	from .completion import if_else
 	return {
 		'import': '_filedir',
+		'export': if_else('$prev == -o', '_filedir'),
 	}
