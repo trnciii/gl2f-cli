@@ -28,6 +28,8 @@ def add_to():
 	return 'gl2f', 'open'
 
 def add_args(parser):
+	parser.description = 'Open pages in the browser'
+
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')

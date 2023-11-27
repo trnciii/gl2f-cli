@@ -61,6 +61,8 @@ def add_to():
 	return 'gl2f', 'search'
 
 def add_args(parser):
+	parser.description = 'Search in articles'
+
 	lister.add_args(parser)
 	pretty.add_args(parser)
 

@@ -12,6 +12,8 @@ def add_to():
 	return 'gl2f', 'ls'
 
 def add_args(parser):
+	parser.description = 'List pages'
+
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(handler=subcommand)

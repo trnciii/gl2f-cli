@@ -37,6 +37,8 @@ def add_to():
 	return 'gl2f', 'cat'
 
 def add_args(parser):
+	parser.description = 'Display articles'
+
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')

@@ -95,12 +95,14 @@ def add_to():
 	return 'gl2f', 'config'
 
 def add_args(parser):
+	parser.description = 'Configure gl2f cli'
+
 	sub = parser.add_subparsers()
 
-	sub.add_parser('create').set_defaults(handler=lambda _:create())
-	sub.add_parser('path').set_defaults(handler=lambda _:path())
-	sub.add_parser('view').set_defaults(handler=lambda _:view())
-	sub.add_parser('edit').set_defaults(handler=lambda _:edit())
+	sub.add_parser('create', description='Create default configuration').set_defaults(handler=lambda _:create())
+	sub.add_parser('path', description='File path of the configuration').set_defaults(handler=lambda _:path())
+	sub.add_parser('view', description='Display current configuration').set_defaults(handler=lambda _:view())
+	sub.add_parser('edit', description='Edit configuration').set_defaults(handler=lambda _:edit())
 
 	return sub
 

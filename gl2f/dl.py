@@ -120,6 +120,8 @@ def add_to():
 	return 'gl2f', 'dl'
 
 def add_args(parser):
+	parser.description = 'Save articles'
+
 	lister.add_args(parser)
 
 	pretty.add_args(parser)
