@@ -46,7 +46,7 @@ def add_args(parser):
 	p.add_argument('-p', '--password', type=str, default=None)
 	p.set_defaults(handler=lambda args: login(args.email, args.password))
 
-	sub.add_parser('remove', description='Remove authorization token').set_defaults(handler=lambda _:auth.remove())
+	sub.add_parser('logout', description='Remove authorization token').set_defaults(handler=lambda _:auth.remove())
 
 	p = sub.add_parser('set-token', description='Set authorization token manually')
 	p.add_argument('token', nargs='?', type=str)

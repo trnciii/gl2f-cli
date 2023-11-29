@@ -16,9 +16,9 @@ email アドレスとパスワードを入力して認証をとります。
 * `-u --email` アカウントのemailアドレス
 * `-p --password` アカウントのパスワード
 
-### `gl2f auth remove`
+### `gl2f auth logout`
 
-PCに保存されている認証情報を削除します。
+端末の認証情報を削除します。
 
 ### `gl2f auth set-token`
 

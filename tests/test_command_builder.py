@@ -47,7 +47,7 @@ def test_builtin_command_tree():
 		'sixel', 'auth', 'cat', 'completion', 'config',
 		'dl','local','ls','open','search',
 	} ==  tree['gl2f'].choices.keys()
-	assert {'login', 'remove', 'set-token', 'update'} == tree['gl2f.auth'].choices.keys()
+	assert {'login', 'logout', 'set-token', 'update'} == tree['gl2f.auth'].choices.keys()
 	assert {'create', 'path', 'view', 'edit'} == tree['gl2f.config'].choices.keys()
 	assert {
 		'clear-cache', 'dir', 'export', 'import', 'index',
