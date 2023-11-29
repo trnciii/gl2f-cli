@@ -31,7 +31,7 @@ def build(registrars):
 	}
 
 	parser.add_argument('-v', '--version', action='version', version=version())
-	subparsers.add_parser('sixel').set_defaults(handler=lambda args:sixel.check())
+	subparsers.add_parser('sixel', description='check sixel compatibility').set_defaults(handler=lambda args:sixel.check())
 
 	for registrar in registrars:
 		parent_key, name = registrar.add_to()

@@ -1,8 +1,6 @@
+import os
 from .core import lister, pretty, util
 from .ayame import terminal as term
-import os
-
-def name(): return 'dl'
 
 class Bar:
 	def __init__(self, li, contentId):
@@ -122,6 +120,8 @@ def add_to():
 	return 'gl2f', 'dl'
 
 def add_args(parser):
+	parser.description = 'Save articles'
+
 	lister.add_args(parser)
 
 	pretty.add_args(parser)
@@ -148,4 +148,4 @@ def add_args(parser):
 	parser.set_defaults(handler=subcommand)
 
 def set_compreply():
-	return '__gl2f_complete_boards'
+	return '__gl2f_complete_list_args'

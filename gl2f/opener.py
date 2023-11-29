@@ -1,8 +1,6 @@
 from .core import lister, pretty
 from .ayame import terminal as term
 
-def name(): return 'open'
-
 def open_url(i):
 	import webbrowser
 	from .core import board
@@ -30,6 +28,8 @@ def add_to():
 	return 'gl2f', 'open'
 
 def add_args(parser):
+	parser.description = 'Open pages in the browser'
+
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
@@ -41,4 +41,4 @@ def add_args(parser):
 	parser.set_defaults(handler=subcommand)
 
 def set_compreply():
-	return '__gl2f_complete_boards'
+	return '__gl2f_complete_list_args'

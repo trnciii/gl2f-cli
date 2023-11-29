@@ -1,8 +1,6 @@
 from .core import lister, pretty, article
 from .ayame import terminal as term
 
-def name(): return 'cat'
-
 def cat(i, args):
 	from .dl import save
 
@@ -39,6 +37,8 @@ def add_to():
 	return 'gl2f', 'cat'
 
 def add_args(parser):
+	parser.description = 'Display articles'
+
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
@@ -73,4 +73,4 @@ def add_args(parser):
 
 
 def set_compreply():
-	return '__gl2f_complete_boards'
+	return '__gl2f_complete_list_args'
