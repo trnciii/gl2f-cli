@@ -31,7 +31,7 @@ def add_args(parser):
 	parser.description = 'Open pages in the browser'
 
 	lister.add_args(parser)
-	pretty.add_args(parser)
+	pretty.add_args_core(parser)
 	parser.set_defaults(format='author:title')
 	parser.add_argument('-a', '--all', action='store_true',
 		help='Open all items')

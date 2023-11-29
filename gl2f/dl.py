@@ -124,7 +124,7 @@ def add_args(parser):
 
 	lister.add_args(parser)
 
-	pretty.add_args(parser)
+	pretty.add_args_core(parser)
 	parser.set_defaults(format='author:media:title')
 
 	parser.add_argument('-a', '--all', action='store_true',

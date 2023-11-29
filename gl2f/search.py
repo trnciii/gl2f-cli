@@ -64,7 +64,7 @@ def add_args(parser):
 	parser.description = 'Search in articles'
 
 	lister.add_args(parser)
-	pretty.add_args(parser)
+	pretty.add_args_core(parser)
 
 	parser.set_defaults(date='%m/%d', number=30)
 

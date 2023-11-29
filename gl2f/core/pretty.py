@@ -111,16 +111,19 @@ class Formatter:
 	def print(self, item, end='\n', encoding=None):
 		term.write_with_encoding(f'{self.format(item)}\n', encoding=encoding)
 
-
-def add_args(parser):
+def add_args_core(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
 		help='Format list items. default is "author:title:url"')
 
-	parser.add_argument('--break-urls', action='store_true',
-		help='Break before url')
-
 	parser.add_argument('--date', '-d', type=str, nargs='?', const='%m/%d',
 		help='Format date time.')
+
+
+def add_args(parser):
+	add_args_core(parser)
+
+	parser.add_argument('--break-urls', action='store_true',
+		help='Break before url')
 
 	parser.add_argument('--enum', action='store_true',
 		help='Prepend index')
