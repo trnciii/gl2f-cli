@@ -5,10 +5,9 @@ import re
 ptn_endspaces = re.compile(r'\s+(?P<end>\n|$)')
 
 class Formatter:
-	def __init__(self, f='author:title:url', fd=None, sep=' ', items=None):
+	def __init__(self, f='author:title:url', fd=None, items=None):
 		self.fstring = f
 		self.fdstring = fd if fd else '%m/%d'
-		self.sep = sep
 
 		self.index = 0
 		self.digits = 2
@@ -82,7 +81,7 @@ class Formatter:
 	def media_stat(self, item):
 		from . import article
 		re = article.media_stat(item['values']['body'])
-		return self.sep.join([f'i{re["image"]:02}', f'v{re["video"]}'])
+		return ' '.join([f'i{re["image"]:02}', f'v{re["video"]}'])
 
 	def page(self, item):
 		return board.get('id', item['boardId'])['key'].split('/')[0]
@@ -106,7 +105,7 @@ class Formatter:
 
 	def format(self, item):
 		return ptn_endspaces.sub(r'\g<end>',
-			self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
+			' '.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
 		)
 
 	def print(self, item, end='\n', encoding=None):
@@ -116,9 +115,6 @@ class Formatter:
 def add_args(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
 		help='Format list items. default is "author:title:url"')
-
-	parser.add_argument('--sep', type=str, default=' ',
-		help='Separator string.')
 
 	parser.add_argument('--break-urls', action='store_true',
 		help='Break before url')
@@ -149,4 +145,4 @@ def make_format(args):
 
 
 def from_args(args, items=None):
-	return Formatter(f=make_format(args), fd=args.date, sep=args.sep, items=items)
+	return Formatter(f=make_format(args), fd=args.date, items=items)
