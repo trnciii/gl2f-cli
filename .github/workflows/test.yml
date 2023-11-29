@@ -30,6 +30,7 @@ jobs:
         python-version: ${{ matrix.python }}
 
     - run: pip install .[dev]
+    - run: gl2f completion
 
     - run: python3 -m pytest --junit-xml results/pytest.xml
       continue-on-error: true
