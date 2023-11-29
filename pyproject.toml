@@ -36,4 +36,5 @@ dev = [
 	'pyinstaller',
 	'pipdeptree',
 	'pip-licenses',
+	'pytest-pylint',
 ]
