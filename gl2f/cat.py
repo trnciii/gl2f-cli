@@ -45,29 +45,30 @@ def add_args(parser):
 
 	parser.add_argument('--encoding')
 
-	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact')
+	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact',
+		help='Choose style to display articles')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',
-		help='not use sixel image')
+		help='Do not use sixel image')
 	parser.add_argument('-a', '--all', action='store_true',
-		help='preview all items')
+		help='Show all items')
 	parser.add_argument('--pick', type=int, nargs='+',
-		help='select articles to show')
+		help='Select articles to show')
 	parser.add_argument('--dl', action='store_true',
-		help='also downloads the article')
+		help='Also downloads the article')
 	parser.add_argument('-W', '--width', type=int,
-		help='set max image width')
+		help='Set max image width')
 	parser.add_argument('-H', '--height', type=int,
-		help='set max image height')
+		help='Set max image height')
 
 	# options from dl
 	parser.add_argument('--stream', action='store_true',
-		help='save video files as stream')
+		help='Save video files as stream')
 	parser.add_argument('--skip', action='store_true',
-		help='not actually download video files')
+		help='Do not actually download video files')
 	parser.add_argument('-F', '--force', action='store_true',
-		help='force download to overwrite existing files')
+		help='Force download to overwrite existing files')
 	parser.add_argument('-o', type=str, default='',
-		help='output path')
+		help='Set output path')
 
 	parser.set_defaults(handler=subcommand)
 

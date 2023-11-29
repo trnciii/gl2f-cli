@@ -34,9 +34,9 @@ def add_args(parser):
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
 	parser.add_argument('-a', '--all', action='store_true',
-		help='open all items')
+		help='Open all items')
 	parser.add_argument('--pick', type=int, nargs='+',
-		help='select articles to show')
+		help='Select articles to open')
 
 	parser.set_defaults(handler=subcommand)
 

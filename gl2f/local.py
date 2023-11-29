@@ -387,15 +387,17 @@ def add_args(parser):
 
 	sub = parser.add_subparsers()
 
-	sub.add_parser('clear-cache', description='remove media cache').set_defaults(handler=lambda _:clear_cache())
-	sub.add_parser('dir', description='Path of gl2f directory').set_defaults(handler=lambda _:print(local.home()))
+	sub.add_parser('clear-cache', description='Remove media cache').set_defaults(handler=lambda _:clear_cache())
+	sub.add_parser('dir', description='Get the path of gl2f directory').set_defaults(handler=lambda _:print(local.home()))
 
 	p = sub.add_parser('export', description='Export saved contents to an archive')
-	p.add_argument('-o', default='.')
+	p.add_argument('-o', type=str, default='.',
+		help='Set output file name.')
 	p.set_defaults(handler=lambda args:export_contents(args.o))
 
 	p = sub.add_parser('import', description='Import contents from an archive')
-	p.add_argument('archive')
+	p.add_argument('archive', type=str,
+		help='Set archive file path to import')
 	p.set_defaults(handler=lambda args:import_contents(args.archive))
 
 	sub.add_parser('index', description='Create index of contents for web viewer').set_defaults(handler = lambda _:index.main(full=True))
@@ -403,7 +405,7 @@ def add_args(parser):
 
 	p = sub.add_parser('ls', description='List all local contents')
 	p.add_argument('--order', type=str,
-		help='sort order')
+		help='Set the order with [reservedAt, name] and [asc, desc].')
 	pretty.add_args(p)
 	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')
@@ -427,6 +429,8 @@ def set_compreplies():
 		'export': if_else('$prev == -o', '_filedir'),
 		'ls': '''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
   __gl2f_complete_format
+elif [ $prev == --order ]; then
+    __gl2f_complete_order
 fi
 		'''
 	}

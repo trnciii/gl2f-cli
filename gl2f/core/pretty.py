@@ -115,19 +115,19 @@ class Formatter:
 
 def add_args(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
-		help='format of items. default is "author:title:url"')
+		help='Format list items. default is "author:title:url"')
 
 	parser.add_argument('--sep', type=str, default=' ',
-		help='separator string.')
+		help='Separator string.')
 
 	parser.add_argument('--break-urls', action='store_true',
-		help='break before url')
+		help='Break before url')
 
 	parser.add_argument('--date', '-d', type=str, nargs='?', const='%m/%d',
-		help='date formatting')
+		help='Format date time.')
 
 	parser.add_argument('--enum', action='store_true',
-		help='show index on the left (lefter than date)')
+		help='Prepend index')
 
 
 def make_format(args):
