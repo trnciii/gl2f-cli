@@ -2,10 +2,6 @@ from .core import lister, pretty, article
 from .ayame import terminal as term
 
 def cat(i, args):
-	from .dl import save
-
-	if args.dl:
-		save(i, args)
 	fm = pretty.Formatter()
 	fm.print(i, encoding=args.encoding)
 	for s in article.lines(i, args.style, args.sixel, args.max_size):
@@ -53,22 +49,10 @@ def add_args(parser):
 		help='Show all items')
 	parser.add_argument('--pick', type=int, nargs='+',
 		help='Select articles to show')
-	parser.add_argument('--dl', action='store_true',
-		help='Also downloads the article')
 	parser.add_argument('-W', '--width', type=int,
 		help='Set max image width')
 	parser.add_argument('-H', '--height', type=int,
 		help='Set max image height')
-
-	# options from dl
-	parser.add_argument('--stream', action='store_true',
-		help='Save video files as stream')
-	parser.add_argument('--skip', action='store_true',
-		help='Do not actually download video files')
-	parser.add_argument('-F', '--force', action='store_true',
-		help='Force download to overwrite existing files')
-	parser.add_argument('-o', type=str, default='',
-		help='Set output path')
 
 	parser.set_defaults(handler=subcommand)
 
