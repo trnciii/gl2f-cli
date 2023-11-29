@@ -94,13 +94,13 @@ def add_args(parser):
 		help='Page number')
 
 	parser.add_argument('--order', type=str, default='reservedAt:desc',
-		help='Set the order with [reservedAt, name] and [asc, desc].')
+		help='Set the order with [reservedAt, name] and [asc, desc]')
 
 	parser.add_argument('--group', type=str, choices={'girls2', 'lucky2', 'lovely2'},
 		help='Set group when you fetch a member board')
 
 	parser.add_argument('--dump', type=str, nargs='?', const='.',
-		help='Dump response. You can optionally set the file name')
+		help='Dump response, optionally setting the file name')
 
 
 def in24h(i):

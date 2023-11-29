@@ -113,10 +113,10 @@ class Formatter:
 
 def add_args_core(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
-		help='Format list items. default is "author:title:url"')
+		help='Format list items, default is author:title:url')
 
 	parser.add_argument('--date', '-d', type=str, nargs='?', const='%m/%d',
-		help='Format date time.')
+		help='Format date time')
 
 
 def add_args(parser):
