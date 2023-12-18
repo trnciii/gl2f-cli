@@ -50,10 +50,10 @@ def rep_sixel(p, boardId, contentId, max_size, xauth):
 		image = Image.open(BytesIO(data.content))
 
 	image = sixel.limit(image, max_size)
-	ret = sixel.to_sixel(image)
 	if t == 'video':
-		ret += rep_type_url(p, boardId, contentId, xauth)
-	return ret
+		return f'{sixel.to_sixel(image)}\n{rep_type_url(p, boardId, contentId, xauth)}'
+	else:
+		return sixel.to_sixel(image)
 
 def to_media_style(article_style, boardId, contentId, use_sixel, max_size=None):
 	from functools import partial
