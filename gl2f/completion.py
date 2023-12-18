@@ -48,7 +48,7 @@ def generate():
 		source = f.read()
 
 	boards = board.tree()
-	parser, commands = command_builder.build(command_builder.builtin + command_builder.get_addon_registrars())
+	parser, commands = command_builder.build(tuple(command_builder.builtin + command_builder.get_addon_registrars()))
 	fm = pretty.Formatter()
 
 	return source.replace('## REPLACE_PAGES_FIRST',

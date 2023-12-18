@@ -41,7 +41,7 @@ def has_subcommand(tree, command, subcommand):
 
 
 def test_builtin_command_tree():
-	parser, tree = command_builder.build(command_builder.builtin)
+	parser, tree = command_builder.build(tuple(command_builder.builtin))
 	assert {'gl2f', 'gl2f.auth', 'gl2f.config', 'gl2f.local'} == tree.keys()
 	assert {
 		'sixel', 'auth', 'cat', 'completion', 'config',
@@ -60,7 +60,7 @@ def test_addons():
 		Overwright_Subcommand,
 		Overwright_Nested_Subcommand
 	]
-	parser, tree = command_builder.build(command_builder.builtin + registrars)
+	parser, tree = command_builder.build(tuple(command_builder.builtin + registrars))
 
 
 	assert has_subcommand(tree, 'gl2f', 'new')
@@ -74,7 +74,7 @@ def test_addons():
 
 def test_build_time():
 	t0 = time.time()
-	parser, tree = command_builder.build(command_builder.builtin)
+	parser, tree = command_builder.build(tuple(command_builder.builtin))
 	t1 = time.time()
 	duration = t1 - t0
-	assert duration < 0.02
+	assert duration < 0.01
