@@ -1,5 +1,6 @@
 import argparse
 import importlib
+from functools import lru_cache
 from . import auth, cat, completion, configurator, dl, local, ls, opener, search
 from .ayame import sixel
 
@@ -23,7 +24,10 @@ def get_addon_registrars():
 			print(f'failed to import addon {addon}')
 	return ret
 
+import time
+@lru_cache()
 def build(registrars):
+	t0 = time.time()
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers()
 	tree = {
@@ -43,5 +47,6 @@ def build(registrars):
 		sub = registrar.add_args(p)
 		if sub:
 			tree[f'{parent_key}.{name}'] = sub
-
+	t1 = time.time()
+	print(t1-t0)
 	return parser, tree
