@@ -1,11 +1,10 @@
 from .core import lister, pretty
 from .ayame import terminal as term
 
-def name(): return 'open'
-
 def open_url(i):
 	import webbrowser
 	from .core import board
+	webbrowser.register("termux-open '%s'", None)
 	webbrowser.open(board.content_url(i), new=0, autoraise=True)
 
 
@@ -22,12 +21,15 @@ def subcommand(args):
 			fm.print(i)
 			open_url(i)
 	else:
-		selected = term.select([fm.format(i) for i in items])
-		for i in [i for s, i in zip(selected, items) if s]:
+		for i in term.selected(items, fm.format):
 			open_url(i)
 
+def add_to():
+	return 'gl2f', 'open'
 
 def add_args(parser):
+	parser.description = 'Open pages in the browser'
+
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
@@ -37,3 +39,6 @@ def add_args(parser):
 		help='select articles to show')
 
 	parser.set_defaults(handler=subcommand)
+
+def set_compreply():
+	return '__gl2f_complete_list_args'

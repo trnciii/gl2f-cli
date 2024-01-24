@@ -3,7 +3,7 @@ __gl2f_complete_boards(){
     local realcur=${cur##*/}
     local prefix=${cur%/*}
     case ${prefix} in
-      ## REPLACE_PAGES_SECOND
+## REPLACE_PAGES_SECOND
     esac
   else
     ## REPLACE_PAGES_FIRST
@@ -11,10 +11,45 @@ __gl2f_complete_boards(){
     if declare -F _init_completion >/dev/null 2>&1; then
       [[ $COMPREPLY == */ ]] && compopt -o nospace # not work on mac
     fi
-
   fi
 }
 
+__gl2f_complete_format(){
+  local realcur=$cur
+  if [[ "$cur" == *:* ]]; then
+    realcur=${cur##*:}
+  fi
+
+  ## REPLACE_FORMAT
+
+  if declare -F _init_completion >/dev/null 2>&1; then
+    compopt -o nospace
+  fi
+}
+
+__gl2f_complete_order(){
+  if [[ "$cur" == *:* ]]; then
+    local realcur=${cur##*:}
+    COMPREPLY=( $(compgen -W "asc desc" -- $realcur) )
+  else
+    COMPREPLY=( $(compgen -W "name: reservedAt:" -- $cur) )
+    if declare -F _init_completion >/dev/null 2>&1; then
+      compopt -o nospace
+    fi
+  fi
+}
+
+__gl2f_complete_list_args(){
+  if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
+    __gl2f_complete_format
+  elif [ $prev == --order ]; then
+    __gl2f_complete_order
+  elif [ $prev == --dump ]; then
+    _filedir
+  else
+    __gl2f_complete_boards
+  fi
+}
 
 _gl2f(){
   local cur prev words cword split
@@ -25,24 +60,11 @@ _gl2f(){
     _get_comp_words_by_ref -n :/ cur prev words cword || return
   fi
 
-  case $cword in
-    1)
-      COMPREPLY=( $(compgen -W 'auth cat dl local ls open search completion' -- "$cur") )
-      ;;
-    *)
-      case ${words[1]} in
-        auth)
-          COMPREPLY=( $(compgen -W 'file load login remove update set-token' -- "$cur") )
-          ;;
-        local)
-          COMPREPLY=( $(compgen -W 'clear-cache dir index install ls stat open build' -- "$cur") )
-          ;;
-        cat | dl | ls | open | search)
-          __gl2f_complete_boards
-          ;;
-        esac
-      ;;
-  esac
+## REPLACE_COMMAND_TREE
 }
 
-complete -F _gl2f gl2f
+if declare -F _init_completion >/dev/null 2>&1; then
+  complete -F _gl2f gl2f
+else
+  complete -o nospace -F _gl2f gl2f
+fi

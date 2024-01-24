@@ -1,8 +1,6 @@
 from .core import lister, pretty, article
 from .ayame import terminal as term
 
-def name(): return 'cat'
-
 def cat(i, args):
 	from .dl import save
 
@@ -10,12 +8,14 @@ def cat(i, args):
 		save(i, args)
 	fm = pretty.Formatter()
 	fm.print(i, encoding=args.encoding)
-	for s in article.lines(i, args.style, args.sixel):
+	for s in article.lines(i, args.style, args.sixel, args.max_size):
 		term.write_with_encoding(s, encoding=args.encoding, errors='ignore')
 	term.write_with_encoding('\n', encoding=args.encoding)
 
 
 def subcommand(args):
+	args.max_size = (args.width, args.height) if (args.width or args.height) else None
+
 	if args.board.startswith('https'):
 		cat(lister.fetch_content(args.board, dump=args.dump), args)
 		return
@@ -30,12 +30,15 @@ def subcommand(args):
 			cat(i, args)
 	else:
 		fm = pretty.from_args(args, items)
-		selected = term.select([fm.format(i) for i in items])
-		for i in [i for s, i in zip(selected, items) if s]:
+		for i in term.selected(items, fm.format):
 			cat(i, args)
 
+def add_to():
+	return 'gl2f', 'cat'
 
 def add_args(parser):
+	parser.description = 'Display articles'
+
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
@@ -51,6 +54,10 @@ def add_args(parser):
 		help='select articles to show')
 	parser.add_argument('--dl', action='store_true',
 		help='also downloads the article')
+	parser.add_argument('-W', '--width', type=int,
+		help='set max image width')
+	parser.add_argument('-H', '--height', type=int,
+		help='set max image height')
 
 	# options from dl
 	parser.add_argument('--stream', action='store_true',
@@ -63,3 +70,7 @@ def add_args(parser):
 		help='output path')
 
 	parser.set_defaults(handler=subcommand)
+
+
+def set_compreply():
+	return '__gl2f_complete_list_args'

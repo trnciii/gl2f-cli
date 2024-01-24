@@ -32,35 +32,55 @@ def load_content(i):
 	with open(os.path.join(refdir('contents'), i, f'{i}.json'), encoding='utf-8') as f:
 		return json.load(f)
 
-def search_media(mediaId, contentId=None):
-	directory = refdir_untouch('cache')
-	if directory:
-		cache = os.path.join(directory, mediaId)
+def search_image(mediaId, contentId=None):
+	if ret := search_image_in_cache(mediaId):
+		return ret
+
+	if ret := search_image_in_content(mediaId, contentId):
+		return ret
+
+	return search_image_all_contents(mediaId)
+
+def search_image_in_cache(mediaId):
+	cache_dir = refdir_untouch('cache')
+	if cache_dir:
+		cache = os.path.join(cache_dir, mediaId)
 		if os.path.isfile(cache):
 			return cache
 
-
+def search_image_in_content(mediaId, contentId):
 	if not contentId:
-		import glob
-		cand = glob.iglob(f'contents/*/{mediaId}*', root_dir=home())
-		try:
-			return os.path.join(home(), next(cand))
-		except:
-			return None
-
-
-	directory = refdir_untouch(f'contents/{contentId}')
-	if not directory:
+		return None
+	content_dir = refdir_untouch(os.path.join('contents', contentId))
+	if not content_dir:
 		return None
 
-	pattern = re.compile(rf'{mediaId}.*')
-	li = filter(pattern.match, os.listdir(directory))
+	pattern = re.compile(rf'{mediaId}\.(?!mp4$|mov$)')
+	li = filter(pattern.match, os.listdir(content_dir))
 
 	try:
-		return os.path.join(directory, next(li))
+		return os.path.join(content_dir, next(li))
 	except:
 		return None
 
+def search_image_all_contents(mediaId):
+	import glob
+	exclude = ['.mp4', '.mov']
+	try:
+		files = glob.iglob(f'{os.path.abspath(home())}/contents/*/{mediaId}.*')
+		return os.path.relpath(next(f for f in files if not any(f.endswith(e) for e in exclude)))
+	except StopIteration:
+		return None
+	except Exception as e:
+		print(e)
+		raise RuntimeError()
+
+
+def stat():
+	return {os.path.basename(p): {
+		'count': len(os.listdir(p)),
+		'size': sum(sum( os.path.getsize(os.path.join(d,_f)) for _f in f ) for d,_,f in os.walk(p))
+	} for p in filter(lambda x:x, map(refdir_untouch, ['contents', 'cache']))}
 
 def package_data(f=''):
 	import gl2f

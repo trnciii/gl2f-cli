@@ -1,26 +1,13 @@
 name: build
 
 on:
+  pull_request:
   push:
     tags:
-      - 'v*'
-    branches:
-      - 'build'
+      - '*'
 
 jobs:
-  check_version:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-
-      - run: python3 check_version.py ${{ github.ref_name }}
-      - run: echo 'passed!'
-
-
-  build:
+  build-pyinstaller:
     strategy:
       matrix:
         target:
@@ -42,18 +29,67 @@ jobs:
           python-version: 3.x
       - run: pip install . pyinstaller
 
-      - run: pyinstaller bin/_gl2f.py --onefile --name gl2f --collect-data gl2f
+      - run: . bin/build-pyinstaller.bash
+        shell: bash
 
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.target }}
           path: dist/*
 
-  release:
-    if: github.ref_name != 'build'
-    needs: [check_version, build]
+  build-dist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: git submodule update --init
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: python3 -m pip install build
+
+      - run: python3 -m build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+  publish-to-pypi:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+    - build-dist
 
     runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/gl2f
+
+    permissions:
+      id-token: write
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  release:
+    if: startsWith(github.ref, 'refs/tags')
+    needs:
+    - build-pyinstaller
+    - publish-to-pypi
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
     steps:
       - uses: actions/checkout@v3
 
@@ -69,9 +105,16 @@ jobs:
           name: macos
       - run: zip macos.zip macos/*
 
-      # source
-      - run: git submodule update --init --recursive
-      - run: zip -r source.zip gl2f/* setup.py
+      # dist
+      - uses: actions/download-artifact@v1
+        with:
+          name: dist
+          path: dist/
+      - uses: sigstore/gh-action-sigstore-python@v1.2.3
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
 
       - name: Release
         id: create_release
@@ -81,10 +124,4 @@ jobs:
           files: |
             windows.zip
             macos.zip
-            source.zip
-
-      - run: |
-          git fetch
-          git switch release
-          git reset --hard ${{ github.ref_name }}
-          git push origin release
+            dist/**

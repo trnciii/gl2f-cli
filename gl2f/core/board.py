@@ -155,6 +155,13 @@ def table():
 		},
 
 		{
+			'id': '789417493352416266',
+			'key': 'fm/girls2-open',
+			'group': 'girls2',
+			'page': 'G2OpenFanMeetingPG'
+		},
+
+		{
 			'id': '750275859142673638',
 			'key': 'fm/lucky2-2023',
 			'group': 'lucky2',
@@ -219,6 +226,53 @@ def table():
 			'key': 'wallpaper',
 			'page': 'wallpaper'
 		},
+
+		# ticket
+		{
+			'id': '335268051140216033',
+			'key': 'ticket',
+			'page': 'ticket',
+		},
+
+		# history
+		{
+			'id': '801380069393040517',
+			'key': 'history/girls2',
+			'page': 'Girls2history',
+		},
+
+		# Happy Summer
+		{
+			'id': '809652098881814530',
+			'key': 'happysummer/pg',
+			'page': 'HappySummerPG',
+		},
+
+		# activate
+		{
+			'id': '836873836174508033',
+			'key': 'activate/pg',
+			'page': 'activatePG',
+		},
+
+		# not a post found
+		# {
+		# 	'id': '385773910110503958',
+		# 	'key': 'information',
+		# 	'page': 'information'
+		# },
+
+		{
+			'id': '289220886836282449',
+			'key': 'pass',
+			'page': 'miraclepass'
+		},
+
+		{
+			'id': '570095770410156859',
+			'key': 'checkin',
+			'page': 'CheckInPhoto'
+		},
 	]
 
 
@@ -257,7 +311,6 @@ def tree():
 
 def active():
 	return [
-		'fm/girls2-2023',
 		'blogs/girls2',
 		'blogs/lucky2',
 		'news/family',
@@ -265,5 +318,6 @@ def active():
 		'radio/lucky2',
 		'gtube',
 		'cm',
-		'wallpaper'
+		'wallpaper',
+		'pass',
 	]
