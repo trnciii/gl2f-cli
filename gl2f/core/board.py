@@ -320,6 +320,4 @@ def active():
 		'cm',
 		'wallpaper',
 		'pass',
-		'checkin',
-		'activate/pg',
 	]
