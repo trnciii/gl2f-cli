@@ -251,7 +251,7 @@ def import_contents(src):
 	checker = ImportChecker(left, right)
 	checker.report()
 
-	def view():
+	def view_all_contents():
 		fm = pretty.Formatter(f='id:date-p:author:title', fd='%m/%d')
 		for i in os.listdir(right):
 			filepath = os.path.join(right, i, f'{i}.json')
@@ -297,15 +297,16 @@ def import_contents(src):
 				os.makedirs(os.path.dirname(dst), exist_ok=True)
 				shutil.copy(src, dst)
 
-	operations = list(filter(lambda x: x[2](), [
-		('view all contents', view, lambda: True),
-		('copy new contents', copy_new_contents, lambda: len(checker.right_only)),
-		('copy new files', copy_new_files, lambda: any(checker.new_files())),
-		('show diff', show_diff, lambda: len(checker.diff_files))
-	]))
-	selection = term.select([k for k, _, _ in operations])
-	for s, (_, o, _) in zip(selection, operations):
-		if s: o()
+	ops = [view_all_contents]
+	if len(checker.right_only):
+		ops.append(copy_new_contents)
+	if any(checker.new_files()):
+		ops.append(copy_new_files)
+	if len(checker.diff_files):
+		ops.append( show_diff)
+
+	for o in term.selected(ops, lambda o:o.__name__.replace('_', ' ')):
+		o()
 
 def export_contents(out):
 	import shutil
