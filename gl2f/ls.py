@@ -1,7 +1,7 @@
 from .core import lister, pretty
 
 def subcommand(args):
-	items = lister.list_contents(args)
+	items, _ = lister.list_contents(args)
 
 	fm = pretty.from_args(args, items)
 

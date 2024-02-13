@@ -9,19 +9,21 @@ def open_url(i):
 
 
 def subcommand(args):
-	items = lister.list_contents(args)
-	fm = pretty.from_args(args, items)
+	fm = pretty.from_args(args)
 
 	if args.all:
+		items, _ = lister.list_contents(args)
+		fm.set_width(items)
 		for i in items:
 			fm.print(i)
 			open_url(i)
 	elif args.pick:
+		items, _ = lister.list_contents(args)
 		for i in util.pick(items, args.pick):
 			fm.print(i)
 			open_url(i)
 	else:
-		for i in term.selected(items, fm.format):
+		for i in lister.selected(args, fm.format):
 			open_url(i)
 
 def add_to():

@@ -18,19 +18,16 @@ def subcommand(args):
 
 	if args.board.startswith('https'):
 		cat(lister.fetch_content(args.board, dump=args.dump), args)
-		return
-
-	items = lister.list_contents(args)
-
-	if args.all:
+	elif args.all:
+		items, _ = lister.list_contents(args)
 		for i in items:
 			cat(i, args)
 	elif args.pick:
+		items, _ = lister.list_contents(args)
 		for i in util.pick(items, args.pick):
 			cat(i, args)
 	else:
-		fm = pretty.from_args(args, items)
-		for i in term.selected(items, fm.format):
+		for i in lister.selected(args, pretty.from_args(args).format):
 			cat(i, args)
 
 def add_to():

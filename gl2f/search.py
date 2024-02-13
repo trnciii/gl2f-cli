@@ -28,7 +28,7 @@ def subcommand(args):
 
 	hi = re.compile( fr"(?P<match>{'|'.join(keywords)})" )
 
-	items = lister.list_contents(args)
+	items, _ = lister.list_contents(args)
 	texts = [''.join(article.lines(i, 'plain', False)) for i in items]
 	counts = [
 		sum(int(k in te) + int(k in ti) for k in keywords)

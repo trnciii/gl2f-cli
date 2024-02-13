@@ -102,12 +102,11 @@ def subcommand(args):
 	if args.board.startswith('https'):
 		items = [lister.fetch_content(args.board, dump=args.dump)]
 	elif args.all:
-		items = lister.list_contents(args)
+		items, _ = lister.list_contents(args)
 	elif args.pick:
-		items = util.pick(lister.list_contents(args), args.pick)
+		items = util.pick(lister.list_contents(args)[0], args.pick)
 	else:
-		li = lister.list_contents(args)
-		items = term.selected(li, pretty.from_args(args, li).format)
+		items = lister.selected(args, pretty.from_args(args).format)
 
 	for i in items:
 		save(i, args)
