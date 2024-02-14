@@ -42,10 +42,10 @@ def has_subcommand(tree, command, subcommand):
 
 def test_builtin_command_tree():
 	parser, tree = command_builder.build(command_builder.builtin)
-	assert {'gl2f', 'gl2f.auth', 'gl2f.config', 'gl2f.local'} == tree.keys()
+	assert {'gl2f', 'gl2f.auth', 'gl2f.config', 'gl2f.local', 'gl2f.pages'} == tree.keys()
 	assert {
 		'sixel', 'auth', 'cat', 'completion', 'config',
-		'dl','local','ls','open','search',
+		'dl','local','ls','open','pages','search',
 	} ==  tree['gl2f'].choices.keys()
 	assert {'login', 'remove', 'set-token', 'update'} == tree['gl2f.auth'].choices.keys()
 	assert {'create', 'path', 'view', 'edit'} == tree['gl2f.config'].choices.keys()
@@ -53,6 +53,7 @@ def test_builtin_command_tree():
 		'clear-cache', 'dir', 'export', 'import', 'index',
 		'install', 'ls', 'open', 'stat', 'serve'
 	} == tree['gl2f.local'].choices.keys()
+	assert {'add-definition', 'remove-definition', 'add-to-today', 'remove-from-today', 'show-today'} == tree['gl2f.pages'].choices.keys()
 
 def test_addons():
 	registrars = [
