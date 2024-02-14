@@ -1,9 +1,9 @@
 import argparse
 import importlib
-from . import auth, cat, completion, configurator, dl, local, ls, opener, search
+from . import auth, cat, completion, configurator, dl, local, ls, opener, pages, search
 from .ayame import sixel
 
-builtin = [auth, cat, completion, configurator, dl, local, ls, opener, search]
+builtin = [auth, cat, completion, configurator, dl, local, ls, opener, pages, search]
 
 def version():
 	try:

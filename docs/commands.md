@@ -155,6 +155,58 @@ gl2f open -a blogs/today
 ```
 
 
+## `gl2f pages` ページ定義を編集する
+
+リストとして取得可能なページを追加したり、`today` で巡回するページの追加や削除をおこないます。
+ページ定義の変更後はコマンド補完は改めて生成してください。
+
+### 用語
+|用語|意味|例|
+||||
+| key | コマンドに与えるページ名 | blogs/girls2, gtube, news/lucky2 |
+| page id | url 上の page 以下の文字列 | blogs, gtube, lucky2news |
+
+
+
+### `gl2f pages add-definition <page id>` 取得可能なページを追加する
+Page id を与えて gl2f がページを取得可能にします。
+
+オプション
+* `--key <key>` コマンドの引数として使うページ名前を指定します。
+* `--activate` ページを `today` の巡回対象に設定します。
+
+ttps://girls2-fc.jp/page/Lucky2FanMeeting2024PG を `fm/lucky2-2024` として追加する。
+```sh
+gl2f pages add-page Lucky2FanMeeting2024PG --key fm/lucky2-2024
+# key の名前で使用可能になった
+gl2f ls fm/lucky2 -f title
+【東京公演】07組の突撃Vlog!⑦
+【東京公演】りなゆら本番前リポーター🤍💜③
+【東京公演】07組の突撃Vlog!⑥
+【東京公演】07組の突撃Vlog!⑤
+【東京公演】07組の突撃Vlog!④
+【東京公演】集合写真📸
+【東京公演】つばききのCloset
+【東京公演】Lucky²の座席占い
+【東京公演】07組の突撃Vlog!③
+【東京公演】07組の突撃Vlog!②
+```
+
+### `gl2f pages remove-definition <key>` ページ定義を削除する
+key が指すページ定義を削除します。
+
+
+### `gl2f pages add-to-today <key>`
+`key` のページを `today` の巡回対象に追加します。
+
+### `gl2f pages remove-from-today <key>`
+`key` のページを `today` の巡回対象から外します。
+
+
+### `gl2f pages show-today`
+`today` の巡回対象として設定されているページを表示します。
+
+
 ## `gl2f search` 記事の内容を検索する
 
 引数に記事のリストと1つ以上のキーワードをスペース区切りで与えます。

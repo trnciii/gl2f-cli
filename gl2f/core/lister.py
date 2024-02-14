@@ -147,7 +147,8 @@ def list_contents(args):
 
 
 	elif args.board == 'today':
-		ret = list_multiple_boards([board.get('key', x)['id'] for x in board.active()], args)
+		table = board.definitions()
+		ret = list_multiple_boards([i['id'] for i in table['pages'] if i['key'] in table['active']], args)
 		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True)
 
 	elif b := board.get('key', args.board):
