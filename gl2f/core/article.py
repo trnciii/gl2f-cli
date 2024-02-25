@@ -120,7 +120,7 @@ def lines(item, style, use_sixel, max_size=None):
 			yield '\n'
 
 		elif style == 'plain':
-			yield from results
+			yield from (term.declip(r) for r in results)
 
 
 def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, video_url_key='originalUrl', xauth=None):

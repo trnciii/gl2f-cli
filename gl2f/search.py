@@ -1,4 +1,4 @@
-import re
+import re, os
 from .core import lister, pretty, article
 from .ayame import terminal as term
 
@@ -22,36 +22,52 @@ def merge(ranges):
 	ret.append(cur)
 	return ret
 
-def print_highlighted(result, format, pattern, encoding, max_preview_lines=5):
-		term.write_with_encoding(pattern.sub(
-			term.mod(r'\g<match>', term.color('yellow'), term.inv()),
-			format(result.item)
-		) + '\n', encoding)
+def filter_by_keywords(items, keywords, sort):
+	results = filter(lambda i:i.score > 0, (FilterResult(i, keywords) for i in items))
+	if sort:
+		results = sorted(results, reverse=True, key=lambda x:x.score)
+	return results
+
+
+def to_lines(result, format, pattern, encoding, max_preview_lines=5):
+		title = pattern.sub(term.mod(r'\g<match>', term.color('yellow'), term.inv()), format(result.item))
 
 		merged = merge([(i.start()-20, i.end()+20) for i in pattern.finditer(result.text)])
 		if len(merged) > max_preview_lines:
 			merged = merged[:max_preview_lines]
 
-		for begin, end in merged:
-			term.write_with_encoding('> ' + pattern.sub(
+		heading = ('> ' + pattern.sub(
 				term.mod(r'\g<match>', term.color('yellow')),
 				result.text[max(0, begin):min(len(result.text), end)] + term.reset()
-			) + '\n', encoding)
+			) for begin, end in merged)
+		return [title] + list(heading) + ['']
 
-		term.write_with_encoding('\n', encoding)
+def delimiter():
+	width, _ = os.get_terminal_size()
+	half = (width-5)//4
+	return f'{"-"*half}・_・{"-"*half}'
 
 def subcommand(args):
 	keywords = list(filter(len, sum((k.split('　') for k in args.keywords), [])))
-
-	items, _ = lister.list_contents(args)
-	results = filter(lambda i:i.score > 0, (FilterResult(i, keywords) for i in items))
-	if args.sort:
-		results = sorted(results, reverse=True, key=lambda x:x.score)
+	pattern = re.compile( fr"(?P<match>{'|'.join(keywords)})" )
 
 	fm = pretty.from_args(args)
 	fm.reset_index(digits=len(str(args.number)))
-	for i in results:
-		print_highlighted(i, fm.format, re.compile( fr"(?P<match>{'|'.join(keywords)})" ), args.encoding)
+
+
+	def gen():
+		yield delimiter()
+		args.page = 1
+		while True:
+			items, total_count = lister.list_contents(args)
+			if not items:
+				yield delimiter()
+				return
+			for i in filter_by_keywords(items, keywords, False):
+				yield from to_lines(i, fm.format, pattern, args.encoding)
+			args.page += 1
+
+	term.scroll(gen())
 
 
 def add_to():
@@ -63,7 +79,7 @@ def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 
-	parser.set_defaults(date='%m/%d', number=30)
+	parser.set_defaults(date='%y/%m/%d', break_urls=True, number=50)
 
 	parser.add_argument('keywords', nargs='+')
 	parser.add_argument('--encoding')
