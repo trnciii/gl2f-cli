@@ -9,7 +9,7 @@ def cat(i, args):
 	fm = pretty.Formatter()
 	fm.print(i, encoding=args.encoding)
 	for s in article.lines(i, args.style, args.sixel, args.max_size):
-		term.write_with_encoding(s, encoding=args.encoding, errors='ignore')
+		term.write_with_encoding(f'{s}\n', encoding=args.encoding, errors='ignore')
 	term.write_with_encoding('\n', encoding=args.encoding)
 
 
