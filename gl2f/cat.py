@@ -1,4 +1,4 @@
-from .core import lister, pretty, article
+from .core import lister, pretty, article, util
 from .ayame import terminal as term
 
 def cat(i, args):
@@ -26,7 +26,7 @@ def subcommand(args):
 		for i in items:
 			cat(i, args)
 	elif args.pick:
-		for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
+		for i in util.pick(items, args.pick):
 			cat(i, args)
 	else:
 		fm = pretty.from_args(args, items)

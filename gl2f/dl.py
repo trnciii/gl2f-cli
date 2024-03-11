@@ -104,8 +104,7 @@ def subcommand(args):
 	elif args.all:
 		items = lister.list_contents(args)
 	elif args.pick:
-		li = lister.list_contents(args)
-		items = (li[i-1] for i in args.pick if 0<i<=len(li))
+		items = util.pick(lister.list_contents(args), args.pick)
 	else:
 		li = lister.list_contents(args)
 		items = term.selected(li, pretty.from_args(args, li).format)

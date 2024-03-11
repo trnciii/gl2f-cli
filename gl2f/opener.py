@@ -1,4 +1,4 @@
-from .core import lister, pretty
+from .core import lister, pretty, util
 from .ayame import terminal as term
 
 def open_url(i):
@@ -17,7 +17,7 @@ def subcommand(args):
 			fm.print(i)
 			open_url(i)
 	elif args.pick:
-		for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
+		for i in util.pick(items, args.pick):
 			fm.print(i)
 			open_url(i)
 	else:
