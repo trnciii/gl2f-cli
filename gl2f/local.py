@@ -1,11 +1,11 @@
 import re
 import os, json
-from .ayame import terminal as term
 from .core import pretty, local
 from .core.config import data as config
 
 
 def ls(args):
+	from .ayame import terminal as term
 	items = [local.load_content(i) for i in sorted(local.listdir('contents'))]
 	if args.order:
 		a = args.order.split(':')
@@ -15,10 +15,8 @@ def ls(args):
 		args.format = 'page:' + args.format
 
 	fm = pretty.from_args(args, items)
-	itr = map(fm.format, items)
-
 	if args.paging != 'never':
-		term.scroll(itr, lambda:'')
+		term.scroll(map(fm.format, items), lambda:'')
 	else:
 		for i in items:
 			fm.print(i, encoding=args.encoding)
@@ -414,7 +412,7 @@ def add_args(parser):
 	pretty.add_args(p)
 	p.add_argument('--encoding')
 	p.add_argument('--paging', type=str, choices={'auto', 'never'}, default='auto',
-		help='specify when to use the pager, or use `-P` to disable (*auto*, never)')
+		help='specify when to use the pager, or use -P to disable (*auto*, never)')
 	p.add_argument('-P', dest='paging', action='store_const', const='never')
 	p.set_defaults(handler=ls, format='author:title')
 

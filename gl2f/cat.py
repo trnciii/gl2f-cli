@@ -1,19 +1,7 @@
-import os
 from .core import lister, pretty, article, util
 from .ayame import terminal as term, sixel
 
-def cat(i, args):
-	from .dl import save
-
-	if args.dl:
-		save(i, args)
-	fm = pretty.Formatter()
-	fm.print(i, encoding=args.encoding)
-	for s in article.lines(i, args.style, args.sixel, args.max_size):
-		term.write_with_encoding(f'{s}\n', encoding=args.encoding, errors='ignore')
-	term.write_with_encoding('\n', encoding=args.encoding)
-
-def gen(items, args, never_page):
+def gen(items, args):
 	from .dl import save
 	fm = pretty.from_args(args)
 	for i in items:
@@ -30,21 +18,21 @@ def subcommand(args):
 	never_page = args.paging == 'never' or (args.sixel and sixel.init())
 
 	if args.board.startswith('https'):
-		g = gen([lister.fetch_content(args.board, dump=args.dump)], args, never_page)
+		g = gen([lister.fetch_content(args.board, dump=args.dump)], args)
 	elif args.all:
 		items, _ = lister.list_contents(args)
-		g = gen(items, args, never_page)
+		g = gen(items, args)
 	elif args.pick:
 		items, _ = lister.list_contents(args)
-		g = gen(util.pick(items, args.pick), args, never_page)
+		g = gen(util.pick(items, args.pick), args)
 	else:
-		g = gen(lister.selected(args, pretty.from_args(args).format), args, never_page)
+		g = gen(lister.selected(args, pretty.from_args(args).format), args)
 
 	if never_page:
 		for line in g:
 			print(line)
 	else:
-		term.scroll(g, eof=lambda:util.rule())
+		term.scroll(g, eof=util.rule)
 
 def add_to():
 	return 'gl2f', 'cat'
@@ -72,7 +60,7 @@ def add_args(parser):
 	parser.add_argument('-H', '--height', type=int,
 		help='set max image height')
 	parser.add_argument('--paging', type=str, choices={'auto', 'never'}, default='auto',
-		help='specify when to use the pager, or use `-P` to disable (*auto*, never)')
+		help='specify when to use the pager, or use -P to disable (*auto*, never)')
 	parser.add_argument('-P', dest='paging', action='store_const', const='never')
 
 	# options from dl

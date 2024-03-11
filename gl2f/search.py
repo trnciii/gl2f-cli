@@ -1,4 +1,4 @@
-import re, os
+import re
 from .core import lister, pretty, article, util
 from .ayame import terminal as term
 
@@ -9,18 +9,17 @@ class FilterResult:
 		self.score = sum(int(k in self.text) + int(k in item['values']['title']) for k in keywords)
 
 def merge(ranges):
-	if len(ranges) == 0: return []
-
-	ret = []
-	cur = ranges[0]
-	for r in ranges[1:]:
-		if cur[1] < r[0]:
-			ret.append(cur)
-			cur = r
-		else:
-			cur = cur[0], r[1]
-	ret.append(cur)
-	return ret
+	try:
+		cur = next(ranges)
+		for r in ranges:
+			if cur[1] < r[0]:
+				yield cur
+				cur = r
+			else:
+				cur = cur[0], r[1]
+		yield cur
+	except StopIteration:
+		return
 
 def filter_by_keywords(items, keywords, sort):
 	results = filter(lambda i:i.score > 0, (FilterResult(i, keywords) for i in items))
@@ -29,18 +28,22 @@ def filter_by_keywords(items, keywords, sort):
 	return results
 
 
-def to_lines(result, format, pattern, encoding, max_preview_lines=5):
-		title = pattern.sub(term.mod(r'\g<match>', term.color('yellow'), term.inv()), format(result.item))
+def to_lines(result, format, pattern):
+	from itertools import islice, chain
 
-		merged = merge([(i.start()-20, i.end()+20) for i in pattern.finditer(result.text)])
-		if len(merged) > max_preview_lines:
-			merged = merged[:max_preview_lines]
+	title = pattern.sub(
+		term.mod(r'\g<match>', term.color('yellow'), term.inv()),
+		format(result.item)).split('\n')
 
-		heading = ('> ' + pattern.sub(
-				term.mod(r'\g<match>', term.color('yellow')),
-				result.text[max(0, begin):min(len(result.text), end)] + term.reset()
-			) for begin, end in merged)
-		return [title] + list(heading) + ['']
+	make_range = lambda i: (max(0, i.start()-20), min(len(result.text), i.end()+20))
+	merged = merge(map(make_range, pattern.finditer(result.text)))
+
+	heading = (pattern.sub(
+		term.mod(r'\g<match>', term.color('yellow')),
+		f'> {result.text[begin:end]}{term.reset()}'
+	) for begin, end in islice(merged, 5))
+
+	return chain(title, heading)
 
 def subcommand(args):
 	keywords = list(filter(len, sum((k.split('　') for k in args.keywords), [])))
@@ -51,18 +54,17 @@ def subcommand(args):
 
 
 	def gen():
-		w, _ = os.get_terminal_size()
 		args.page = 1
 		while True:
-			items, total_count = lister.list_contents(args)
+			items, _ = lister.list_contents(args)
 			if not items:
-				yield util.rule()
 				return
 			for i in filter_by_keywords(items, keywords, False):
-				yield from to_lines(i, fm.format, pattern, args.encoding)
+				yield from to_lines(i, fm.format, pattern)
+				yield ''
 			args.page += 1
 
-	term.scroll(gen())
+	term.scroll(gen(), eof=util.rule)
 
 
 def add_to():

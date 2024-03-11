@@ -1,5 +1,4 @@
 from .core import lister, pretty, util
-from .ayame import terminal as term
 
 def open_url(i):
 	import webbrowser
