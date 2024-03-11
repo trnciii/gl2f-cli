@@ -13,3 +13,9 @@ def dump(loc, name, data):
 
 def pick(items, indices):
 	yield from (items[i-1] for i in indices if 0 < i <= len(items))
+
+def rule(length=None):
+	if length is None:
+		length, _ = os.get_terminal_size()
+	hand = '-' * ((length-5)//2)
+	return f'{hand}・_・{hand}'

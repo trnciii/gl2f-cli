@@ -1,5 +1,5 @@
 import re, os
-from .core import lister, pretty, article
+from .core import lister, pretty, article, util
 from .ayame import terminal as term
 
 class FilterResult:
@@ -42,11 +42,6 @@ def to_lines(result, format, pattern, encoding, max_preview_lines=5):
 			) for begin, end in merged)
 		return [title] + list(heading) + ['']
 
-def delimiter():
-	width, _ = os.get_terminal_size()
-	half = (width-5)//4
-	return f'{"-"*half}・_・{"-"*half}'
-
 def subcommand(args):
 	keywords = list(filter(len, sum((k.split('　') for k in args.keywords), [])))
 	pattern = re.compile( fr"(?P<match>{'|'.join(keywords)})" )
@@ -56,12 +51,12 @@ def subcommand(args):
 
 
 	def gen():
-		yield delimiter()
+		w, _ = os.get_terminal_size()
 		args.page = 1
 		while True:
 			items, total_count = lister.list_contents(args)
 			if not items:
-				yield delimiter()
+				yield util.rule()
 				return
 			for i in filter_by_keywords(items, keywords, False):
 				yield from to_lines(i, fm.format, pattern, args.encoding)
