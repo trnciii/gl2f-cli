@@ -1,5 +1,6 @@
 import re
 import os, json
+from .ayame import terminal as term
 from .core import pretty, local
 from .core.config import data as config
 
@@ -14,8 +15,13 @@ def ls(args):
 		args.format = 'page:' + args.format
 
 	fm = pretty.from_args(args, items)
-	for i in items:
-		fm.print(i, encoding=args.encoding)
+	itr = map(fm.format, items)
+
+	if args.paging != 'never':
+		term.scroll(itr, lambda:'')
+	else:
+		for i in items:
+			fm.print(i, encoding=args.encoding)
 
 
 def clear_cache():
@@ -407,6 +413,9 @@ def add_args(parser):
 		help='sort order')
 	pretty.add_args(p)
 	p.add_argument('--encoding')
+	p.add_argument('--paging', type=str, choices={'auto', 'never'}, default='auto',
+		help='specify when to use the pager, or use `-P` to disable (*auto*, never)')
+	p.add_argument('-P', dest='paging', action='store_const', const='never')
 	p.set_defaults(handler=ls, format='author:title')
 
 	sub.add_parser('open', description='Open local static web viewer in the browser').set_defaults(handler=lambda _:open_site())
