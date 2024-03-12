@@ -2,9 +2,6 @@ name: test
 
 on:
   pull_request:
-  push:
-    branches:
-    - main
 
 jobs:
   test:
@@ -17,12 +14,19 @@ jobs:
           - '3.9'
           - '3.10'
           - '3.11'
+          - '3.12'
 
     name: ${{ matrix.python }} • ${{ matrix.runs-on }}
     runs-on: ${{ matrix.runs-on }}
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: main
+        fetch-depth: 0
+    - run: git config user.name "action"
+    - run: git config user.email "action@github.com"
+    - run: git merge origin/${{ github.head_ref }} --no-ff
     - run: git submodule update --init
 
     - uses: actions/setup-python@v4
