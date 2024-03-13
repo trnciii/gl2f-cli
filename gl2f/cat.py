@@ -2,12 +2,8 @@ from .core import lister, pretty, article, util
 from .ayame import terminal as term, sixel
 
 def gen(items, args):
-	from .dl import save
 	fm = pretty.from_args(args)
 	for i in items:
-		if args.dl:
-			save(i, args)
-
 		yield fm.format(i)
 		yield from article.lines(i, args.style, args.sixel, args.max_size)
 		yield ''
@@ -59,16 +55,6 @@ def add_args(parser):
 		help='set max image width')
 	parser.add_argument('-H', '--height', type=int,
 		help='set max image height')
-
-	# options from dl
-	parser.add_argument('--stream', action='store_true',
-		help='save video files as stream')
-	parser.add_argument('--skip', action='store_true',
-		help='not actually download video files')
-	parser.add_argument('-F', '--force', action='store_true',
-		help='force download to overwrite existing files')
-	parser.add_argument('-o', type=str, default='',
-		help='output path')
 
 	parser.set_defaults(handler=subcommand)
 
