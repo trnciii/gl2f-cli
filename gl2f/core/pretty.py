@@ -10,16 +10,12 @@ class Formatter:
 		self.fdstring = fd if fd else '%m/%d'
 		self.sep = sep
 
-		self.index = 0
-		self.digits = 2
-
 		self.functions = {
 			'author': self.author,
 			'title': self.title,
 			'url': self.url,
 			'date-p': self.date_p,
 			'date-c': self.date_c,
-			'index': self.inc_index,
 			'br': self.breakline,
 			'id': self.content_id,
 			'media': self.media_stat,
@@ -27,12 +23,6 @@ class Formatter:
 		}
 
 		self.set_width(items)
-
-
-	def reset_index(self, i=0, digits=2):
-		self.index = i
-		self.digits = digits
-
 
 	def author(self, item, nomod=False):
 		_, v = member.from_id(item.get('categoryId'))
@@ -71,10 +61,6 @@ class Formatter:
 
 	def breakline(self, item):
 		return '\n'
-
-	def inc_index(self, item):
-		self.index += 1
-		return f'{self.index:{self.digits}}'
 
 	def content_id(self, item):
 		return item['contentId']
@@ -126,9 +112,6 @@ def add_args(parser):
 	parser.add_argument('--date', '-d', type=str, nargs='?', const='%m/%d',
 		help='date formatting')
 
-	parser.add_argument('--enum', action='store_true',
-		help='show index on the left (lefter than date)')
-
 
 def make_format(args):
 	f = args.format.strip(':')
@@ -141,9 +124,6 @@ def make_format(args):
 
 	if args.date and 'date-p' not in f:
 		f = 'date-p:' + f
-
-	if args.enum:
-		f = 'index:' + f
 
 	return f
 

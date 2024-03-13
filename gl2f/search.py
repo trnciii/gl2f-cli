@@ -50,8 +50,6 @@ def subcommand(args):
 	pattern = re.compile( fr"(?P<match>{'|'.join(keywords)})" )
 
 	fm = pretty.from_args(args)
-	fm.reset_index(digits=len(str(args.number)))
-
 
 	def gen():
 		args.page = 1
