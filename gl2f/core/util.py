@@ -10,3 +10,18 @@ def dump(loc, name, data):
 	with open(filepath, 'w', encoding='utf-8') as f:
 		json.dump(data, f, indent=2, ensure_ascii=False)
 	print('saved', filepath)
+
+def pick(items, indices):
+	yield from (items[i-1] for i in indices if 0 < i <= len(items))
+
+def rule(length=None):
+	if length is None:
+		length, _ = os.get_terminal_size()
+	hand = '-' * ((length-5)//2)
+	return f'{hand}・_・{hand}'
+
+paging_choices = ['auto', 'never']
+def add_paging_args(parser):
+	parser.add_argument('--paging', type=str, choices=paging_choices, default='auto',
+		help=f'specify when to use the pager, or use -P to disable (*{", ".join(paging_choices)})')
+	parser.add_argument('-P', dest='paging', action='store_const', const='never')

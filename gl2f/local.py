@@ -1,10 +1,11 @@
 import re
 import os, json
-from .core import pretty, local
+from .core import pretty, local, util
 from .core.config import data as config
 
 
 def ls(args):
+	from .ayame import terminal as term
 	items = [local.load_content(i) for i in sorted(local.listdir('contents'))]
 	if args.order:
 		a = args.order.split(':')
@@ -14,8 +15,11 @@ def ls(args):
 		args.format = 'page:' + args.format
 
 	fm = pretty.from_args(args, items)
-	for i in items:
-		fm.print(i, encoding=args.encoding)
+	if args.paging != 'never':
+		term.scroll(map(fm.format, items), lambda:'')
+	else:
+		for i in items:
+			fm.print(i, encoding=args.encoding)
 
 
 def clear_cache():
@@ -251,7 +255,7 @@ def import_contents(src):
 	checker = ImportChecker(left, right)
 	checker.report()
 
-	def view():
+	def view_all_contents():
 		fm = pretty.Formatter(f='id:date-p:author:title', fd='%m/%d')
 		for i in os.listdir(right):
 			filepath = os.path.join(right, i, f'{i}.json')
@@ -297,15 +301,16 @@ def import_contents(src):
 				os.makedirs(os.path.dirname(dst), exist_ok=True)
 				shutil.copy(src, dst)
 
-	operations = list(filter(lambda x: x[2](), [
-		('view all contents', view, lambda: True),
-		('copy new contents', copy_new_contents, lambda: len(checker.right_only)),
-		('copy new files', copy_new_files, lambda: any(checker.new_files())),
-		('show diff', show_diff, lambda: len(checker.diff_files))
-	]))
-	selection = term.select([k for k, _, _ in operations])
-	for s, (_, o, _) in zip(selection, operations):
-		if s: o()
+	ops = [view_all_contents]
+	if len(checker.right_only):
+		ops.append(copy_new_contents)
+	if any(checker.new_files()):
+		ops.append(copy_new_files)
+	if len(checker.diff_files):
+		ops.append( show_diff)
+
+	for o in term.selected(ops, lambda o:o.__name__.replace('_', ' ')):
+		o()
 
 def export_contents(out):
 	import shutil
@@ -407,6 +412,7 @@ def add_args(parser):
 	p.add_argument('--order', type=str,
 		help='Set the order with [reservedAt, name] and [asc, desc].')
 	pretty.add_args(p)
+	util.add_paging_args(p)
 	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')
 
@@ -423,14 +429,13 @@ def add_args(parser):
 	return sub
 
 def set_compreplies():
-	from .completion import if_else
+	from .completion import if_else, generate_compreply, add_no_desc, indent
 	return {
 		'import': '_filedir',
 		'export': if_else('$prev == -o', '_filedir'),
-		'ls': '''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
+		'ls': f'''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
   __gl2f_complete_format
-elif [ $prev == --order ]; then
-    __gl2f_complete_order
-fi
-		'''
+elif [ $prev == "--paging" ]; then
+{indent(generate_compreply(add_no_desc(util.paging_choices)), 1)}
+fi'''
 	}

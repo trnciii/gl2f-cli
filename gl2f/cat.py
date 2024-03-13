@@ -1,33 +1,34 @@
-from .core import lister, pretty, article
-from .ayame import terminal as term
+from .core import lister, pretty, article, util
+from .ayame import terminal as term, sixel
 
-def cat(i, args):
-	fm = pretty.Formatter()
-	fm.print(i, encoding=args.encoding)
-	for s in article.lines(i, args.style, args.sixel, args.max_size):
-		term.write_with_encoding(s, encoding=args.encoding, errors='ignore')
-	term.write_with_encoding('\n', encoding=args.encoding)
-
+def gen(items, args):
+	fm = pretty.from_args(args)
+	for i in items:
+		yield fm.format(i)
+		yield from article.lines(i, args.style, args.sixel, args.max_size)
+		yield ''
 
 def subcommand(args):
 	args.max_size = (args.width, args.height) if (args.width or args.height) else None
 
+	never_page = args.paging == 'never' or (args.sixel and sixel.init())
+
 	if args.board.startswith('https'):
-		cat(lister.fetch_content(args.board, dump=args.dump), args)
-		return
-
-	items = lister.list_contents(args)
-
-	if args.all:
-		for i in items:
-			cat(i, args)
+		g = gen([lister.fetch_content(args.board, dump=args.dump)], args)
+	elif args.all:
+		items, _ = lister.list_contents(args)
+		g = gen(items, args)
 	elif args.pick:
-		for i in (items[i-1] for i in args.pick if 0<i<=len(items)):
-			cat(i, args)
+		items, _ = lister.list_contents(args)
+		g = gen(util.pick(items, args.pick), args)
 	else:
-		fm = pretty.from_args(args, items)
-		for i in term.selected(items, fm.format):
-			cat(i, args)
+		g = gen(lister.selected(args, pretty.from_args(args).format), args)
+
+	if never_page:
+		for line in g:
+			print(line)
+	else:
+		term.scroll(g, eof=util.rule)
 
 def add_to():
 	return 'gl2f', 'cat'
@@ -38,6 +39,7 @@ def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args_core(parser)
 	parser.set_defaults(format='author:title')
+	util.add_paging_args(parser)
 
 	parser.add_argument('--encoding')
 
@@ -53,6 +55,7 @@ def add_args(parser):
 		help='Set max image width')
 	parser.add_argument('-H', '--height', type=int,
 		help='Set max image height')
+
 
 	parser.set_defaults(handler=subcommand)
 

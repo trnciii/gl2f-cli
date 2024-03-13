@@ -2,6 +2,7 @@ import requests
 from . import board, member, auth, util
 import os, json, re
 from datetime import datetime
+from ..ayame import terminal
 
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=False, xauth=None):
@@ -111,49 +112,69 @@ def list_contents(args):
 		sub = args.board.split('/')[1]
 		if member.is_group(sub):
 			boardId = board.get('key', args.board)['id']
-			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+			ret = fetch(boardId, args.number, args.page, args.order, dump=args.dump)
+			return ret['list'], ret['totalCount']
 
 		elif member.is_member(sub):
 			boardId, categoryId = get_IDs('blogs', sub, args.group)
-			return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
+			ret = fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)
+			return ret['list'], ret['totalCount']
 
 		elif sub == 'today':
 			return list(filter(in24h, list_multiple_boards(
 				[board.get('key', f'blogs/{g}')['id'] for g in ['girls2', 'lucky2']],
 				args
-			)))
-
+			))), 1
 
 	elif args.board.startswith('radio/'):
 		sub = args.board.split('/')[1]
 		if member.is_group(sub):
 			boardId = board.get('key', args.board)['id']
-			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
+			ret = fetch(boardId, args.number, args.page, args.order, dump=args.dump)
+			return ret['list'], ret['totalCount']
 
 		elif member.is_member(sub):
 			boardId, categoryId = get_IDs('radio', sub, args.group)
-			return fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)['list']
-
+			ret = fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)
+			return ret['list'], ret['totalCount']
 
 	elif args.board.startswith('news/'):
 		sub = args.board.split('/')[1]
 		if sub == 'today':
 			boardId = board.get('key', 'news/family')['id']
-			return list(filter(in24h, fetch(boardId, size=10, page=1, dump=args.dump)['list']))
+			return list(filter(in24h, fetch(boardId, size=10, page=1, dump=args.dump)['list'])), 1
 
 		else:
 			boardId = board.get('key', args.board)['id']
-			return fetch(boardId, args.number, args.page, args.order, dump=args.dump)['list']
-
+			ret = fetch(boardId, args.number, args.page, args.order, dump=args.dump)
+			return ret['list'], ret['totalCount']
 
 	elif args.board == 'today':
-		ret = list_multiple_boards([board.get('key', x)['id'] for x in board.active()], args)
-		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True)
+		table = board.definitions()
+		ret = list_multiple_boards([i['id'] for i in table['pages'] if i['key'] in table['active']], args)
+		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True), 1
 
 	elif b := board.get('key', args.board):
-		return fetch(b['id'], args.number, args.page, args.order, dump=args.dump)['list']
-
+		ret = fetch(b['id'], args.number, args.page, args.order, dump=args.dump)
+		return ret['list'], ret['totalCount']
 
 	elif os.path.isfile(args.board):
 		with open(args.board, encoding='utf-8') as f:
-			return json.load(f)['list']
+			return json.load(f)['list'], 1
+
+class Pager:
+	def __init__(self, args):
+		self.args = args
+		self._max_page = -1
+
+	def flip(self, i):
+		self.args.page = i
+		items, total_count = list_contents(self.args)
+		self._max_page = total_count // self.args.number + 1
+		return terminal.SelectionList(items)
+
+	def max_page(self):
+		return self._max_page
+
+def selected(args, to_string):
+	return terminal.selected(Pager(args), args.page, to_string)

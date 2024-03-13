@@ -35,10 +35,9 @@ class Bar:
 
 
 def save(item, args):
-	import json, datetime, re
+	import json, re
 	from .core import local, article, auth
 	from concurrent.futures import ThreadPoolExecutor
-	from functools import partial
 
 	boardId = item['boardId']
 	contentId = item['contentId']
@@ -102,13 +101,11 @@ def subcommand(args):
 	if args.board.startswith('https'):
 		items = [lister.fetch_content(args.board, dump=args.dump)]
 	elif args.all:
-		items = lister.list_contents(args)
+		items, _ = lister.list_contents(args)
 	elif args.pick:
-		li = lister.list_contents(args)
-		items = (li[i-1] for i in args.pick if 0<i<=len(li))
+		items = util.pick(lister.list_contents(args)[0], args.pick)
 	else:
-		li = lister.list_contents(args)
-		items = term.selected(li, pretty.from_args(args, li).format)
+		items = lister.selected(args, pretty.from_args(args).format)
 
 	for i in items:
 		save(i, args)

@@ -9,16 +9,12 @@ class Formatter:
 		self.fstring = f
 		self.fdstring = fd if fd else '%m/%d'
 
-		self.index = 0
-		self.digits = 2
-
 		self.functions = {
 			'author': self.author,
 			'title': self.title,
 			'url': self.url,
 			'date-p': self.date_p,
 			'date-c': self.date_c,
-			'index': self.inc_index,
 			'br': self.breakline,
 			'id': self.content_id,
 			'media': self.media_stat,
@@ -26,12 +22,6 @@ class Formatter:
 		}
 
 		self.set_width(items)
-
-
-	def reset_index(self, i=0, digits=2):
-		self.index = i
-		self.digits = digits
-
 
 	def author(self, item, nomod=False):
 		_, v = member.from_id(item.get('categoryId'))
@@ -68,20 +58,16 @@ class Formatter:
 	def date_c(self, item):
 		return util.to_datetime(item['createdAt']).strftime(self.fdstring)
 
-	def breakline(self, item):
+	def breakline(self, _):
 		return '\n'
-
-	def inc_index(self, item):
-		self.index += 1
-		return f'{self.index:{self.digits}}'
 
 	def content_id(self, item):
 		return item['contentId']
 
 	def media_stat(self, item):
 		from . import article
-		re = article.media_stat(item['values']['body'])
-		return ' '.join([f'i{re["image"]:02}', f'v{re["video"]}'])
+		counts = article.media_stat(item['values']['body'])
+		return ' '.join([f'i{counts["image"]:02}', f'v{counts["video"]}'])
 
 	def page(self, item):
 		return board.get('id', item['boardId'])['key'].split('/')[0]
@@ -99,7 +85,7 @@ class Formatter:
 		else:
 			self.width = {
 				'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
-				'page': max(len(i.split('/')[0]) for i in board.active()),
+				'page': max(len(i.split('/')[0]) for i in board.definitions()['active']),
 			}
 
 
@@ -109,7 +95,7 @@ class Formatter:
 		)
 
 	def print(self, item, end='\n', encoding=None):
-		term.write_with_encoding(f'{self.format(item)}\n', encoding=encoding)
+		term.write_with_encoding(f'{self.format(item)}{end}', encoding=encoding)
 
 def add_args_core(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
@@ -125,9 +111,6 @@ def add_args(parser):
 	parser.add_argument('--break-urls', action='store_true',
 		help='Break before url')
 
-	parser.add_argument('--enum', action='store_true',
-		help='Prepend index')
-
 
 def make_format(args):
 	f = args.format.strip(':')
@@ -140,9 +123,6 @@ def make_format(args):
 
 	if args.date and 'date-p' not in f:
 		f = 'date-p:' + f
-
-	if args.enum:
-		f = 'index:' + f
 
 	return f
 
