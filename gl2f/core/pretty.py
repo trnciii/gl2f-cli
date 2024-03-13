@@ -2,7 +2,7 @@ from . import board, member, util
 from ..ayame import terminal as term, zen
 import re
 
-ptn_endspaces = re.compile(r' +(\n|$)')
+ptn_endspaces = re.compile(r'\s+(?P<end>\n|$)')
 
 class Formatter:
 	def __init__(self, f='author:title:url', fd=None, sep=' ', items=None):
@@ -34,7 +34,7 @@ class Formatter:
 		self.digits = digits
 
 
-	def author(self, item):
+	def author(self, item, nomod=False):
 		_, v = member.from_id(item.get('categoryId'))
 		if v:
 			fullname = v['fullname']
@@ -44,7 +44,10 @@ class Formatter:
 			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
 
-		return term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b'))
+		if nomod:
+			return fullname
+		else:
+			return term.mod(fullname, term.bold(), term.rgb(*colf), term.rgb(*colb, 'b'))
 
 	def title(self, item):
 		ret = term.mod(item['values']['title'], term.bold())
@@ -97,12 +100,12 @@ class Formatter:
 		else:
 			self.width = {
 				'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
-				'page': max(len(i.split('/')[0]) for i in board.active()),
+				'page': max(len(i.split('/')[0]) for i in board.definitions()['active']),
 			}
 
 
 	def format(self, item):
-		return ptn_endspaces.sub(r'\1',
+		return ptn_endspaces.sub(r'\g<end>',
 			self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
 		)
 

@@ -1,8 +1,6 @@
 from .core import lister, pretty
 from .ayame import terminal as term
 
-def name(): return 'search'
-
 def merge(ranges):
 	if len(ranges) == 0: return []
 
@@ -59,7 +57,12 @@ def subcommand(args):
 		term.write_with_encoding('\n', args.encoding)
 
 
+def add_to():
+	return 'gl2f', 'search'
+
 def add_args(parser):
+	parser.description = 'Search in articles'
+
 	lister.add_args(parser)
 	pretty.add_args(parser)
 
@@ -69,3 +72,6 @@ def add_args(parser):
 	parser.add_argument('--encoding')
 
 	parser.set_defaults(handler=subcommand)
+
+def set_compreply():
+	return '__gl2f_complete_list_args'

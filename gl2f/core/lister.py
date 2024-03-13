@@ -94,9 +94,9 @@ def add_args(parser):
 		help='page number')
 
 	parser.add_argument('--order', type=str, default='reservedAt:desc',
-		help='order. {reservedAt, name} × {asc, desc}. default = reservedAt:desc.')
+		help='order. [reservedAt, name] x [asc, desc]. default is reservedAt:desc.')
 
-	parser.add_argument('--group', type=str,
+	parser.add_argument('--group', type=str, choices={'girls2', 'lucky2', 'lovely2'},
 		help='specify group when name is a member.')
 
 	parser.add_argument('--dump', type=str, nargs='?', const='.',
@@ -147,7 +147,8 @@ def list_contents(args):
 
 
 	elif args.board == 'today':
-		ret = list_multiple_boards([board.get('key', x)['id'] for x in board.active()], args)
+		table = board.definitions()
+		ret = list_multiple_boards([i['id'] for i in table['pages'] if i['key'] in table['active']], args)
 		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True)
 
 	elif b := board.get('key', args.board):

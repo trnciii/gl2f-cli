@@ -10,3 +10,6 @@ def dump(loc, name, data):
 	with open(filepath, 'w', encoding='utf-8') as f:
 		json.dump(data, f, indent=2, ensure_ascii=False)
 	print('saved', filepath)
+
+def pick(items, indices):
+	yield from (items[i-1] for i in indices if 0 < i <= len(items))

@@ -1,8 +1,6 @@
+import os
 from .core import lister, pretty, util
 from .ayame import terminal as term
-import os
-
-def name(): return 'dl'
 
 class Bar:
 	def __init__(self, li, contentId):
@@ -55,21 +53,21 @@ def save(item, args):
 		f.write(json.dumps(item, indent=2, ensure_ascii=False))
 
 
-	li = [i.group(1) for i in article.ptn_media.finditer(item['values']['body'])]
+	li = [i.group('id') for i in article.ptn_media.finditer(item['values']['body'])]
 
 	if len(li) > 0:
 		bar = Bar(li, contentId)
 		bar.print()
 
 		xauth = auth.update(auth.load())
-
+		video_url_key = 'accessUrl' if args.stream else 'originalUrl'
 		def dl(mediaId):
 			ptn = re.compile(mediaId + r'\..+')
 			if (not args.force) and any(map(ptn.search, os.listdir(out))):
 				return 'skipped'
 
 			meta, response = article.dl_medium(boardId, contentId, mediaId,
-				head=args.skip, stream=True, streamfile=args.stream, xauth=xauth)
+				head=args.skip, request_as_stream=True, video_url_key=video_url_key, xauth=xauth)
 
 			bar.progress[mediaId]['length'] = int(response.headers['content-length'])
 
@@ -106,22 +104,23 @@ def subcommand(args):
 	elif args.all:
 		items = lister.list_contents(args)
 	elif args.pick:
-		li = lister.list_contents(args)
-		items = (li[i-1] for i in args.pick if 0<i<=len(li))
+		items = util.pick(lister.list_contents(args), args.pick)
 	else:
 		li = lister.list_contents(args)
-		fm = pretty.from_args(args, li)
-		selected = term.select([fm.format(i) for i in li])
-		items = (i for s, i in zip(selected, li) if s)
+		items = term.selected(li, pretty.from_args(args, li).format)
 
 	for i in items:
 		save(i, args)
 
 	if refdir_untouch('site'):
-		index.main()
+		index.main(full=args.force)
 
+def add_to():
+	return 'gl2f', 'dl'
 
 def add_args(parser):
+	parser.description = 'Save articles'
+
 	lister.add_args(parser)
 
 	pretty.add_args(parser)
@@ -146,3 +145,6 @@ def add_args(parser):
 		help='output path')
 
 	parser.set_defaults(handler=subcommand)
+
+def set_compreply():
+	return '__gl2f_complete_list_args'

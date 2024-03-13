@@ -30,51 +30,36 @@
 です。
 
 
+また[アドオン](./docs/addon.md) によりコマンドを追加することができます。
+
+
 ## 必要なもの
 
-* ターミナル （必須ではありませんが、以下の機能があると使いやすくなります）
+* ターミナル (必須ではありませんが、以下の機能があると使いやすくなります)
 	* 全角文字や絵文字の表示
 	* 256 color
-	* url を開いてくれるものが便利です
-	* sixel による画像表示ができます
-* Chrome ブラウザ (ログインのため)
-* [libsixel](https://github.com/saitoha/libsixel) (ターミナル上に画像を表示するため)
-
-括弧書きは必要な場面が限られている場合で、それ以外の機能は問題なく使えるはずです。
-[依存](#依存) の節も見てください。
+	* url を開いてくれる
+	* sixel による画像表示
+* [libsixel](https://github.com/saitoha/libsixel) (ターミナル上に画像を表示するため, 無くても他の機能は動作します)
 
 
 ## インストール
 
-三つのインストール方法があります。
+二つのインストール方法があります。
 
+### 1. pip を使う
 
-### 1. pip + git を使う
-
-Python3, pip, git の環境があればこのリポジトリから直接インストールできます。
-
-```sh
-pip install git+https://github.com/trnciii/gl2f-cli@release
-```
-
-### 2. ソースファイルから pip でインストールする
-
-Gitが無い場合はソースを落としてpipでインストールできます。
-まず[Release](https://github.com/trnciii/gl2f-cli/releases/latest)の `source.zip` をダウンロードます。
-( `Source code (zip), Source code (tar.gz)` ではありません! )
-ファイルを展開し、そのフォルダに対して次のコマンドを実行してください。
+Python3.8 or later と pip の環境があれば [PyPI](https://pypi.org/project/gl2f/) に公開されているパッケージからインストールできます。
 
 ```sh
-pip install <path/to/extracted/directory>
+pip install gl2f
 ```
 
-
-### 3. 実行ファイルをダウンロードする
+### 2. 実行ファイルをダウンロードする
 
 Windows と MacOS では、ダウンロードしてすぐ使えるアプリケーションをリリースしています。
 
 https://github.com/trnciii/gl2f-cli/releases
-
 
 いま配布しているアプリケーションには署名ができていないため、システムのセキュリティによってマルウェアの判定を食らいます。
 作者を信用していただける場合は、以下の方法で動作を許可してください。
@@ -85,17 +70,17 @@ https://github.com/trnciii/gl2f-cli/releases
 
 ![](docs/permit_windows.jpg)
 
-
 #### MacOS で実行を許可する
 
 ターミナルを開き、以下のコマンドでファイルの権限を変更します。
 ```sh
-chmod 755 path/to/gl2f
+chmod +x <path/to/gl2f>
 ```
 
-### コマンドの補完スクリプト
 
-bash-completion 用の簡単なスクリプトを用意しています。
+### コマンドの補完を有効にする
+
+bash 用の簡単な補完スクリプトを用意しています。
 インストール後、 `gl2f completion` で生成されるので、シェルの起動時などに読み込むとコマンドやページ名に補完が効くようになります。
 
 ```sh
@@ -237,5 +222,4 @@ twitter 等に伝えてもらっても構いません。
 ## 依存
 
 * requests
-* selenium, webdriver_manager (`gl2f auth login` で使います)
 * libsixel, libsixel-python, Pillow (画像をターミナル上に表示するため)
