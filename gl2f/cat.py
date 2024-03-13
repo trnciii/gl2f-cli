@@ -43,9 +43,9 @@ def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
+	util.add_paging_args(parser)
 
 	parser.add_argument('--encoding')
-
 	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',
 		help='not use sixel image')
@@ -59,9 +59,6 @@ def add_args(parser):
 		help='set max image width')
 	parser.add_argument('-H', '--height', type=int,
 		help='set max image height')
-	parser.add_argument('--paging', type=str, choices={'auto', 'never'}, default='auto',
-		help='specify when to use the pager, or use -P to disable (*auto*, never)')
-	parser.add_argument('-P', dest='paging', action='store_const', const='never')
 
 	# options from dl
 	parser.add_argument('--stream', action='store_true',

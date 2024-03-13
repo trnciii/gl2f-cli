@@ -19,3 +19,9 @@ def rule(length=None):
 		length, _ = os.get_terminal_size()
 	hand = '-' * ((length-5)//2)
 	return f'{hand}・_・{hand}'
+
+paging_choices = ['auto', 'never']
+def add_paging_args(parser):
+	parser.add_argument('--paging', type=str, choices=paging_choices, default='auto',
+		help=f'specify when to use the pager, or use -P to disable (*{", ".join(paging_choices)})')
+	parser.add_argument('-P', dest='paging', action='store_const', const='never')

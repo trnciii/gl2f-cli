@@ -1,6 +1,6 @@
 import re
 import os, json
-from .core import pretty, local
+from .core import pretty, local, util
 from .core.config import data as config
 
 
@@ -410,10 +410,8 @@ def add_args(parser):
 	p.add_argument('--order', type=str,
 		help='sort order')
 	pretty.add_args(p)
+	util.add_paging_args(p)
 	p.add_argument('--encoding')
-	p.add_argument('--paging', type=str, choices={'auto', 'never'}, default='auto',
-		help='specify when to use the pager, or use -P to disable (*auto*, never)')
-	p.add_argument('-P', dest='paging', action='store_const', const='never')
 	p.set_defaults(handler=ls, format='author:title')
 
 	sub.add_parser('open', description='Open local static web viewer in the browser').set_defaults(handler=lambda _:open_site())
@@ -436,6 +434,6 @@ def set_compreplies():
 		'ls': f'''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
   __gl2f_complete_format
 elif [ $prev == "--paging" ]; then
-{indent(generate_compreply(add_no_desc({'auto', 'never'})), 1)}
+{indent(generate_compreply(add_no_desc(util.paging_choices)), 1)}
 fi'''
 	}

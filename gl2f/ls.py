@@ -1,4 +1,4 @@
-from .core import lister, pretty
+from .core import lister, pretty, util
 from .ayame import terminal as term
 
 def subcommand(args):
@@ -20,11 +20,9 @@ def add_args(parser):
 
 	lister.add_args(parser)
 	pretty.add_args(parser)
+	util.add_paging_args(parser)
 	parser.set_defaults(handler=subcommand)
 	parser.add_argument('--encoding')
-	parser.add_argument('--paging', type=str, choices={'auto', 'never'}, default='auto',
-		help='specify when to use the pager, or use -P to disable (*auto*, never)')
-	parser.add_argument('-P', dest='paging', action='store_const', const='never')
 
 def set_compreply():
 	return '__gl2f_complete_list_args'
