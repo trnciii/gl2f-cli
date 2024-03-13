@@ -59,7 +59,7 @@ class Formatter:
 	def date_c(self, item):
 		return util.to_datetime(item['createdAt']).strftime(self.fdstring)
 
-	def breakline(self, item):
+	def breakline(self, _):
 		return '\n'
 
 	def content_id(self, item):
@@ -67,8 +67,8 @@ class Formatter:
 
 	def media_stat(self, item):
 		from . import article
-		re = article.media_stat(item['values']['body'])
-		return self.sep.join([f'i{re["image"]:02}', f'v{re["video"]}'])
+		counts = article.media_stat(item['values']['body'])
+		return self.sep.join([f'i{counts["image"]:02}', f'v{counts["video"]}'])
 
 	def page(self, item):
 		return board.get('id', item['boardId'])['key'].split('/')[0]
@@ -96,7 +96,7 @@ class Formatter:
 		)
 
 	def print(self, item, end='\n', encoding=None):
-		term.write_with_encoding(f'{self.format(item)}\n', encoding=encoding)
+		term.write_with_encoding(f'{self.format(item)}{end}', encoding=encoding)
 
 
 def add_args(parser):
