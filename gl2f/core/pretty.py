@@ -66,8 +66,8 @@ class Formatter:
 
 	def media_stat(self, item):
 		from . import article
-		counts = article.media_stat(item['values']['body'])
-		return ' '.join([f'i{counts["image"]:02}', f'v{counts["video"]}'])
+		d = article.media_stat(item['values']['body'])
+		return f'i{d["image"]:02} v{d["video"]}'
 
 	def page(self, item):
 		return board.get('id', item['boardId'])['key'].split('/')[0]
