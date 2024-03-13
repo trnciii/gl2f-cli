@@ -1,5 +1,5 @@
 import os, json
-from .local import home
+from .local.fs import home
 
 def path():
 	return os.path.join(home(), 'pages.json')
