@@ -1,12 +1,16 @@
-from .core import lister, pretty
+from .core import lister, pretty, util
+from .ayame import terminal as term
 
 def subcommand(args):
-	items = lister.list_contents(args)
+	items, _ = lister.list_contents(args)
 
 	fm = pretty.from_args(args, items)
+	if args.paging == 'never':
+		for i in items:
+			fm.print(i, encoding=args.encoding)
+	else:
+		term.scroll(map(fm.format, items), eof=lambda:'')
 
-	for i in items:
-		fm.print(i, encoding=args.encoding)
 
 def add_to():
 	return 'gl2f', 'ls'
@@ -16,6 +20,7 @@ def add_args(parser):
 
 	lister.add_args(parser)
 	pretty.add_args(parser)
+	util.add_paging_args(parser)
 	parser.set_defaults(handler=subcommand)
 	parser.add_argument('--encoding')
 

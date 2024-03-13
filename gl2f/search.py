@@ -1,60 +1,68 @@
-from .core import lister, pretty
+import re
+from .core import lister, pretty, article, util
 from .ayame import terminal as term
 
+class FilterResult:
+	def __init__(self, item, keywords):
+		self.item = item
+		self.text = ''.join(article.lines(item, 'plain', False))
+		self.score = sum(int(k in self.text) + int(k in item['values']['title']) for k in keywords)
+
 def merge(ranges):
-	if len(ranges) == 0: return []
+	try:
+		cur = next(ranges)
+		for r in ranges:
+			if cur[1] < r[0]:
+				yield cur
+				cur = r
+			else:
+				cur = cur[0], r[1]
+		yield cur
+	except StopIteration:
+		return
 
-	ret = []
-	cur = ranges[0]
-	for j in range(1, len(ranges)):
-		if cur[1] < ranges[j][0]:
-			ret.append(cur)
-			cur = ranges[j]
-		else:
-			cur = cur[0], ranges[j][1]
-	ret.append(cur)
-	return ret
+def filter_by_keywords(items, keywords, sort):
+	results = filter(lambda i:i.score > 0, (FilterResult(i, keywords) for i in items))
+	if sort:
+		results = sorted(results, reverse=True, key=lambda x:x.score)
+	return results
 
+
+def to_lines(result, format, pattern):
+	from itertools import islice, chain
+
+	title = pattern.sub(
+		term.mod(r'\g<match>', term.color('yellow'), term.inv()),
+		format(result.item)).split('\n')
+
+	make_range = lambda i: (max(0, i.start()-20), min(len(result.text), i.end()+20))
+	merged = merge(map(make_range, pattern.finditer(result.text)))
+
+	heading = (pattern.sub(
+		term.mod(r'\g<match>', term.color('yellow')),
+		f'> {result.text[begin:end]}{term.reset()}'
+	) for begin, end in islice(merged, 5))
+
+	return chain(title, heading)
 
 def subcommand(args):
-	from .core import article
-	import re
-
 	keywords = list(filter(len, sum((k.split('　') for k in args.keywords), [])))
-
+	pattern = re.compile( fr"(?P<match>{'|'.join(keywords)})" )
 
 	fm = pretty.from_args(args)
-	fm.reset_index(digits=len(str(args.number)))
 
-	hi = re.compile( fr"(?P<match>{'|'.join(keywords)})" )
+	def gen():
+		args.page = 1
+		while True:
+			items, _ = lister.list_contents(args)
+			if not items:
+				return
+			for i in filter_by_keywords(items, keywords, False):
+				yield from to_lines(i, fm.format, pattern)
+				yield ''
+			args.page += 1
 
-	items = lister.list_contents(args)
-	texts = [''.join(article.lines(i, 'plain', False)) for i in items]
-	counts = [
-		sum(int(k in te) + int(k in ti) for k in keywords)
-		for te, ti in zip(texts, [i['values']['title'] for i in items])
-	]
-
-	for c, t, i in sorted(zip(counts, texts, items), reverse=True, key=lambda x:x[0]):
-		if c == 0: break
-
-		term.write_with_encoding(hi.sub(
-			term.mod(r'\g<match>', term.color('yellow'), term.inv()),
-			fm.format(i)
-		) + '\n', args.encoding)
-
-		ranges = [(i.start()-20, i.end()+20) for i in hi.finditer(t)]
-		merged = merge(ranges)
-		if len(merged)>5:
-			merged = merged[:5]
-
-		for begin, end in merged:
-			term.write_with_encoding('> ' + hi.sub(
-				term.mod(r'\g<match>', term.color('yellow')),
-				t[max(0, begin):min(len(t), end)] + term.reset()
-			) + '\n', args.encoding)
-
-		term.write_with_encoding('\n', args.encoding)
+	term.scroll(gen(), eof=util.rule)
 
 
 def add_to():
@@ -66,10 +74,11 @@ def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 
-	parser.set_defaults(date='%m/%d', number=30)
+	parser.set_defaults(date='%y/%m/%d', break_urls=True, number=50)
 
 	parser.add_argument('keywords', nargs='+')
 	parser.add_argument('--encoding')
+	parser.add_argument('--sort', action='store_true')
 
 	parser.set_defaults(handler=subcommand)
 

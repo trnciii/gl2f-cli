@@ -110,17 +110,16 @@ def lines(item, style, use_sixel, max_size=None):
 		results = e.map(f, (p.group('paragraph') for p in ptn_paragraph.finditer(item['values']['body'])))
 
 		if style == 'full':
-			yield from (f'{r}\n' for r in results)
+			yield from results
 
 		elif style == 'compact':
-			yield from (f'{r}\n' for r in results if len(r))
+			yield from filter(len, results)
 
 		elif style == 'compressed':
-			yield from (f'{r} ' for r in results if len(r))
-			yield '\n'
+			yield ' '.join(filter(len, results))
 
 		elif style == 'plain':
-			yield from results
+			yield from map(term.declip, results)
 
 
 def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, video_url_key='originalUrl', xauth=None):

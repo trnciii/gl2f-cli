@@ -1,37 +1,34 @@
 from .core import lister, pretty, article, util
-from .ayame import terminal as term
+from .ayame import terminal as term, sixel
 
-def cat(i, args):
-	from .dl import save
-
-	if args.dl:
-		save(i, args)
-	fm = pretty.Formatter()
-	fm.print(i, encoding=args.encoding)
-	for s in article.lines(i, args.style, args.sixel, args.max_size):
-		term.write_with_encoding(s, encoding=args.encoding, errors='ignore')
-	term.write_with_encoding('\n', encoding=args.encoding)
-
+def gen(items, args):
+	fm = pretty.from_args(args)
+	for i in items:
+		yield fm.format(i)
+		yield from article.lines(i, args.style, args.sixel, args.max_size)
+		yield ''
 
 def subcommand(args):
 	args.max_size = (args.width, args.height) if (args.width or args.height) else None
 
+	never_page = args.paging == 'never' or (args.sixel and sixel.init())
+
 	if args.board.startswith('https'):
-		cat(lister.fetch_content(args.board, dump=args.dump), args)
-		return
-
-	items = lister.list_contents(args)
-
-	if args.all:
-		for i in items:
-			cat(i, args)
+		g = gen([lister.fetch_content(args.board, dump=args.dump)], args)
+	elif args.all:
+		items, _ = lister.list_contents(args)
+		g = gen(items, args)
 	elif args.pick:
-		for i in util.pick(items, args.pick):
-			cat(i, args)
+		items, _ = lister.list_contents(args)
+		g = gen(util.pick(items, args.pick), args)
 	else:
-		fm = pretty.from_args(args, items)
-		for i in term.selected(items, fm.format):
-			cat(i, args)
+		g = gen(lister.selected(args, pretty.from_args(args).format), args)
+
+	if never_page:
+		for line in g:
+			print(line)
+	else:
+		term.scroll(g, eof=util.rule)
 
 def add_to():
 	return 'gl2f', 'cat'
@@ -42,9 +39,9 @@ def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
+	util.add_paging_args(parser)
 
 	parser.add_argument('--encoding')
-
 	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',
 		help='not use sixel image')
@@ -58,16 +55,6 @@ def add_args(parser):
 		help='set max image width')
 	parser.add_argument('-H', '--height', type=int,
 		help='set max image height')
-
-	# options from dl
-	parser.add_argument('--stream', action='store_true',
-		help='save video files as stream')
-	parser.add_argument('--skip', action='store_true',
-		help='not actually download video files')
-	parser.add_argument('-F', '--force', action='store_true',
-		help='force download to overwrite existing files')
-	parser.add_argument('-o', type=str, default='',
-		help='output path')
 
 	parser.set_defaults(handler=subcommand)
 

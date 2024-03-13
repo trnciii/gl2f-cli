@@ -193,11 +193,6 @@ gl2f cat news/girls2
 # GL2 family のニュース本文を、すべての改行を維持して表示する。
 gl2f cat --style full news/family
 
-# 森朱里のブログを、左端に番号を振って一覧表示する
-gl2f ls blogs/akari --enum
-# or
-gl2f ls blogs/akari -f index:author:title:url
-
 # 鶴屋美咲のラジオを公開日とともに一覧表示する
 gl2f ls radio/misaki -d
 # or
