@@ -429,12 +429,13 @@ def add_args(parser):
 	return sub
 
 def set_compreplies():
-	from .completion import if_else
+	from .completion import if_else, generate_compreply, add_no_desc, indent
 	return {
 		'import': '_filedir',
 		'export': if_else('$prev == -o', '_filedir'),
-		'ls': '''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
+		'ls': f'''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
   __gl2f_complete_format
-fi
-		'''
+elif [ $prev == "--paging" ]; then
+{indent(generate_compreply(add_no_desc({'auto', 'never'})), 1)}
+fi'''
 	}
