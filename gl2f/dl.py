@@ -123,12 +123,7 @@ def add_args(parser):
 
 	pretty.add_args_core(parser)
 	parser.set_defaults(format='author:media:title')
-
-	parser.add_argument('-a', '--all', action='store_true',
-		help='Download all items')
-
-	parser.add_argument('--pick', type=int, nargs='+',
-		help='Select articles to download')
+	util.add_selection_args(parser)
 
 	parser.add_argument('--stream', action='store_true',
 		help='Get stream info for video files')

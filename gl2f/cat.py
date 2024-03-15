@@ -40,6 +40,7 @@ def add_args(parser):
 	pretty.add_args_core(parser)
 	parser.set_defaults(format='author:title')
 	util.add_paging_args(parser)
+	util.add_selection_args(parser)
 
 	parser.add_argument('--encoding')
 
@@ -47,10 +48,6 @@ def add_args(parser):
 		help='Choose style to display articles')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',
 		help='Do not use sixel image')
-	parser.add_argument('-a', '--all', action='store_true',
-		help='Show all items')
-	parser.add_argument('--pick', type=int, nargs='+',
-		help='Select articles to show')
 	parser.add_argument('-W', '--width', type=int,
 		help='Set max image width')
 	parser.add_argument('-H', '--height', type=int,
