@@ -104,6 +104,7 @@ def add_args_core(parser):
 	parser.add_argument('--date', '-d', type=str, nargs='?', const='%m/%d',
 		help='Format date time')
 
+	parser.set_defaults(break_urls=False)
 
 def add_args(parser):
 	add_args_core(parser)

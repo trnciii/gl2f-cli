@@ -411,7 +411,7 @@ def add_args(parser):
 	p = sub.add_parser('ls', description='List all local contents')
 	p.add_argument('--order', type=str,
 		help='Set the order with [reservedAt, name] and [asc, desc].')
-	pretty.add_args(p)
+	pretty.add_args_core(p)
 	util.add_paging_args(p)
 	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')
