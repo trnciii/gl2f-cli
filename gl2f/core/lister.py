@@ -40,7 +40,7 @@ def fetch_content(url, dump=False, xauth=None):
 		r'https://girls2-fc\.jp/page/(?P<page>.+)/(?P<contentId>.+)',
 		url
 	).groups()
-	boardId = board.get('page', page)['id']
+	boardId = board.get('page', board.map_board_alias(page))['id']
 
 	response = requests.get(
 		f'https://api.fensi.plus/v1/sites/girls2-fc/texts/{boardId}/contents/{contentId}',
