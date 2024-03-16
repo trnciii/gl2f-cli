@@ -256,7 +256,7 @@ def import_contents(src):
 	checker.report()
 
 	def view_all_contents():
-		fm = pretty.Formatter(f='id:date-p:author:title', fd='%m/%d')
+		fm = pretty.Formatter(f='id:published:author:title', fd='%m/%d')
 		for i in os.listdir(right):
 			filepath = os.path.join(right, i, f'{i}.json')
 			with open(filepath, encoding='utf-8') as f:

@@ -196,7 +196,7 @@ gl2f cat --style full news/family
 # 鶴屋美咲のラジオを公開日とともに一覧表示する
 gl2f ls radio/misaki -d
 # or
-gl2f ls radio/misaki -f date-p:author:title:url
+gl2f ls radio/misaki -f published:author:title:url
 
 # 永山椿のブログを url を改行して一覧表示する
 gl2f ls blogs/tsubaki --break-urls
@@ -204,7 +204,7 @@ gl2f ls blogs/tsubaki --break-urls
 gl2f ls blogs/tsubaki -f author:title:br:url
 
 # lovely2 スタッフのブログを、投稿日と公開日とともに一覧表示する。日時は秒まで表示する。
-gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
+gl2f ls blogs/lovely2staff -f author:published:created:title:url -d '%m/%d %H:%M:%S'
 ```
 
 ## 開発予定

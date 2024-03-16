@@ -13,8 +13,8 @@ class Formatter:
 			'author': self.author,
 			'title': self.title,
 			'url': self.url,
-			'date-p': self.date_p,
-			'date-c': self.date_c,
+			'published': self.date_p,
+			'created': self.date_c,
 			'br': self.breakline,
 			'id': self.content_id,
 			'media': self.media_stat,
@@ -121,8 +121,8 @@ def make_format(args):
 	if args.break_urls:
 		f = f.replace('url', 'br:url')
 
-	if args.date and 'date-p' not in f:
-		f = 'date-p:' + f
+	if args.date and 'published' not in f:
+		f = 'published:' + f
 
 	return f
 

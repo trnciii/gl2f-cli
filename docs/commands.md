@@ -210,7 +210,7 @@ gl2f ls radio/yuzuha --break-urls
 
 lovely2 スタッフのブログ20件を投稿日と公開日（秒まで）表示する。
 ```sh
-gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
+gl2f ls blogs/lovely2staff -f author:published:created:title:url -d '%m/%d %H:%M:%S'
 ```
 
 

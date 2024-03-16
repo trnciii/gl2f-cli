@@ -141,8 +141,8 @@ gl2f ls blogs/toa --order name:desc -n 30
 	* `author` 著者名。
 	* `title` 記事タイトル。
 	* `url` URL。
-	* `date-p` 記事が公開された日時。
-	* `date-c` 記事がアップロードされた日時。
+	* `published` 記事が公開された日時。
+	* `created` 記事がアップロードされた日時。
 	* `br` 改行。
 	* `id` 記事のID。ダウンロードするフォルダ名などに使っているので、調べたいときに使えます。
 	* `media` 記事に含まれる画像と動画の数。画像が5、動画が1あるときは`i05 v1` のように出力されます。
@@ -158,7 +158,7 @@ gl2f ls news/girls2 --order reservedAt:asc -d '%Y/%m/%d'
 
 lovely2 スタッフのブログを、投稿日と公開日とともに一覧表示する。日時は秒まで表示する。
 ```sh
-gl2f ls blogs/lovely2staff -f author:date-p:date-c:title:url -d '%m/%d %H:%M:%S'
+gl2f ls blogs/lovely2staff -f author:published:created:title:url -d '%m/%d %H:%M:%S'
 ```
 
 今日の更新をページ名を含め表示する
