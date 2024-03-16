@@ -289,6 +289,12 @@ def definitions():
 		]
 	}
 
+def map_board_alias(key):
+	to_blogs = {'yuzuhaBlog', 'momokaBlog', 'misakiBlog', 'youkaBlog', 'kureaBlog', 'minamiBlog', 'kiraBlog', 'toaBlog', 'ranBlog'}
+	if key in to_blogs:
+		return 'blogs'
+	return key
+
 
 def get(k, v):
 	try:
