@@ -12,7 +12,7 @@ class Warn_once:
 
 def filepath():
 	from . import local
-	return os.path.join(local.home(), 'auth')
+	return os.path.join(local.fs.home(), 'auth')
 
 def file():
 	path = filepath()
