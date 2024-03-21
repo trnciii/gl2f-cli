@@ -5,17 +5,16 @@ import re
 ptn_endspaces = re.compile(r'\s+(?P<end>\n|$)')
 
 class Formatter:
-	def __init__(self, f='author:title:url', fd=None, sep=' ', items=None):
+	def __init__(self, f='author:title:url', fd=None, items=None):
 		self.fstring = f
 		self.fdstring = fd if fd else '%m/%d'
-		self.sep = sep
 
 		self.functions = {
 			'author': self.author,
 			'title': self.title,
 			'url': self.url,
-			'date-p': self.date_p,
-			'date-c': self.date_c,
+			'published': self.date_p,
+			'created': self.date_c,
 			'br': self.breakline,
 			'id': self.content_id,
 			'media': self.media_stat,
@@ -67,8 +66,8 @@ class Formatter:
 
 	def media_stat(self, item):
 		from . import article
-		counts = article.media_stat(item['values']['body'])
-		return self.sep.join([f'i{counts["image"]:02}', f'v{counts["video"]}'])
+		d = article.media_stat(item['values']['body'])
+		return f'i{d["image"]:02} v{d["video"]}'
 
 	def page(self, item):
 		return board.get('id', item['boardId'])['key'].split('/')[0]
@@ -92,25 +91,26 @@ class Formatter:
 
 	def format(self, item):
 		return ptn_endspaces.sub(r'\g<end>',
-			self.sep.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
+			' '.join(zen.ljust(self.functions[k](item), self.width.get(k, 0)) for k in self.keys())
 		)
 
 	def print(self, item, end='\n', encoding=None):
 		term.write_with_encoding(f'{self.format(item)}{end}', encoding=encoding)
 
-
-def add_args(parser):
+def add_args_core(parser):
 	parser.add_argument('--format', '-f', type=str, default='author:title:url',
-		help='format of items. default is "author:title:url"')
-
-	parser.add_argument('--sep', type=str, default=' ',
-		help='separator string.')
-
-	parser.add_argument('--break-urls', action='store_true',
-		help='break before url')
+		help='Format list items, default is author:title:url')
 
 	parser.add_argument('--date', '-d', type=str, nargs='?', const='%m/%d',
-		help='date formatting')
+		help='Format date time')
+
+	parser.set_defaults(break_urls=False)
+
+def add_args(parser):
+	add_args_core(parser)
+
+	parser.add_argument('--break-urls', action='store_true',
+		help='Break before url')
 
 
 def make_format(args):
@@ -122,11 +122,11 @@ def make_format(args):
 	if args.break_urls:
 		f = f.replace('url', 'br:url')
 
-	if args.date and 'date-p' not in f:
-		f = 'date-p:' + f
+	if args.date and 'published' not in f:
+		f = 'published:' + f
 
 	return f
 
 
 def from_args(args, items=None):
-	return Formatter(f=make_format(args), fd=args.date, sep=args.sep, items=items)
+	return Formatter(f=make_format(args), fd=args.date, items=items)

@@ -32,12 +32,9 @@ def add_args(parser):
 	parser.description = 'Open pages in the browser'
 
 	lister.add_args(parser)
-	pretty.add_args(parser)
+	pretty.add_args_core(parser)
+	util.add_selection_args(parser)
 	parser.set_defaults(format='author:title')
-	parser.add_argument('-a', '--all', action='store_true',
-		help='open all items')
-	parser.add_argument('--pick', type=int, nargs='+',
-		help='select articles to show')
 
 	parser.set_defaults(handler=subcommand)
 

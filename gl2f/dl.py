@@ -121,26 +121,21 @@ def add_args(parser):
 
 	lister.add_args(parser)
 
-	pretty.add_args(parser)
+	pretty.add_args_core(parser)
 	parser.set_defaults(format='author:media:title')
-
-	parser.add_argument('-a', '--all', action='store_true',
-		help='preview all items')
-
-	parser.add_argument('--pick', type=int, nargs='+',
-		help='select articles to show')
+	util.add_selection_args(parser)
 
 	parser.add_argument('--stream', action='store_true',
-		help='save video files as stream file')
+		help='Get stream info for video files')
 
 	parser.add_argument('--skip', action='store_true',
-		help='not actually download video files')
+		help='Do not actually download videos')
 
 	parser.add_argument('-F', '--force', action='store_true',
-		help='force download to overwrite existing files')
+		help='Force download to overwrite existing files')
 
 	parser.add_argument('-o', type=str, default='',
-		help='output path')
+		help='Set output directory')
 
 	parser.set_defaults(handler=subcommand)
 

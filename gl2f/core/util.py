@@ -25,3 +25,9 @@ def add_paging_args(parser):
 	parser.add_argument('--paging', type=str, choices=paging_choices, default='auto',
 		help=f'specify when to use the pager, or use -P to disable (*{", ".join(paging_choices)})')
 	parser.add_argument('-P', dest='paging', action='store_const', const='never')
+
+def add_selection_args(parser):
+	parser.add_argument('-a', '--all', action='store_true',
+		help='Show all items')
+	parser.add_argument('-i', '--pick', type=int, nargs='+',
+		help='Select articles to show')

@@ -37,24 +37,22 @@ def add_args(parser):
 	parser.description = 'Display articles'
 
 	lister.add_args(parser)
-	pretty.add_args(parser)
+	pretty.add_args_core(parser)
 	parser.set_defaults(format='author:title')
 	util.add_paging_args(parser)
+	util.add_selection_args(parser)
 
 	parser.add_argument('--encoding')
-	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact')
+
+	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact',
+		help='Choose style to display articles')
 	parser.add_argument('--no-image', dest='sixel', action='store_false',
-		help='not use sixel image')
-	parser.add_argument('-a', '--all', action='store_true',
-		help='preview all items')
-	parser.add_argument('--pick', type=int, nargs='+',
-		help='select articles to show')
-	parser.add_argument('--dl', action='store_true',
-		help='also downloads the article')
+		help='Do not use sixel image')
 	parser.add_argument('-W', '--width', type=int,
-		help='set max image width')
+		help='Set max image width')
 	parser.add_argument('-H', '--height', type=int,
-		help='set max image height')
+		help='Set max image height')
+
 
 	parser.set_defaults(handler=subcommand)
 

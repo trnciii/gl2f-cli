@@ -256,7 +256,7 @@ def import_contents(src):
 	checker.report()
 
 	def view_all_contents():
-		fm = pretty.Formatter(f='id:date-p:author:title', fd='%m/%d')
+		fm = pretty.Formatter(f='id:published:author:title', fd='%m/%d')
 		for i in os.listdir(right):
 			filepath = os.path.join(right, i, f'{i}.json')
 			with open(filepath, encoding='utf-8') as f:
@@ -392,15 +392,17 @@ def add_args(parser):
 
 	sub = parser.add_subparsers()
 
-	sub.add_parser('clear-cache', description='remove media cache').set_defaults(handler=lambda _:clear_cache())
-	sub.add_parser('dir', description='Path of gl2f directory').set_defaults(handler=lambda _:print(local.home()))
+	sub.add_parser('clear-cache', description='Remove media cache').set_defaults(handler=lambda _:clear_cache())
+	sub.add_parser('dir', description='Get the path of gl2f directory').set_defaults(handler=lambda _:print(local.home()))
 
 	p = sub.add_parser('export', description='Export saved contents to an archive')
-	p.add_argument('-o', default='.')
+	p.add_argument('-o', type=str, default='.',
+		help='Set output file name.')
 	p.set_defaults(handler=lambda args:export_contents(args.o))
 
 	p = sub.add_parser('import', description='Import contents from an archive')
-	p.add_argument('archive')
+	p.add_argument('archive', type=str,
+		help='Set archive file path to import')
 	p.set_defaults(handler=lambda args:import_contents(args.archive))
 
 	sub.add_parser('index', description='Create index of contents for web viewer').set_defaults(handler = lambda _:index.main(full=True))
@@ -408,8 +410,8 @@ def add_args(parser):
 
 	p = sub.add_parser('ls', description='List all local contents')
 	p.add_argument('--order', type=str,
-		help='sort order')
-	pretty.add_args(p)
+		help='Set the order with [reservedAt, name] and [asc, desc].')
+	pretty.add_args_core(p)
 	util.add_paging_args(p)
 	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')

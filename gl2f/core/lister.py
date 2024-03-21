@@ -86,22 +86,22 @@ def get_IDs(domain, m, g):
 
 def add_args(parser):
 	parser.add_argument('board', type=str,
-		help='board and group or member name')
+		help='Board to fetch')
 
 	parser.add_argument('-n', '--number', type=int, default=10,
-		help='number of articles in [1, 99]')
+		help='Number of articles to fetch within [1, 99]')
 
 	parser.add_argument('-p', '--page', type=int, default=1,
-		help='page number')
+		help='Page number')
 
 	parser.add_argument('--order', type=str, default='reservedAt:desc',
-		help='order. [reservedAt, name] x [asc, desc]. default is reservedAt:desc.')
+		help='Set the order with [reservedAt, name] and [asc, desc]')
 
 	parser.add_argument('--group', type=str, choices={'girls2', 'lucky2', 'lovely2'},
-		help='specify group when name is a member.')
+		help='Set group when you fetch a member board')
 
 	parser.add_argument('--dump', type=str, nargs='?', const='.',
-		help='dump response from server as ./response.json')
+		help='Dump response, optionally setting the file name')
 
 
 def in24h(i):
