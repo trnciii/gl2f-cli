@@ -158,7 +158,7 @@ gl2f open -a blogs/today
 ## `gl2f pages` ページ定義を編集する
 
 リストとして取得可能なページを追加したり、`today` で巡回するページの追加や削除をおこないます。
-ページ定義の変更後はコマンド補完は改めて生成してください。
+ページ定義の変更後はコマンド補完を改めて設定してください。
 
 ### 用語
 |用語|意味|例|
@@ -177,7 +177,7 @@ Page id を与えて gl2f がページを取得可能にします。
 
 ttps://girls2-fc.jp/page/Lucky2FanMeeting2024PG を `fm/lucky2-2024` として追加する。
 ```sh
-gl2f pages add-page Lucky2FanMeeting2024PG --key fm/lucky2-2024
+gl2f pages add-definition Lucky2FanMeeting2024PG --key fm/lucky2-2024
 # key の名前で使用可能になった
 gl2f ls fm/lucky2 -f title
 【東京公演】07組の突撃Vlog!⑦
@@ -205,6 +205,23 @@ key が指すページ定義を削除します。
 
 ### `gl2f pages show-today`
 `today` の巡回対象として設定されているページを表示します。
+
+### `gl2f pages filter-page-data`
+リスト可能なページ定義を取得し、フィルタして出力します。
+
+
+オプション
+* `-f, --filter` フィルタを追加します。複数指定した場合はすべての条件を満たすものが出力されます。デフォルトは `list-board not-existing` です。
+* `--dump` 取得したページ定義全体を指定したパスに保存します。
+* `--load` ページ定義をダウンロードするかわりに、指定したファイルから読み込みます。
+* `--no-filter` フィルタを適用せず、全てのページ定義を出力します。
+* `--raw` 結果のデータ構造をそのまま出力します。
+
+使用できるフィルタ
+* `list-board` リスト可能なものをフィルタします。
+* `existing` ローカルの定義に存在するもののみ表示します。
+* `not-existing` ローカルの定義に存在しないもののみ表示します。
+* `board-id:<id>` id を `:` 区切りで直接指定します。
 
 
 ## `gl2f search` 記事の内容を検索する
