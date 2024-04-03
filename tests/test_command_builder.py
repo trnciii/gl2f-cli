@@ -80,9 +80,24 @@ def test_addons():
 	assert run_command(parser, ['local', 'serve'], 'overwritten local.serve')
 
 
+def time_build(n=1):
+	elapsed_times = []
+	for _ in range(n):
+		t0 = time.time()
+		parser, tree = gl2f.command_builder.build(gl2f.command_builder.builtin)
+		t1 = time.time()
+		elapsed_times.append(t1-t0)
+	return elapsed_times
+
 def test_build_time():
-	t0 = time.time()
-	parser, tree = gl2f.command_builder.build(gl2f.command_builder.builtin)
-	t1 = time.time()
-	duration = t1 - t0
-	assert duration < 0.02
+	n = 10
+	assert sum(time_build(n))/n < 0.02
+
+
+if __name__ == '__main__':
+	print('command tree build time')
+	n = 10
+	elapsed = time_build(n)
+	for t in elapsed:
+		print(t)
+	print(f'average: {sum(elapsed)/n}')
