@@ -15,7 +15,12 @@ def ls(args):
 		args.format = 'page:' + args.format
 
 	fm = pretty.from_args(args, items)
-	if args.paging != 'never':
+
+	if args.scroll == 'auto':
+		_, h = os.get_terminal_size()
+		args.scroll = 'never' if len(items) < h-1 else 'always'
+
+	if args.scroll == 'always':
 		term.scroll(map(fm.format, items), lambda:'')
 	else:
 		for i in items:
@@ -410,7 +415,7 @@ def add_args(parser):
 	p.add_argument('--order', type=str,
 		help='sort order')
 	pretty.add_args(p)
-	util.add_paging_args(p)
+	util.add_paging_args(p, 'auto')
 	p.add_argument('--encoding')
 	p.set_defaults(handler=ls, format='author:title')
 

@@ -39,7 +39,7 @@ def add_args(parser):
 	lister.add_args(parser)
 	pretty.add_args(parser)
 	parser.set_defaults(format='author:title')
-	util.add_paging_args(parser)
+	util.add_paging_args(parser, 'never')
 
 	parser.add_argument('--encoding')
 	parser.add_argument('--style', type=str, choices={'full', 'compact', 'compressed', 'plain'}, default='compact')

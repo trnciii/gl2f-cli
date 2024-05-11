@@ -62,7 +62,12 @@ def subcommand(args):
 				yield ''
 			args.page += 1
 
-	term.scroll(gen(), eof=util.rule)
+	if args.scroll == 'always':
+		term.scroll(gen(), eof=util.rule)
+	else:
+		for i in gen():
+			term.write_with_encoding(i, encoding=args.encoding)
+			print()
 
 
 def add_to():
@@ -79,6 +84,8 @@ def add_args(parser):
 	parser.add_argument('keywords', nargs='+')
 	parser.add_argument('--encoding')
 	parser.add_argument('--sort', action='store_true')
+
+	util.add_paging_args(parser, 'always')
 
 	parser.set_defaults(handler=subcommand)
 
