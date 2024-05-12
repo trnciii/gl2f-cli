@@ -1,5 +1,5 @@
 import os, importlib
-from . import local
+from .local import fs
 from ..__version__ import version
 
 def default():
@@ -13,7 +13,7 @@ def default():
 	}
 
 def filepath():
-	return os.path.join(local.home(), 'config.json')
+	return os.path.join(fs.home(), 'config.json')
 
 def load():
 	import json
