@@ -1,6 +1,6 @@
 import os
 import re, json
-from . import fs, data
+from . import fs, content
 from ..config import data as config
 
 def declare_js_string_constant(name, value):
@@ -59,7 +59,7 @@ class index:
 	def value(i):
 		from .. import board, article
 
-		item = data.load(i)
+		item = content.load(i)
 		media = [i for i, _ in article.ptn_media.findall(item['values']['body'])]
 		return {
 			'title': item['values']['title'],

@@ -40,7 +40,7 @@ def rep_sixel(p, boardId, contentId, max_size, xauth):
 		return p
 	i, t = match.group('id', 'type')
 
-	if file:=local.data.search_image(i, contentId):
+	if file:=local.content.search_image(i, contentId):
 		image = Image.open(file)
 	else:
 		_, data = dl_medium(boardId, contentId, i, video_url_key='thumbnailAccessUrl', xauth=xauth)

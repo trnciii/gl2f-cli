@@ -1,5 +1,5 @@
 import os, json
-from . import fs, data
+from . import fs, content
 from .. import pretty
 
 def colored_diff_lines(left, right):
@@ -163,6 +163,6 @@ def export_contents(out):
 
 		base = out
 
-	sizeInGb = data.stat()["contents"]["size"]/1024**3
+	sizeInGb = content.stat()["contents"]["size"]/1024**3
 	print(f'zipping contents into {base}.zip ({sizeInGb:.2f} GB)')
 	shutil.make_archive(base, 'zip', root_dir=contents)

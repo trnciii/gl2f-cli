@@ -5,7 +5,7 @@ from .core.config import data as config
 from .core.local import site, archive
 
 def ls(args):
-	items = [local.data.load(i) for i in sorted(local.fs.listdir('contents'))]
+	items = [local.content.load(i) for i in sorted(local.fs.listdir('contents'))]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
@@ -69,7 +69,7 @@ def add_args(parser):
 	p.set_defaults(handler=ls, format='author:title')
 
 	sub.add_parser('open', description='Open local static web viewer in the browser').set_defaults(handler=lambda _:open_site())
-	sub.add_parser('stat', description='Show storage statistics').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.data.stat().items())))
+	sub.add_parser('stat', description='Show storage statistics').set_defaults(handler=lambda _:print('\n'.join(f'{k:10} items: {v["count"]}, size: {v["size"]/(1024**3):,.2f} GB' for k, v in local.content.stat().items())))
 
 	p = sub.add_parser('serve', description='Serve web viewer')
 	p.add_argument('-p', '--port', type=int,  default=config['serve-port'],
