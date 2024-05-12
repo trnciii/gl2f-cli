@@ -86,9 +86,9 @@ def import_contents(src):
 	checker = ImportChecker(left, right)
 	checker.report()
 
-	def view():
+	def list_new_contents():
 		fm = pretty.Formatter(f='id:date-p:author:title', fd='%m/%d')
-		for i in os.listdir(right):
+		for i in checker.right_only:
 			filepath = os.path.join(right, i, f'{i}.json')
 			with open(filepath, encoding='utf-8') as f:
 				fm.print(json.load(f))
@@ -133,7 +133,7 @@ def import_contents(src):
 				shutil.copy(src, dst)
 
 	operations = list(filter(lambda x: x[2](), [
-		('view all contents', view, lambda: True),
+		('list new contents', list_new_contents, lambda: True),
 		('copy new contents', copy_new_contents, lambda: len(checker.right_only)),
 		('copy new files', copy_new_files, lambda: any(checker.new_files())),
 		('show diff', show_diff, lambda: len(checker.diff_files))
