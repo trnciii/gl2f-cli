@@ -26,6 +26,7 @@ jobs:
         fetch-depth: 0
     - run: git config user.name "action"
     - run: git config user.email "action@github.com"
+    - run: git switch ${{ github.base_ref }}
     - run: git merge origin/${{ github.head_ref }} --no-ff
     - run: git submodule update --init
 

@@ -40,12 +40,12 @@ def rep_sixel(p, boardId, contentId, max_size, xauth):
 		return p
 	i, t = match.group('id', 'type')
 
-	if file:=local.search_image(i, contentId):
+	if file:=local.content.search_image(i, contentId):
 		image = Image.open(file)
 	else:
 		_, data = dl_medium(boardId, contentId, i, video_url_key='thumbnailAccessUrl', xauth=xauth)
 		if data.ok:
-			with open(os.path.join(local.refdir('cache'), i), 'wb') as f:
+			with open(os.path.join(local.fs.refdir('cache'), i), 'wb') as f:
 				f.write(data.content)
 		image = Image.open(BytesIO(data.content))
 
@@ -65,7 +65,7 @@ def to_media_style(article_style, boardId, contentId, use_sixel, max_size=None):
 		return rep_none
 
 	if use_sixel and sixel.init():
-		local.refdir('cache')
+		local.fs.refdir('cache')
 		max_size = max_size if max_size else config.get('max-image-size', (1000, 1000))
 		return partial(rep_sixel, boardId=boardId, contentId=contentId, max_size=max_size, xauth=auth.update(auth.load()))
 

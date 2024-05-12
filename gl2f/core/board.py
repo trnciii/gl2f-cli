@@ -1,5 +1,5 @@
 import os, json
-from .local import home
+from .local.fs import home
 
 def path():
 	return os.path.join(home(), 'pages.json')
@@ -289,6 +289,12 @@ def definitions():
 		]
 	}
 
+def map_board_alias(key):
+	to_blogs = {'yuzuhaBlog', 'momokaBlog', 'misakiBlog', 'youkaBlog', 'kureaBlog', 'minamiBlog', 'kiraBlog', 'toaBlog', 'ranBlog'}
+	if key in to_blogs:
+		return 'blogs'
+	return key
+
 
 def get(k, v):
 	try:
@@ -301,20 +307,36 @@ def save(data):
 	with open(path(), 'w', encoding='utf-8') as f:
 		f.write(json.dumps(normalize(data), indent=2, ensure_ascii=False))
 
-def add(page_id, key, active=False):
+def is_json_meme_type(t):
+	return t.startswith('application/json')
+
+def add_definition(page_id, key, active=False):
 	data = definitions()
-	i = get_board_id(page_id)
-	if not i:
-		return None
-	data['pages'] = [i for i in data['pages'] if i['key'] != key]
-	data['pages'].append({
+
+	status, content_type, content = fetch_page_data(page_id)
+	if not (status and is_json_meme_type(content_type)):
+		return None, ['failed to find board data']
+
+	try:
+		components = content['result']['pageContext']['def']['components']
+		i = next(filter(lambda i:i, (c['attributes'].get('board-id') for c in components)))
+	except StopIteration:
+		return None, ['failed to find board id']
+
+	d = {
 		'id': i,
 		'key': key,
 		'page': page_id
-	})
+	}
+	data['pages'] = [p for p in data['pages'] if p['key'] != key]
+	data['pages'].append(d)
+
+	reports = [f'added definition: {d}']
+
 	if active:
 		data['active'] = list(set(data['active']) | {key})
-	return data
+		reports.append('added to active pages')
+	return data, reports
 
 def remove(key):
 	data = definitions()
@@ -327,20 +349,6 @@ def normalize(data):
 	data['pages'] = sorted(data['pages'], key=lambda i:i['key'])
 	data['active'] = sorted(list(set(data['active']) & {i['key'] for i in data['pages']}))
 	return data
-
-
-def get_board_id(page_id):
-	import requests
-	res = requests.get(f'https://girls2-fc.jp/page-data/page/{page_id}/page-data.json')
-	try:
-		data = res.json()
-		components = data['result']['pageContext']['def']['components']
-		# print(components[0]['hbs'], page_id) # todo: check capability
-		return components[0]['attributes']['board-id']
-	except Exception as e:
-		print(e)
-		return None
-
 
 def content_url(item):
 	page = get('id', item['boardId'])['page']
@@ -368,3 +376,42 @@ def tree():
 	tree['radio'] |= (mem_G2 | mem_L2)
 
 	return tree
+
+
+def fetch_pages():
+	import requests
+
+	size = 99
+	page = 1
+
+	results = []
+	while True:
+		response = requests.get('https://yomo-api.girls2-fc.jp/web/v1/sites/girls2-fc/pages',
+			params={
+				'size': str(size),
+				'page': str(page),
+			})
+
+		if not response.ok:
+			break
+
+		data = response.json()
+		yield from data['list']
+
+		if data['totalCount'] <= size * data['currentPage']:
+			return
+		page += 1
+
+def fetch_page_data(pageId):
+	import requests
+
+	res = requests.get(f'https://girls2-fc.jp/page-data/page/{pageId}/page-data.json')
+	if not res.ok:
+		return False, None, None
+
+	content_type = res.headers.get('Content-Type')
+	if is_json_meme_type(content_type):
+		content = res.json()
+	else:
+		content = str(res.content)
+	return True, content_type, content
