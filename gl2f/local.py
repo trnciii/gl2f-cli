@@ -97,7 +97,7 @@ def set_compreplies():
 		'export': if_else('$prev == -o', '_filedir'),
 		'ls': f'''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
   __gl2f_complete_format
-elif [ $prev == "--paging" ]; then
+elif [ $prev == "--scroll" ]; then
 {indent(generate_compreply(add_no_desc(util.paging_choices)), 1)}
 fi'''
 	}

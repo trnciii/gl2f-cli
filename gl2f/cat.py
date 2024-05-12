@@ -11,7 +11,7 @@ def gen(items, args):
 def subcommand(args):
 	args.max_size = (args.width, args.height) if (args.width or args.height) else None
 
-	never_page = args.paging == 'never' or (args.sixel and sixel.init())
+	never_page = args.scroll == 'never' or (args.sixel and sixel.init())
 
 	if args.board.startswith('https'):
 		g = gen([lister.fetch_content(args.board, dump=args.dump)], args)
