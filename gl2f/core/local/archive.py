@@ -92,6 +92,14 @@ class ImportChecker:
 		return chain.from_iterable((os.path.join(k, i) for i in v) for k, v in self.right_only_files.items())
 
 
+class Command:
+	def __init__(self, name, command, can_execute, default):
+		self.name = name
+		self.execute = command
+		self.can_execute = can_execute
+		self.default = default
+
+
 def import_contents(src):
 	import shutil, tempfile
 	from ...ayame import terminal as term
@@ -164,16 +172,20 @@ def import_contents(src):
 				_left_metadata[i] = _right_metadata[i]
 		meta.dump_archive(_left_metadata)
 
-	operations = list(filter(lambda x: x[2](), [
-		('list new contents', list_new_contents, lambda: True),
-		('copy new contents', copy_new_contents, lambda: len(checker.right_only)),
-		('copy new files', copy_new_files, lambda: any(checker.new_files())),
-		('merge metadata', merge_all_metadata, lambda: checker.right_only_files or checker.diff_metadata),
-		('show diff', show_diff, lambda: len(checker.diff_files))
+
+	commands = list(filter(lambda x:x.can_execute, [
+		Command('list new contents', list_new_contents, len(checker.right_only), False),
+		Command('copy new contents', copy_new_contents, len(checker.right_only), True),
+		Command('copy new files', copy_new_files, any(checker.new_files()), True),
+		Command('merge_metadata', merge_all_metadata, checker.right_only_metadata or checker.diff_metadata, True),
+		Command('show diff', show_diff, len(checker.diff_files), False)
 	]))
-	selection = term.select([k for k, _, _ in operations])
-	for s, (_, o, _) in zip(selection, operations):
-		if s: o()
+
+	if commands:
+		for c in term.selected(commands, format=lambda c:c.name, default=[c.default for c in commands]):
+			c.execute()
+	else:
+		print('Nothing to do. Exit.')
 
 def export_contents(out):
 	import shutil
