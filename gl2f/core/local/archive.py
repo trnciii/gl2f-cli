@@ -1,5 +1,5 @@
 import os, json
-from . import fs, content
+from . import fs, content, meta
 from .. import pretty
 
 def colored_diff_lines(left, right):
@@ -25,10 +25,10 @@ class ImportChecker:
 	def __init__(self, left, right):
 		from filecmp import dircmp, cmpfiles
 
-		self.items = os.listdir(right)
+		self.right_dirs = [i for i in os.listdir(right) if os.path.isdir(os.path.join(right, i))]
 
-		self.common = [i for i in self.items if os.path.isdir(os.path.join(left, i))]
-		self.right_only = [i for i in self.items if i not in self.common]
+		self.common = [i for i in self.right_dirs if os.path.isdir(os.path.join(left, i))]
+		self.right_only = [i for i in self.right_dirs if i not in self.common]
 		self.compare = {i:dircmp(os.path.join(left, i), os.path.join(right, i)) for i in self.common}
 
 		self.identical = [k for k, v in self.compare.items() if not v.diff_files]
@@ -44,9 +44,19 @@ class ImportChecker:
 			for k, v in self.compare.items()
 		}
 
+
+		_left_dirs = content.get_ids()
+		_left_metadata = meta.load(filepath = os.path.join(left, 'meta.json'))
+		_right_metadata = meta.load(filepath = os.path.join(right, 'meta.json'))
+
+		self.right_only_metadata = {k for k in _right_metadata.keys() if k in _left_dirs and k not in _left_metadata}
+		_keys = _left_metadata.keys() & _right_metadata.keys()
+		self.diff_metadata = {k for k in _keys if _left_metadata[k] != _right_metadata[k]}
+
+
 	def report(self):
-		print(f'{len(self.items)} total contents')
-		print('\t', ' '.join(self.items))
+		print(f'{len(self.right_dirs)} total contents')
+		print('\t', ' '.join(self.right_dirs))
 
 		print(f'{len(self.identical)} same contents')
 		print('\t', ' '.join(self.identical))
@@ -62,6 +72,16 @@ class ImportChecker:
 
 		print(f'{sum(map(len, self.unknown.values()))} unchecked subdirs')
 		print('\n'.join(f'\t{k}\n\t\t{v}' for k, v in self.unknown.items() if v))
+
+
+		print(f'{len(self.right_only_metadata)} new metadata')
+		print(' '.join(self.right_only_metadata))
+		print()
+
+		print(f'{len(self.diff_metadata)} diff metadata')
+		print(' '.join(self.diff_metadata))
+		print()
+
 
 	def all_diff_files(self):
 		from itertools import chain
@@ -96,6 +116,7 @@ def import_contents(src):
 	def copy_new_contents():
 		for i in checker.right_only:
 			shutil.copytree(os.path.join(right, i), os.path.join(left, i))
+			meta.dump_entry(i, meta.load(i, filepath = os.path.join(right, 'meta.json')))
 			print(f'copied: {i}')
 		print()
 
@@ -132,10 +153,22 @@ def import_contents(src):
 				os.makedirs(os.path.dirname(dst), exist_ok=True)
 				shutil.copy(src, dst)
 
+	def merge_all_metadata():
+		_left_metadata = meta.load()
+		_right_metadata = meta.load(filepath = os.path.join(right, 'meta.json'))
+
+		for i in filter(lambda i: i in _right_metadata, content.get_ids()):
+			if i in _left_metadata:
+				_left_metadata[i].merge(_right_metadata[i])
+			else:
+				_left_metadata[i] = _right_metadata[i]
+		meta.dump_archive(_left_metadata)
+
 	operations = list(filter(lambda x: x[2](), [
 		('list new contents', list_new_contents, lambda: True),
 		('copy new contents', copy_new_contents, lambda: len(checker.right_only)),
 		('copy new files', copy_new_files, lambda: any(checker.new_files())),
+		('merge metadata', merge_all_metadata, lambda: checker.right_only_files or checker.diff_metadata),
 		('show diff', show_diff, lambda: len(checker.diff_files))
 	]))
 	selection = term.select([k for k, _, _ in operations])

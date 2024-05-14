@@ -52,7 +52,7 @@ def save(item, args):
 	with open(os.path.join(out, f'{contentId}.json'), 'w', encoding='utf-8') as f:
 		f.write(json.dumps(item, indent=2, ensure_ascii=False))
 
-	local.meta.dump(contentId, local.meta.create(
+	local.meta.dump_entry(contentId, local.meta.create(
 		important = 'closingAt' in item
 	))
 

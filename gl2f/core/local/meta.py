@@ -9,6 +9,16 @@ class Metadata:
 	def merge(self, other):
 		self.important |= other.important
 
+	def __eq__(self, other):
+		if not isinstance(other, self.__class__):
+			return False
+
+		if self.important != other.important:
+			return False
+
+		return True
+
+
 def create(**kwargs):
 	return Metadata(**kwargs)
 
@@ -28,8 +38,10 @@ class MetadataDecoder(json.JSONDecoder):
 		return o
 
 
-def load(i=None):
-	filepath = os.path.join(fs.refdir('contents'), 'meta.json')
+def load(i=None, filepath=None):
+	if filepath is None:
+		filepath = os.path.join(fs.refdir('contents'), 'meta.json')
+
 	if not os.path.isfile(filepath):
 		return {} if i is None else create()
 
@@ -39,12 +51,15 @@ def load(i=None):
 			return data
 		return data.get(i, Metadata())
 
-def dump(i, data):
+def dump_archive(archive):
+	with open(os.path.join(fs.refdir('contents'), 'meta.json'), 'w', encoding='utf-8') as f:
+		json.dump(archive, f, cls=MetadataEncoder, sort_keys=True, indent=2, ensure_ascii=False)
+
+def dump_entry(i, data):
 	archive = load()
 	if i in archive:
 		archive[i].merge(data)
 	else:
 		archive[i] = data
 
-	with open(os.path.join(fs.refdir('contents'), 'meta.json'), 'w', encoding='utf-8') as f:
-		json.dump(archive, f, cls=MetadataEncoder, indent=2, ensure_ascii=False)
+	dump_archive(archive)
