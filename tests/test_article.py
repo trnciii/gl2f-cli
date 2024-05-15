@@ -1,8 +1,19 @@
 from sys import stdout
-stdout.isatty = lambda:True
-
+import importlib
 from gl2f.core import article
 from gl2f.ayame import terminal as term
+
+class VirtualTty:
+	_default_isatty = stdout.isatty
+
+	def __enter__(self):
+		stdout.isatty = lambda:True
+		importlib.reload(term)
+
+	def __exit__(self, *args):
+		stdout.isatty = VirtualTty._default_isatty
+		importlib.reload(term)
+
 
 sample_url = 'https://an.url/of/somewhere#including-hashtag'
 
@@ -26,43 +37,47 @@ def kernel(p):
 
 
 def test_media():
-	assert ('media-id', 'type') == article.ptn_media.search(media).group('id', 'type')
+	with VirtualTty():
+		assert ('media-id', 'type') == article.ptn_media.search(media).group('id', 'type')
 
-	assert '' == article.line_kernel(media, article.rep_none)
-	assert '\x1b[2m[type]\x1b[m' == article.line_kernel(media, article.rep_type)
-	assert '\x1b[2m[type](media-id)\x1b[m' == article.line_kernel(media, article.rep_type_id)
+		assert '' == article.line_kernel(media, article.rep_none)
+		assert '\x1b[2m[type]\x1b[m' == article.line_kernel(media, article.rep_type)
+		assert '\x1b[2m[type](media-id)\x1b[m' == article.line_kernel(media, article.rep_type_id)
 
 def test_url():
-	assert (sample_url, 'a link to somewhere') == article.ptn_link.search(anchor_with_text).group('url', 'text')
+	with VirtualTty():
+		assert (sample_url, 'a link to somewhere') == article.ptn_link.search(anchor_with_text).group('url', 'text')
 
-	assert f'\x1b[94m{sample_url}\x1b[m' == kernel(anchor_with_url)
-	assert f'[\x1b[1ma link to somewhere\x1b[m]( \x1b[94m{sample_url}\x1b[m )' == kernel(anchor_with_text)
-	assert f'go to \x1b[94m{sample_url}\x1b[m for nothing' == kernel(url_as_text)
+		assert f'\x1b[94m{sample_url}\x1b[m' == kernel(anchor_with_url)
+		assert f'[\x1b[1ma link to somewhere\x1b[m]( \x1b[94m{sample_url}\x1b[m )' == kernel(anchor_with_text)
+		assert f'go to \x1b[94m{sample_url}\x1b[m for nothing' == kernel(url_as_text)
 
 def test_strong_span():
-	assert '\x1b[97;1;4ma strong text\x1b[m' == kernel(strong)
-	assert '\x1b[97;1;4manother strong followed by a break\x1b[m' == kernel(strong_break)
+	with VirtualTty():
+		assert '\x1b[97;1;4ma strong text\x1b[m' == kernel(strong)
+		assert '\x1b[97;1;4manother strong followed by a break\x1b[m' == kernel(strong_break)
 
-	pairs = [
-		('\x1b[97;1;4mstrong in span\x1b[m', strong_in_span),
-		('plain text in span', text_in_span),
-		(f'another plain text in span, [\x1b[1man anchor, \x1b[m]( \x1b[94m{sample_url}\x1b[m )and plain text again', text_and_anchor_in_span),
-		('', only_br_in_span),
-	]
+		pairs = [
+			('\x1b[97;1;4mstrong in span\x1b[m', strong_in_span),
+			('plain text in span', text_in_span),
+			(f'another plain text in span, [\x1b[1man anchor, \x1b[m]( \x1b[94m{sample_url}\x1b[m )and plain text again', text_and_anchor_in_span),
+			('', only_br_in_span),
+		]
 
-	for expected, source in pairs:
-		assert expected == kernel(source)
+		for expected, source in pairs:
+			assert expected == kernel(source)
 
-	assert ''.join(e for e, _ in pairs) == kernel(''.join(s for _, s in pairs)), 'fail with multiple spans'
+		assert ''.join(e for e, _ in pairs) == kernel(''.join(s for _, s in pairs)), 'fail with multiple spans'
 
 def test_hashtag():
-	tags = '#Girls2 の#小田柚葉 様 #ｷｮｳﾉﾐｻｷﾓｼﾞ　#鶴屋美咲 さん　#ﾄﾂｹﾞｷﾕｳﾜ#比嘉優和 ちゃん ＃Lucky2'
-	expected = '\x1b[94m#Girls2\x1b[m の\x1b[94m#小田柚葉\x1b[m 様 \x1b[94m#ｷｮｳﾉﾐｻｷﾓｼﾞ\x1b[m　\x1b[94m#鶴屋美咲\x1b[m さん　\x1b[94m#ﾄﾂｹﾞｷﾕｳﾜ\x1b[m\x1b[94m#比嘉優和\x1b[m ちゃん ＃Lucky2'
-	assert expected == kernel(tags)
+	with VirtualTty():
+		tags = '#Girls2 の#小田柚葉 様 #ｷｮｳﾉﾐｻｷﾓｼﾞ　#鶴屋美咲 さん　#ﾄﾂｹﾞｷﾕｳﾜ#比嘉優和 ちゃん ＃Lucky2'
+		expected = '\x1b[94m#Girls2\x1b[m の\x1b[94m#小田柚葉\x1b[m 様 \x1b[94m#ｷｮｳﾉﾐｻｷﾓｼﾞ\x1b[m　\x1b[94m#鶴屋美咲\x1b[m さん　\x1b[94m#ﾄﾂｹﾞｷﾕｳﾜ\x1b[m\x1b[94m#比嘉優和\x1b[m ちゃん ＃Lucky2'
+		assert expected == kernel(tags)
 
-	tags_not_in_url = f'{sample_url} only #hashtags {sample_url} in plain text {sample_url} match and also#tagwithoutspace match {sample_url}'
-	expected_only_plain = f'\x1b[94m{sample_url}\x1b[m only \x1b[94m#hashtags\x1b[m \x1b[94m{sample_url}\x1b[m in plain text \x1b[94m{sample_url}\x1b[m match and also\x1b[94m#tagwithoutspace\x1b[m match \x1b[94m{sample_url}\x1b[m'
-	assert expected_only_plain == kernel(tags_not_in_url)
+		tags_not_in_url = f'{sample_url} only #hashtags {sample_url} in plain text {sample_url} match and also#tagwithoutspace match {sample_url}'
+		expected_only_plain = f'\x1b[94m{sample_url}\x1b[m only \x1b[94m#hashtags\x1b[m \x1b[94m{sample_url}\x1b[m in plain text \x1b[94m{sample_url}\x1b[m match and also\x1b[94m#tagwithoutspace\x1b[m match \x1b[94m{sample_url}\x1b[m'
+		assert expected_only_plain == kernel(tags_not_in_url)
 
 def test_paragraph():
 	body_source = [
