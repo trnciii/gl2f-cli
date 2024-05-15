@@ -52,6 +52,10 @@ def save(item, args):
 	with open(os.path.join(out, f'{contentId}.json'), 'w', encoding='utf-8') as f:
 		f.write(json.dumps(item, indent=2, ensure_ascii=False))
 
+	local.meta.dump_entry(contentId, local.meta.create(
+		important = 'closingAt' in item
+	))
+
 
 	li = [i.group('id') for i in article.ptn_media.finditer(item['values']['body'])]
 

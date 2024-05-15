@@ -1,5 +1,5 @@
 import os, json
-from . import fs, content
+from . import fs, content, meta
 from .. import pretty
 
 def colored_diff_lines(left, right):
@@ -25,10 +25,10 @@ class ImportChecker:
 	def __init__(self, left, right):
 		from filecmp import dircmp, cmpfiles
 
-		self.items = os.listdir(right)
+		self.right_dirs = [i for i in os.listdir(right) if os.path.isdir(os.path.join(right, i))]
 
-		self.common = [i for i in self.items if os.path.isdir(os.path.join(left, i))]
-		self.right_only = [i for i in self.items if i not in self.common]
+		self.common = [i for i in self.right_dirs if os.path.isdir(os.path.join(left, i))]
+		self.right_only = [i for i in self.right_dirs if i not in self.common]
 		self.compare = {i:dircmp(os.path.join(left, i), os.path.join(right, i)) for i in self.common}
 
 		self.identical = [k for k, v in self.compare.items() if not v.diff_files]
@@ -44,9 +44,19 @@ class ImportChecker:
 			for k, v in self.compare.items()
 		}
 
+
+		_left_dirs = content.get_ids()
+		_left_metadata = meta.load(filepath = os.path.join(left, 'meta.json'))
+		_right_metadata = meta.load(filepath = os.path.join(right, 'meta.json'))
+
+		self.right_only_metadata = {k for k in _right_metadata.keys() if k in _left_dirs and k not in _left_metadata}
+		_keys = _left_metadata.keys() & _right_metadata.keys()
+		self.diff_metadata = {k for k in _keys if _left_metadata[k] != _right_metadata[k]}
+
+
 	def report(self):
-		print(f'{len(self.items)} total contents')
-		print('\t', ' '.join(self.items))
+		print(f'{len(self.right_dirs)} total contents')
+		print('\t', ' '.join(self.right_dirs))
 
 		print(f'{len(self.identical)} same contents')
 		print('\t', ' '.join(self.identical))
@@ -63,6 +73,16 @@ class ImportChecker:
 		print(f'{sum(map(len, self.unknown.values()))} unchecked subdirs')
 		print('\n'.join(f'\t{k}\n\t\t{v}' for k, v in self.unknown.items() if v))
 
+
+		print(f'{len(self.right_only_metadata)} new metadata')
+		print(' '.join(self.right_only_metadata))
+		print()
+
+		print(f'{len(self.diff_metadata)} diff metadata')
+		print(' '.join(self.diff_metadata))
+		print()
+
+
 	def all_diff_files(self):
 		from itertools import chain
 		return chain.from_iterable((os.path.join(c, f) for f in files) for c, files in self.diff_files.items())
@@ -70,6 +90,14 @@ class ImportChecker:
 	def new_files(self):
 		from itertools import chain
 		return chain.from_iterable((os.path.join(k, i) for i in v) for k, v in self.right_only_files.items())
+
+
+class Command:
+	def __init__(self, name, command, can_execute, default):
+		self.name = name
+		self.execute = command
+		self.can_execute = can_execute
+		self.default = default
 
 
 def import_contents(src):
@@ -96,6 +124,7 @@ def import_contents(src):
 	def copy_new_contents():
 		for i in checker.right_only:
 			shutil.copytree(os.path.join(right, i), os.path.join(left, i))
+			meta.dump_entry(i, meta.load(i, filepath = os.path.join(right, 'meta.json')))
 			print(f'copied: {i}')
 		print()
 
@@ -132,15 +161,31 @@ def import_contents(src):
 				os.makedirs(os.path.dirname(dst), exist_ok=True)
 				shutil.copy(src, dst)
 
-	operations = list(filter(lambda x: x[2](), [
-		('list new contents', list_new_contents, lambda: True),
-		('copy new contents', copy_new_contents, lambda: len(checker.right_only)),
-		('copy new files', copy_new_files, lambda: any(checker.new_files())),
-		('show diff', show_diff, lambda: len(checker.diff_files))
+	def merge_all_metadata():
+		_left_metadata = meta.load()
+		_right_metadata = meta.load(filepath = os.path.join(right, 'meta.json'))
+
+		for i in filter(lambda i: i in _right_metadata, content.get_ids()):
+			if i in _left_metadata:
+				_left_metadata[i].merge(_right_metadata[i])
+			else:
+				_left_metadata[i] = _right_metadata[i]
+		meta.dump_archive(_left_metadata)
+
+
+	commands = list(filter(lambda x:x.can_execute, [
+		Command('list new contents', list_new_contents, len(checker.right_only), False),
+		Command('copy new contents', copy_new_contents, len(checker.right_only), True),
+		Command('copy new files', copy_new_files, any(checker.new_files()), True),
+		Command('merge_metadata', merge_all_metadata, checker.right_only_metadata or checker.diff_metadata, True),
+		Command('show diff', show_diff, len(checker.diff_files), False)
 	]))
-	selection = term.select([k for k, _, _ in operations])
-	for s, (_, o, _) in zip(selection, operations):
-		if s: o()
+
+	if commands:
+		for c in term.selected(commands, format=lambda c:c.name, default=[c.default for c in commands]):
+			c.execute()
+	else:
+		print('Nothing to do. Exit.')
 
 def export_contents(out):
 	import shutil
