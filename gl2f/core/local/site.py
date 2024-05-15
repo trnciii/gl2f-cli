@@ -95,10 +95,10 @@ class index:
 			return
 
 		if full:
-			table = index.create_table(fs.listdir('contents'))
+			table = index.create_table(content.get_ids())
 		else:
 			prev = index.load()
-			contents = list(set(fs.listdir('contents')).difference(prev.keys()))
+			contents = list(set(content.get_ids()).difference(prev.keys()))
 			table = prev | index.create_table(contents)
 
 		out = os.path.join(fs.home(), 'index.js')
