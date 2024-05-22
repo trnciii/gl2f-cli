@@ -26,6 +26,7 @@ def clear_cache():
 
 def open_site():
 	import webbrowser
+	webbrowser.register("termux-open '%s'", None)
 
 	html = os.path.join(local.fs.home(), 'site', 'index.html')
 
