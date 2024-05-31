@@ -3,6 +3,7 @@ from . import local
 from ..ayame import sixel, terminal as term
 from . import auth
 from .config import data as config
+from .board import content_url
 
 ptn_paragraph = re.compile(r'<p.*?>(?P<paragraph>.*?)</p>')
 ptn_media = re.compile(r'<fns-media.*?media-id="(?P<id>.+?)".*?type="(?P<type>.+?)".*?></fns-media>')
@@ -107,7 +108,12 @@ def lines(item, style, use_sixel, max_size=None):
 	f = partial(line_kernel, mediarep=to_media_style(style, item['boardId'], item['contentId'], use_sixel, max_size))
 
 	with ThreadPoolExecutor(max_workers=5) as e:
-		results = e.map(f, (p.group('paragraph') for p in ptn_paragraph.finditer(item['values']['body'])))
+		body = item['values'].get('body')
+		if not body:
+			yield term.mod('Article not available on terminal. Visit the web site.\n', term.inv())
+			yield content_url(item)
+			return
+		results = e.map(f, (p.group('paragraph') for p in ptn_paragraph.finditer(body)))
 
 		if style == 'full':
 			yield from (f'{r}\n' for r in results)
