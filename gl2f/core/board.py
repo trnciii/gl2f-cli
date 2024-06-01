@@ -30,6 +30,11 @@ def definitions():
 				'group': 'lucky2',
 				'page': 'lucky2blogs',
 			},
+			{
+				'id': '920124413225992193',
+				'key': 'blogs/staff',
+				'page': 'staffdiary',
+			},
 
 			# news
 			{
