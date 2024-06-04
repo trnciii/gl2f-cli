@@ -123,7 +123,6 @@ def list_contents(args):
 				args
 			)))
 
-
 	elif args.board.startswith('radio/'):
 		sub = args.board.split('/')[1]
 		if member.is_group(sub):
@@ -151,10 +150,9 @@ def list_contents(args):
 		ret = list_multiple_boards([i['id'] for i in table['pages'] if i['key'] in table['active']], args)
 		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True)
 
-	elif b := board.get('key', args.board):
-		return fetch(b['id'], args.number, args.page, args.order, dump=args.dump)['list']
-
-
 	elif os.path.isfile(args.board):
 		with open(args.board, encoding='utf-8') as f:
 			return json.load(f)['list']
+
+	if b := board.get('key', args.board):
+		return fetch(b['id'], args.number, args.page, args.order, dump=args.dump)['list']
