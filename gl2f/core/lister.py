@@ -154,13 +154,13 @@ def list_contents(args):
 		ret = list_multiple_boards([i['id'] for i in table['pages'] if i['key'] in table['active']], args)
 		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True), 1
 
-	elif b := board.get('key', args.board):
-		ret = fetch(b['id'], args.number, args.page, args.order, dump=args.dump)
-		return ret['list'], ret['totalCount']
-
 	elif os.path.isfile(args.board):
 		with open(args.board, encoding='utf-8') as f:
 			return json.load(f)['list'], 1
+	if b := board.get('key', args.board):
+		ret = fetch(b['id'], args.number, args.page, args.order, dump=args.dump)
+		return ret['list'], ret['totalCount']
+
 
 class Pager:
 	def __init__(self, args):
