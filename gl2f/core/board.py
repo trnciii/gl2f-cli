@@ -315,6 +315,11 @@ def save(data):
 def is_json_meme_type(t):
 	return t.startswith('application/json')
 
+def get_first_list_board_id(components):
+	for component in filter(lambda c:'list' in c['hbs'], components):
+		return component['attributes']['board-id']
+	return None
+
 def add_definition(page_id, key, active=False):
 	data = definitions()
 
@@ -322,10 +327,10 @@ def add_definition(page_id, key, active=False):
 	if not (status and is_json_meme_type(content_type)):
 		return None, ['failed to find board data']
 
-	try:
-		components = content['result']['pageContext']['def']['components']
-		i = next(filter(lambda i:i, (c['attributes'].get('board-id') for c in components)))
-	except StopIteration:
+	components = content['result']['pageContext']['def']['components']
+	i = get_first_list_board_id(components)
+
+	if i is None:
 		return None, ['failed to find board id']
 
 	d = {
