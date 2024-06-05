@@ -25,11 +25,12 @@ class Formatter:
 		self.set_width(items)
 
 	def author(self, item, nomod=False):
-		_, v = member.from_id(item.get('categoryId'))
-		if v:
-			fullname = v['fullname']
-			group = board.get('id', item['boardId'])['group']
-			colf, colb = v['color'][group].values()
+		for v in member.default():
+			group = board.get('id', item['boardId']).get('group')
+			if v['categoryId'] == item.get('categoryId') and v['group'] == group:
+				fullname = v['fullname']
+				colf, colb = v['foreground'], v['background']
+				break
 		else:
 			fullname = item.get('category', {'name':''})['name']
 			colf, colb = [255, 255, 255], [157, 157, 157]
@@ -85,10 +86,9 @@ class Formatter:
 			}
 		else:
 			self.width = {
-				'author': max(map(zen.display_length, (i['fullname'] for i in member.get().values()) )),
+				'author': max(map(zen.display_length, (i['fullname'] for i in member.default()) )),
 				'page': max(len(i.split('/')[0]) for i in board.definitions()['active']),
 			}
-
 
 	def format(self, item):
 		return ptn_endspaces.sub(r'\g<end>',
