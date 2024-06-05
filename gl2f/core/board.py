@@ -377,9 +377,9 @@ def tree():
 		for f in first
 	}
 
-	mem_G2 = member.of_group('girls2').keys()
-	mem_L2 = member.of_group('lucky2').keys()
-	mem_l2 = member.of_group('lovely2').keys()
+	mem_G2 = {d['id'] for d in member.default() if d['group'] == 'girls2'}
+	mem_L2 = {d['id'] for d in member.default() if d['group'] == 'lucky2'}
+	mem_l2 = {d['id'] for d in member.default() if d['group'] == 'lovely2'}
 
 	tree['news'] |= {'today'}
 	tree['blogs'] |= (mem_G2 | mem_L2 | mem_l2 | {'today'})
