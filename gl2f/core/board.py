@@ -131,6 +131,12 @@ def definitions():
 				'page': '3rdAnnivCheerForG2',
 			},
 
+			{
+				'id': '935769953628323842',
+				'key': 'wearegirls2thelive',
+				'page': '5thAnivPG',
+			},
+
 			# CL special live
 			{
 				'id': '639636551948567355',
@@ -281,7 +287,7 @@ def definitions():
 			},
 		],
 		'active': [
-			'fm/lucky2-2024',
+			'wearegirls2thelive',
 			'blogs/girls2',
 			'blogs/lucky2',
 			'news/family',
