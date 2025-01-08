@@ -7,7 +7,7 @@ def load(i):
 
 def get_ids():
 	root = fs.refdir_untouch('contents')
-	return [i for i in fs.listdir('contents') if os.path.isdir(os.path.join(root, i))]
+	return sorted((i for i in fs.listdir('contents') if os.path.isdir(os.path.join(root, i))), key=int)
 
 def stat():
 	return {os.path.basename(p): {
