@@ -6,8 +6,7 @@ from .core.local import site, archive
 
 def ls(args):
 	from .ayame import terminal as term
-	items = [local.content.load(i) for i in sorted(local.content.get_ids())]
-
+	items = [local.content.load(i) for i in local.content.get_ids()]
 	if args.order:
 		a = args.order.split(':')
 		items.sort(key=lambda i: i[a[0]], reverse=(len(a)==2 and a[1]=='desc'))
