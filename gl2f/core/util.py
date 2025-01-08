@@ -27,4 +27,4 @@ def add_paging_args(parser, default):
 		default = default,
 		const = 'always',
 		help = f'specify when to use the pager, or use -P to disable (*{", ".join(paging_choices)})')
-	parser.add_argument('-S', dest='scroll', action='store_const', const='never')
+	parser.add_argument('-P', dest='scroll', action='store_const', const='never')
