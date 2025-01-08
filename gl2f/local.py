@@ -1,5 +1,6 @@
 import re
 import os, json
+from sys import stdout
 from .core import pretty, local, util
 from .core.config import data as config
 from .core.local import site, archive
@@ -15,6 +16,9 @@ def ls(args):
 		args.format = 'page:' + args.format
 
 	fm = pretty.from_args(args, items)
+
+	if not stdout.isatty():
+		args.scroll = 'never'
 
 	if args.scroll == 'auto':
 		_, h = os.get_terminal_size()
