@@ -26,7 +26,7 @@ def subcommand(args):
 
 	if never_page:
 		for line in g:
-			term.write_with_encoding(line, encoding=args.encoding)
+			term.write_with_encoding(f'{line}\n', encoding=args.encoding)
 	else:
 		term.scroll(g, eof=util.rule)
 
