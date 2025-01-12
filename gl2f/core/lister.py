@@ -1,8 +1,14 @@
+from sys import stderr
 import requests
 from . import board, member, auth, util
 import os, json, re
 from datetime import datetime
 
+def check_response(response):
+	if response.ok:
+		return True
+	terminal.write_with_encoding(f'{response}\n{response.reason}\n', file=stderr)
+	return False
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=False, xauth=None):
 	response = requests.get(
@@ -20,9 +26,7 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=Fa
 			'x-authorization': xauth if xauth else auth.update(auth.load()),
 		})
 
-	if not response.ok:
-		print(response)
-		print(response.reason)
+	if not check_response(response):
 		return
 
 	data = response.json()
@@ -50,9 +54,7 @@ def fetch_content(url, dump=False, xauth=None):
 			'x-authorization': xauth if xauth else auth.update(auth.load()),
 		})
 
-	if not response.ok:
-		print(response)
-		print(response.reason)
+	if not check_response(response):
 		return
 
 	data = response.json()
