@@ -1,5 +1,6 @@
 <head>
 <meta charset="utf-8">
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/js/modaal.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -11,59 +12,33 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-
-.tile{
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.list-item{
-  font-size: 16;
-  width:fit-content
-}
-
-.modaal-inner-wrapper {
-  height: 100%;
-  padding: 25px 25px;
-}
-
-.modaal-gallery-item img {
-  max-height: calc(100vh - 60px);
-}
-
-
-.header-controls{
+.header-links {
   display: flex;
+  flex:1;
+  flex-wrap: wrap;
+  margin: 0 0 4 0;
+  align-content: flex-start;
+  gap:4px;
+}
+
+.header-title {
+}
+
+.header-controls {
+  display: flex;
+  flex:1;
   justify-content: right;
   align-items: center;
+  padding-left: 8px;
 }
 
-#list-checkbox {
-  display: none; /* Hide the actual checkbox input */
-}
-
-.list-checkbox {
-  border-radius: 4px;
-  padding: 2px 5px; /* Adjust the padding values as needed */
-  color: #000; /* Default text color when not checked */
-  background: #a5a5a5;
-}
-
-#list-checkbox:checked + .list-checkbox {
-  color: white;
-  background: cadetblue; /* Change text color when checked */
-}
-
-
-@media screen and (max-width: 600px){
+@media screen and (max-width: 600px) {
   .blog-header{
     flex-direction: column;
     align-items: stretch;
   }
 }
-
 </style>
-
 </head>
 
 
@@ -74,75 +49,86 @@
 
   <div class="header-title">
     <div id=title></div>
-    <div id=meta class=title-meta></div>
+    <div id=meta class=title-meta style="font-size: 14;margin: 0;"></div>
   </div>
 
   <div class=header-controls>
     <div>
-      <input type="checkbox" id="list-checkbox" onchange="draw()">
-      <label class="list-checkbox" for="list-checkbox" title='on/off file list'>List</label>
+      <input type="checkbox" class="toggleInput" id="toggleButton" onchange="updateTiles()">
+      <label class="toggleButton" for="toggleButton" title='on/off file list'>List</label>
 
-      <input type="range" id="cols" min="1" max="7" step="1" title='adjust number of colmuns' oninput="draw()">
+      <input type="range" id="cols" min="1" max="7" step="1" title='adjust number of colmuns' oninput="updateTiles()">
     </div>
   </div>
 </header>
 
-<main>
-  <center><span id='media'></span></center>
-</main>
+<main id=main></main>
 
 <script>
 const contentId = location.search.split("?")[1];
-const dir = `contents/${contentId}`
 
-function list(size, media_table){
-  const min = 250;
-  const items = media_table.map(i=>`<div class=list-item>${i}</div>`).join('');
-  const br = size<min?'<br>':'';
-  return `
-<div class="tile" style="width:${Math.max(min, size)}; margin-top:20px; margin-bottom:20px;">
-  <div style="width:fit-content; padding:20px; background: pink;text-align:left;">
-    <a class=list-item href=./contents/${contentId}>Directory</a>
-    ${items}
-  </div>
-</div>${br}`;
-}
+function tileMedia(mediaList, width, columns, showList)
+{
+  const itemWidth = width/columns;
 
-function draw(){
-  const content = table[contentId];
-  const media_table = content['media'];
-  const size = (window.innerWidth-100)/cols.value;
+  const element = document.createElement('center');
 
-  media.innerHTML = (document.getElementById('list-checkbox').checked?list(size, media_table):'')
-    + media_table.map(function(e){
-      const src = `${dir}/${e}`;
+  if(showList)
+  {
+    const min = 250;
+
+    const list = document.createElement('div');
+    list.className = 'tile';
+    list.style.marginTop = '20px';
+    list.style.marginBottom = '20px';
+    list.innerHTML = `<div style="padding:20px; background: pink;text-align:left;">${mediaList.map(i=>`<div class=list-item>${i}</div>`).join('')}</div>`
+
+    element.appendChild(list);
+    element.appendChild(document.createElement('br'));
+  }
+
+  mediaList.map(i => `contents/${i}`)
+    .map(src => {
       const ext = src.slice(src.lastIndexOf('.'));
-
       if([".jpeg", ".png"].indexOf(ext) > -1){
-        return `<a class="image tile" data-group="gallery" href=${src}><img src="${src}" width=${size}/></a>`;
+        return `<a class="image" data-group="gallery" href=${src}><img src="${src}" width=${itemWidth}/></a>`;
       }
       else if([".mp4"].indexOf(ext) > -1){
-        return `<a class="iframe tile" href=${src}><video controls autoplay muted loop src="${src}" width=${size}/></a>`;
+        return `<a class="iframe" href=${src}><video controls autoplay muted loop src="${src}" width=${itemWidth}/></a>`;
       }
       else if([".mov"].indexOf(ext) > -1){
-        return `<video controls autoplay muted loop src="${src}" class="tile" width=${size} />`;
+        return `<video controls autoplay muted loop src="${src}" width=${itemWidth} />`;
       }
-    }).join('');
+      else{
+        alert(`Unknown media file: ${src}`);
+        return '';
+      }
+    })
+    .forEach(t => {
+      const i = document.createElement('div');
+      i.className = 'tile';
+      i.innerHTML = t;
+      element.appendChild(i);
+    });
 
-  $('.image').modaal({
-    type: 'image',
-    hide_close: true,
-  })
-  $('.iframe').modaal({
-    type: 'iframe',
-    hide_close: true,
-  });
+  return element;
+}
+
+function updateTiles(){
+  const mediaList = table[contentId]['media'].map(e => `${contentId}/${e}`);
+  main.replaceChildren();
+  main.appendChild(tileMedia(mediaList, window.innerWidth-100, cols.value, toggleButton.checked));
+  setupModaal();
+}
+
+function calcColumns(n, width, height)
+{
+  return Math.min(Math.ceil(Math.sqrt(n * width/height)), n);
 }
 
 document.getElementById('links').innerHTML = `
 <a href=index.html title=${hostname}>Home</a>
 <a href=article.html?${contentId}>Article</a>`;
-
 
 const content = table[contentId];
 const media_table = content['media'];
@@ -155,12 +141,9 @@ ${content['author']}&nbsp;
 ${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
 <a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link" /></a>`;
 
-document.getElementById('cols').value = Math.min(
-  Math.ceil(Math.sqrt(media_table.length * window.innerWidth/window.innerHeight)),
-  media_table.length
-);
+cols.value = calcColumns(content['media'].length, window.innerWidth, window.innerHeight);
+updateTiles();
 
-draw();
 </script>
 
 </body>

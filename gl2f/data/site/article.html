@@ -9,28 +9,39 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-img, video{
+img, video {
   display: block;
   margin: 8px auto;
   max-width: 100%;
   max-height: calc(100vh - 150px);
 }
 
+.header-links {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 4 0;
+  align-content: flex-start;
+  flex:1;
+  width: 100%;
+  gap:4px;
+}
 
-.header-title{
+.header-title {
   width: 820px;
 }
 
-/* Media query for narrow screens (adjust the max-width as needed) */
+.header-controls {
+  flex:1;
+}
+
 @media screen and (max-width: 960px) {
   .blog-header {
-    flex-direction: column; /* Stack sections vertically on narrow screens */
-    align-items: stretch; /* Stretch sections to full width */
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .header-links,
   .header-title{
-    width: 100%; /* Take full width on narrow screens */
+    width: 100%;
   }
 }
 </style>
@@ -39,11 +50,11 @@ img, video{
 <body>
 
 <header class="blog-header">
-    <nav id=links class="header-links"></nav>
+  <nav id=links class="header-links"></nav>
 
   <div class="header-title">
     <div id=title></div>
-    <div id=meta class=title-meta></div>
+    <div id=meta class=title-meta style="font-size: 14;margin: 0;"></div>
   </div>
 
   <div class="header-controls">
@@ -65,13 +76,12 @@ document.getElementById('links').innerHTML = `
 <a href=index.html title=${hostname}>Home</a>
 <a href=album.html?${contentId}>Album</a>`;
 
-document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
-document.getElementById('meta').innerHTML = `
+title.innerHTML = `<h1>${content['title']}</h1>`;
+meta.innerHTML = `
 ${content['author']}&nbsp;
 ${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
 <a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link" /></a>`;
-
-document.getElementById('body').innerHTML = content['body'];
+  body.innerHTML = content['body'];
 </script>
 
 </body>
