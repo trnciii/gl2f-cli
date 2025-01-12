@@ -1,6 +1,7 @@
 from sys import stderr
 import requests
 from . import board, member, auth, util
+from ..ayame import terminal
 import os, json, re
 from datetime import datetime
 
