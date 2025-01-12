@@ -1,7 +1,8 @@
+from sys import stderr
 import argparse
 import importlib
 from . import auth, cat, completion, configurator, dl, local, ls, opener, pages, search
-from .ayame import sixel
+from .ayame import sixel, terminal as term
 
 builtin = [auth, cat, completion, configurator, dl, local, ls, opener, pages, search]
 
@@ -20,7 +21,7 @@ def get_addon_registrars():
 			module = importlib.import_module(addon)
 			ret += module.registrars
 		except ImportError:
-			print(f'failed to import addon {addon}')
+			term.write_with_encoding(f'failed to import addon {addon}\n', file=stderr)
 	return ret
 
 def build(registrars):
