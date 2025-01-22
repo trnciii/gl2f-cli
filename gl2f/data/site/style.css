@@ -64,6 +64,31 @@ h1{
   background: cadetblue;
 }
 
+.context-menu {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  z-index: 1000;
+  display: none;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 5px 10px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.context-menu button:hover {
+  background: #f0f0f0;
+}
+
+
 /*album*/
 .tile{
   display: inline-block;

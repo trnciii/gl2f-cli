@@ -61,8 +61,129 @@ tr:nth-child(odd) td{
 	<div id='media' style="display:none"></div>
 </main>
 
+<div id="tileContextMenu" class="context-menu"></div>
 
 <script type="text/javascript">
+
+function createArticleUrl(id)
+{
+	return `article.html?${id}`;
+}
+
+function createAlbumUrl(id)
+{
+	return `album.html?${id}`;
+}
+
+function canCopyImage(target)
+{
+	return target.tagName === 'IMG' && navigator.clipboard && navigator.clipboard.write;
+}
+
+function initCustomContextMenu(event, items)
+{
+	event.preventDefault();
+
+	tileContextMenu.replaceChildren();
+	items.forEach(i => tileContextMenu.appendChild(i));
+
+  const menuWidth = tileContextMenu.offsetWidth;
+  const menuHeight = tileContextMenu.offsetHeight;
+  let posX = event.clientX;
+  let posY = event.clientY;
+  if (posX + menuWidth > window.innerWidth) {
+    posX -= menuWidth;
+  }
+  if (posY + menuHeight > window.innerHeight) {
+    posY -= menuHeight;
+  }
+
+	tileContextMenu.style.top = `${posY}px`;
+	tileContextMenu.style.left = `${posX}px`;
+	tileContextMenu.style.display = 'block';
+}
+
+function createContextMenuButton(title, command)
+{
+	const button = document.createElement('button');
+	button.appendChild(document.createTextNode(title));
+	button.onclick = command;
+	button.style.whiteSpace = 'nowrap';
+	return button;
+}
+
+media.addEventListener('contextmenu', event =>{
+	if(event.target.tagName === 'IMG')
+	{
+	  const img = event.target;
+	  const items =  [];
+
+	  items.push(createContextMenuButton('View article', () => {
+	  	const ar = event.target.src.split('/');
+			const id = ar[ar.length - 2];
+	  	window.open(createArticleUrl(id), '_blank');
+	  }));
+
+		items.push(createContextMenuButton("Open image in new tab",() => {
+			window.open(img.src, '_blank');
+		}));
+
+		items.push(document.createElement('hr'));
+
+		if(canCopyImage(img))
+		{
+			items.push(createContextMenuButton('Copy image', async () => {
+				const canvas = document.createElement('canvas');
+				canvas.width = img.naturalWidth;
+				canvas.height = img.naturalHeight;
+
+				const ctx = canvas.getContext('2d');
+				ctx.drawImage(img, 0, 0);
+
+				const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+
+				await navigator.clipboard.write([new ClipboardItem({
+					[blob.type]: blob,
+				})]);
+			}));
+		}
+
+		items.push(createContextMenuButton("Copy image address", () =>{
+			navigator.clipboard.writeText(img.src);
+		}));
+
+		initCustomContextMenu(event, items);
+	}
+
+	if (event.target.tagName === 'VIDEO')
+	{
+	  const video = event.target;
+	  const items = [];
+
+	  items.push(createContextMenuButton("View article", () => {
+	  	const ar = event.target.src.split('/');
+			const id = ar[ar.length - 2];
+	  	window.open(createArticleUrl(id), '_blank');
+	  }));
+
+	  items.push(document.createElement('hr'));
+
+	  items.push(createContextMenuButton("Open video in new tab", () =>{
+	  	window.open(video.src, '_blank');
+	  }));
+
+	  items.push(createContextMenuButton("Copy video address", () => {
+	  	navigator.clipboard.writeText(video.src);
+	  }));
+
+		initCustomContextMenu(event, items);
+	}
+});
+
+document.addEventListener('click', () => {
+  tileContextMenu.style.display = 'none';
+});
+
 const columnDefs = {
 	ID:{
 		data:(k, v)=>`<a href='./contents/${k}'>${k}</a>`,
@@ -91,8 +212,8 @@ const columnDefs = {
 	Title:{
 		key:'title',
 		data:(k, v)=>['girls2radio', 'lucky2radio', 'wallpaper', 'commercialmovie', 'gtube'].includes(v['board'])?
-			`<a href=album.html?${k}>${v['title']}</a>`
-			: `<a href=article.html?${k}>${v['title']}</a>&nbsp;/&nbsp;<a href=album.html?${k}>Album</a>`,
+			`<a href=${createAlbumUrl(k)}>${v['title']}</a>`
+			: `<a href=${createArticleUrl(k)}>${v['title']}</a>&nbsp;/&nbsp;<a href=album.html?${k}>Album</a>`,
 		default: true,
 	},
 };
@@ -137,15 +258,24 @@ function updateTableData()
 		tbody.appendChild(tr);
 	});
 
+	if (toggleAlbumButton.checked)
+	{
+		updateMediaTile();
+	}
+};
+
+function updateMediaTile() {
+	const items = query(table, queryState);
 	const mediaList = Object.entries(items).flatMap(([k, v])=>v['media'].map(m => `${k}/${m}`));
 	media.replaceChildren();
 	media.appendChild(document.createElement('hr'));
 	media.appendChild(tileMedia(mediaList, window.innerWidth-100, 4, false));
 	setupModaal();
-};
+}
 
 function updateAlbumVisibility()
 {
+	updateMediaTile();
 	tableContainer.style.maxHeight = toggleAlbumButton.checked? '30vh' : '';
 	tableContainer.style.overflow = toggleAlbumButton.checked? 'auto': '';
 	media.style.display = toDisplay(toggleAlbumButton.checked);
@@ -233,6 +363,17 @@ Object.keys(columnDefs).forEach(k => {
 });
 
 initTHead();
+
+initFilter('board');
+initFilter('author');
+
+updateLabel();
+updateTableData();
+updateAlbumVisibility();
+
+tileContextMenu.addEventListener('contextmenu', event => {
+	event.preventDefault();
+});
 
 initFilter('board');
 initFilter('author');

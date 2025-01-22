@@ -18,40 +18,97 @@ function tileMedia(mediaList, width, columns, showList)
     element.appendChild(document.createElement('br'));
   }
 
-  mediaList.map(i => `contents/${i}`)
-    .map(src => {
-      const ext = src.slice(src.lastIndexOf('.'));
-      if([".jpeg", ".png"].indexOf(ext) > -1){
-        return `<a class="image" data-group="gallery" href=${src}><img src="${src}" width=${itemWidth}/></a>`;
-      }
-      else if([".mp4"].indexOf(ext) > -1){
-        return `<a class="iframe" href=${src}><video controls autoplay muted loop src="${src}" width=${itemWidth}/></a>`;
-      }
-      else if([".mov"].indexOf(ext) > -1){
-        return `<video controls autoplay muted loop src="${src}" width=${itemWidth} />`;
-      }
-      else{
-        alert(`Unknown media file: ${src}`);
-        return '';
-      }
-    })
-    .forEach(t => {
-      const i = document.createElement('div');
-      i.className = 'tile';
-      i.innerHTML = t;
-      element.appendChild(i);
-    });
+  mediaList.map(i =>
+  {
+    const src = `contents/${i}`;
+    const ext = src.slice(src.lastIndexOf('.'));
+    if([".jpeg", ".png"].indexOf(ext) > -1){
+      const a = document.createElement('a');
+      a.className += "tiledImage";
+      a.setAttribute("data-group", "gallery");
+      a.href = src;
+
+      const img = document.createElement("img");
+      img.src = src;
+      img.width = itemWidth;
+      img.title = i;
+      img.loading = 'lazy';
+
+      a.appendChild(img);
+      return a;
+    }
+    else if([".mp4"].indexOf(ext) > -1){
+      const a = document.createElement('a');
+      a.className += 'tiledIframe';
+      a.href = src;
+
+      const video = document.createElement('video');
+      video.controls = true;
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.width = itemWidth;
+      video.title = i;
+
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry =>{
+          if(entry.isIntersecting){
+            video.src = src;
+            video.load();
+            obs.unobserve(video);
+          }
+        });
+      });
+      observer.observe(video);
+
+      a.appendChild(video);
+      return a;
+    }
+    else if([".mov"].indexOf(ext) > -1){
+      const video = document.createElement('video');
+      video.controls = true;
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.width = itemWidth;
+      video.title = i;
+
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry =>{
+          if(entry.isIntersecting){
+            video.src = src;
+            video.load();
+            obs.unobserve(video);
+          }
+        });
+      });
+      observer.observe(video);
+
+      return video;
+    }
+    else{
+      alert(`Unknown media file: ${src}`);
+      return document.createElement('div');
+    }
+  }).forEach(t =>
+  {
+    const i = document.createElement('div');
+    i.className = 'tile';
+
+    i.appendChild(t);
+    element.appendChild(i);
+  });
 
   return element;
 }
 
 function setupModaal()
 {
-  $('.image').modaal({
+  $('.tiledImage').modaal({
     type: 'image',
     hide_close: true,
   })
-  $('.iframe').modaal({
+  $('.tiledIframe').modaal({
     type: 'iframe',
     hide_close: true,
   });
