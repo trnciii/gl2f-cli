@@ -113,3 +113,46 @@ function setupModaal()
     hide_close: true,
   });
 }
+
+class Notification {
+  constructor(containerId = 'notificationContainer') {
+    this.container = document.getElementById(containerId);
+  }
+
+  info(message)
+  {
+    this.show(message, 'info');
+  }
+
+  warn(message)
+  {
+    this.show(message, 'warning');
+  }
+
+  error(message)
+  {
+    this.show(message, 'error');
+  }
+
+  show(message, type='info', duration=3000) {
+
+    const notification = document.createElement('div');
+    notification.classList.add('notification', type);
+    notification.textContent = message;
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateX(20px)';
+
+    this.container.appendChild(notification);
+
+    requestAnimationFrame(() => {
+      notification.style.opacity = '1';
+      notification.style.transform = 'translateX(0)';
+    });
+
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateY(20px)';
+      setTimeout(() => notification.remove(), 500);
+    }, duration);
+  }
+}

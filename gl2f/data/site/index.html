@@ -51,6 +51,8 @@ tr:nth-child(odd) td{
 </header>
 
 <main>
+	<div id=notificationContainer class="notificationContainer"></div>
+
 	<div id=tableContainer style="display: inline-block;">
 		<table style="margin: 0; border-collapse: collapse;">
 			<thead id='thead'></thead>
@@ -65,6 +67,8 @@ tr:nth-child(odd) td{
 
 <script type="text/javascript">
 
+const notifier = new Notification();
+
 function createArticleUrl(id)
 {
 	return `article.html?${id}`;
@@ -78,6 +82,11 @@ function createAlbumUrl(id)
 function canCopyImage(target)
 {
 	return target.tagName === 'IMG' && navigator.clipboard && navigator.clipboard.write;
+}
+
+function canCopyText()
+{
+	return navigator.clipboard && navigator.clipboard.writeText;
 }
 
 function initCustomContextMenu(event, items)
@@ -103,12 +112,16 @@ function initCustomContextMenu(event, items)
 	tileContextMenu.style.display = 'block';
 }
 
-function createContextMenuButton(title, command)
+function createContextMenuButton(title, command, canExecute)
 {
 	const button = document.createElement('button');
 	button.appendChild(document.createTextNode(title));
 	button.onclick = command;
 	button.style.whiteSpace = 'nowrap';
+	if (!canExecute)
+	{
+		button.disabled = true;
+	}
 	return button;
 }
 
@@ -118,21 +131,22 @@ media.addEventListener('contextmenu', event =>{
 	  const img = event.target;
 	  const items =  [];
 
-	  items.push(createContextMenuButton('View article', () => {
-	  	const ar = event.target.src.split('/');
-			const id = ar[ar.length - 2];
-	  	window.open(createArticleUrl(id), '_blank');
-	  }));
+	  items.push(createContextMenuButton('View article',
+	  	() => {
+		  	const ar = event.target.src.split('/');
+				const id = ar[ar.length - 2];
+		  	window.open(createArticleUrl(id), '_blank');
+		  }, true));
 
-		items.push(createContextMenuButton("Open image in new tab",() => {
-			window.open(img.src, '_blank');
-		}));
+		items.push(createContextMenuButton("Open image in new tab",
+			() => {
+				window.open(img.src, '_blank');
+			}, true));
 
 		items.push(document.createElement('hr'));
 
-		if(canCopyImage(img))
-		{
-			items.push(createContextMenuButton('Copy image', async () => {
+		items.push(createContextMenuButton('Copy image',
+			async () => {
 				const canvas = document.createElement('canvas');
 				canvas.width = img.naturalWidth;
 				canvas.height = img.naturalHeight;
@@ -140,17 +154,20 @@ media.addEventListener('contextmenu', event =>{
 				const ctx = canvas.getContext('2d');
 				ctx.drawImage(img, 0, 0);
 
-				const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+				new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+				.then(blob => navigator.clipboard.write([new ClipboardItem({[blob.type]: blob})])
+					.then(_ => notifier.info('Image copied.')))
+				.catch(_ => notifier.error('Failed to copy the image.'));
+			},
+			canCopyImage(img)));
 
-				await navigator.clipboard.write([new ClipboardItem({
-					[blob.type]: blob,
-				})]);
-			}));
-		}
-
-		items.push(createContextMenuButton("Copy image address", () =>{
-			navigator.clipboard.writeText(img.src);
-		}));
+		items.push(createContextMenuButton("Copy image address",
+			() =>{
+				navigator.clipboard.writeText(img.src)
+				.then(_ => notifier.info('Image path copied.'))
+				.catch(_ => notifier.error('Failed to copy the image path.'));
+			},
+			canCopyText()));
 
 		initCustomContextMenu(event, items);
 	}
@@ -160,21 +177,27 @@ media.addEventListener('contextmenu', event =>{
 	  const video = event.target;
 	  const items = [];
 
-	  items.push(createContextMenuButton("View article", () => {
-	  	const ar = event.target.src.split('/');
-			const id = ar[ar.length - 2];
-	  	window.open(createArticleUrl(id), '_blank');
-	  }));
+	  items.push(createContextMenuButton("View article",
+	  	() => {
+		  	const ar = event.target.src.split('/');
+				const id = ar[ar.length - 2];
+		  	window.open(createArticleUrl(id), '_blank');
+		  }, true));
 
 	  items.push(document.createElement('hr'));
 
-	  items.push(createContextMenuButton("Open video in new tab", () =>{
-	  	window.open(video.src, '_blank');
-	  }));
+	  items.push(createContextMenuButton("Open video in new tab",
+	  	() =>{
+		  	window.open(video.src, '_blank');
+		  }, true));
 
-	  items.push(createContextMenuButton("Copy video address", () => {
-	  	navigator.clipboard.writeText(video.src);
-	  }));
+	  items.push(createContextMenuButton("Copy video address",
+	  	() => {
+		  	navigator.clipboard.writeText(video.src)
+		  	.then(_ => notifier.info('Video path copied.'))
+		  	.catch(_ => notifier.error('Failed to copy the video path.'))
+		  },
+		  canCopyText()));
 
 		initCustomContextMenu(event, items);
 	}
