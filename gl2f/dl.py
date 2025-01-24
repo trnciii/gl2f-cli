@@ -99,7 +99,7 @@ def save(item, args):
 
 
 def subcommand(args):
-	from .core.local import fs, site
+	from .core.local import fs, site, index
 
 	if args.board.startswith('https'):
 		items = [lister.fetch_content(args.board, dump=args.dump)]
@@ -115,7 +115,8 @@ def subcommand(args):
 		save(i, args)
 
 	if fs.refdir_untouch('site'):
-		site.index.main(full=args.force)
+		index.main(full=args.force)
+		site.update_index_js()
 
 def add_to():
 	return 'gl2f', 'dl'

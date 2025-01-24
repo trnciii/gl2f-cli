@@ -2,7 +2,7 @@ import re
 import os, json
 from .core import pretty, local
 from .core.config import data as config
-from .core.local import site, archive
+from .core.local import site, archive, index
 
 def ls(args):
 	items = [local.content.load(i) for i in local.content.get_ids()]
@@ -25,7 +25,7 @@ def clear_cache():
 
 
 def install():
-	site.install_to(os.path.join(local.fs.home(), 'site'), 'relative')
+	site.install_to(os.path.join(local.fs.home(), 'site'), 'symbolic')
 
 def open_site():
 	import webbrowser
@@ -62,7 +62,7 @@ def add_args(parser):
 	p.add_argument('archive')
 	p.set_defaults(handler=lambda args:archive.import_contents(args.archive))
 
-	sub.add_parser('index', description='Create index of contents for web viewer').set_defaults(handler = lambda _:site.index.main(full=True))
+	sub.add_parser('index', description='Update index of contents').set_defaults(handler = lambda _: index.main(full=True))
 	sub.add_parser('install', description='Install static web viewer').set_defaults(handler=lambda _:install())
 
 	p = sub.add_parser('ls', description='List all local contents')
