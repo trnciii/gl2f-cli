@@ -1,4 +1,5 @@
 import os
+from . import util
 
 class Warn_once:
 	printed = set()
@@ -31,8 +32,7 @@ def load():
 
 
 def save(token):
-	with open(filepath(), 'w') as f:
-		f.write(token)
+	util.write_all_text(filepath(), token)
 
 def remove():
 	path = file()

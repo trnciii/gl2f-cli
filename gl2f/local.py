@@ -24,6 +24,9 @@ def clear_cache():
 			os.remove(os.path.join(d, i))
 
 
+def install():
+	site.install_to(os.path.join(local.fs.home(), 'site'), 'relative')
+
 def open_site():
 	import webbrowser
 
@@ -31,7 +34,7 @@ def open_site():
 
 	if not os.path.exists(html):
 		if 'n' != input('site not installed. install now? (Y/n)').lower():
-			site.install_to(os.path.join(local.fs.home(), 'site'), 'relative')
+			install()
 		else:
 			return
 	else:
@@ -60,7 +63,7 @@ def add_args(parser):
 	p.set_defaults(handler=lambda args:archive.import_contents(args.archive))
 
 	sub.add_parser('index', description='Create index of contents for web viewer').set_defaults(handler = lambda _:site.index.main(full=True))
-	sub.add_parser('install', description='Install static web viewer').set_defaults(handler=lambda _:site.install_to(os.path.join(local.fs.home(), 'site'), 'relative'))
+	sub.add_parser('install', description='Install static web viewer').set_defaults(handler=lambda _:install())
 
 	p = sub.add_parser('ls', description='List all local contents')
 	p.add_argument('--order', type=str,

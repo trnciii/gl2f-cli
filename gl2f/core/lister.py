@@ -154,8 +154,7 @@ def list_contents(args):
 		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True)
 
 	elif os.path.isfile(args.board):
-		with open(args.board, encoding='utf-8') as f:
-			return json.load(f)['list']
+		return util.read_json(args.board)['list']
 
 	if b := board.get('key', args.board):
 		return fetch(b['id'], args.number, args.page, args.order, dump=args.dump)['list']

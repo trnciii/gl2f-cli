@@ -49,8 +49,7 @@ def save(item, args):
 	else:
 		out = local.fs.refdir(os.path.join('contents', contentId))
 
-	with open(os.path.join(out, f'{contentId}.json'), 'w', encoding='utf-8') as f:
-		f.write(json.dumps(item, indent=2, ensure_ascii=False))
+	util.write_json(os.path.join(out, f'{contentId}.json'), item)
 
 	local.meta.dump_entry(contentId, local.meta.create(
 		important = 'closingAt' in item
