@@ -114,9 +114,8 @@ def subcommand(args):
 	for i in items:
 		save(i, args)
 
-	if fs.refdir_untouch('site'):
-		index.main(full=args.force)
-		site.update_index_js()
+	site.update_site(args.force)
+
 
 def add_to():
 	return 'gl2f', 'dl'
