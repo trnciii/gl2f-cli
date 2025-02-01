@@ -1,6 +1,6 @@
 import re
 import os, json
-from .core import pretty, local
+from .core import pretty, local, util
 from .core.config import data as config
 from .core.local import site, archive, index
 
@@ -25,8 +25,6 @@ def clear_cache():
 
 
 def open_site():
-	import webbrowser
-
 	html = os.path.join(local.fs.home(), 'site', 'index.html')
 
 	if not os.path.exists(html):
@@ -37,8 +35,11 @@ def open_site():
 	else:
 		site.index.main()
 
-	webbrowser.open(f'file://{html}')
+	util.open_url(f'file://{html}')
 
+def send_command(command, url):
+	status, res = site.send_command(command, url)
+	print(f'[{"Success" if status else "Error"}] {res}')
 
 def add_to():
 	return 'gl2f', 'local'
@@ -79,14 +80,25 @@ def add_args(parser):
 		help='Also open in the browser')
 	p.set_defaults(handler=lambda args:site.serve(args.port, args.open))
 
+	p = sub.add_parser('shutdown', description='Shutdown the web viewer')
+	p.add_argument('url', nargs='?', default=None)
+	p.set_defaults(handler=lambda a:site.send_command('shutdown', a.url))
+
+	p = sub.add_parser('send-command')
+	p.add_argument('command')
+	p.add_argument('url', nargs='?', default=None)
+	p.set_defaults(handler=lambda a:send_command(a.command, a.url))
+
 	return sub
 
 def set_compreplies():
 	from .completion import if_else
+	server_commands = ' '.join(site.create_commandset(None).keys())
 	return {
 		'import': '_filedir',
 		'export': if_else('$prev == -o', '_filedir'),
 		'ls': '''if [ $prev == "-f"  ] || [ $prev == "--format" ]; then
   __gl2f_complete_format
-fi'''
+fi''',
+		'send-command': f'COMPREPLY=( $(compgen -W "{server_commands}" -- $cur) )'
 	}

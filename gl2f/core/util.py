@@ -26,3 +26,8 @@ def read_json(path):
 
 def write_json(path, data):
 	write_all_text(path, json.dumps(data, indent=2, ensure_ascii=False))
+
+def open_url(url, *args, **kwargs):
+	import webbrowser
+	webbrowser.register("termux-open '%s'", None)
+	webbrowser.open(url, *args, **kwargs)
