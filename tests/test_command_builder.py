@@ -51,7 +51,7 @@ def test_builtin_command_tree():
 	assert {'create', 'path', 'view', 'edit'} == tree['gl2f.config'].choices.keys()
 	assert {
 		'clear-cache', 'dir', 'export', 'import', 'index',
-		'install', 'ls', 'open', 'stat', 'serve'
+		'install', 'ls', 'open', 'stat', 'serve', 'shutdown', 'send-command'
 	} == tree['gl2f.local'].choices.keys()
 	assert {
 		'add-definition', 'remove-definition',

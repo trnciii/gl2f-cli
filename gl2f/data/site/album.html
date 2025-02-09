@@ -5,6 +5,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/css/modaal.min.css">
 
+<script src="constants.js"></script>
+<script src="index.js"></script>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
@@ -88,10 +91,9 @@
   <center><span id='media'></span></center>
 </main>
 
-<script src="constants.js"></script>
 <script>
 const contentId = location.search.split("?")[1];
-const dir = `${contentsPath}/${contentId}`
+const dir = `contents/${contentId}`
 
 function list(size, media_table){
   const min = 250;
@@ -141,28 +143,24 @@ document.getElementById('links').innerHTML = `
 <a href=index.html title=${hostname}>Home</a>
 <a href=article.html?${contentId}>Article</a>`;
 
-var element = document.createElement('script');
-element.src = indexPath;
-element.onload = () =>{
-  const content = table[contentId];
-  const media_table = content['media'];
 
-  document.title = `${hostname}/Album - ${content['title']}`;
+const content = table[contentId];
+const media_table = content['media'];
 
-  document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
-  document.getElementById('meta').innerHTML = `
+document.title = `${hostname}/Album - ${content['title']}`;
+
+document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
+document.getElementById('meta').innerHTML = `
 ${content['author']}&nbsp;
 ${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
 <a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link" /></a>`;
 
-  document.getElementById('cols').value = Math.min(
-    Math.ceil(Math.sqrt(media_table.length * window.innerWidth/window.innerHeight)),
-    media_table.length
-  );
+document.getElementById('cols').value = Math.min(
+  Math.ceil(Math.sqrt(media_table.length * window.innerWidth/window.innerHeight)),
+  media_table.length
+);
 
-  draw();
-}
-document.body.appendChild(element);
+draw();
 </script>
 
 </body>

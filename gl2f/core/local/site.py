@@ -1,178 +1,192 @@
-import os
-import re, json
-from . import fs, content
+import os, re, json, http.server, socket, requests
+from .. import util
 from ..config import data as config
+from . import fs, content, index
 
-def declare_js_string_constant(name, value):
-	return f'const {name} = "{value}";\n'
 
-def install_to(dst, link_type):
-	import shutil, socket
+def update_site(full=False):
+	site = fs.refdir_untouch('site')
+	if not site:
+		return 'site is not installed'
+
+	index.main(full=full)
+
+	table_code = f'const table={util.read_all_text(index.get_path())}'
+	util.write_all_text(os.path.join(site, 'index.js'), table_code)
+
+
+def install():
+	import shutil
 
 	src = fs.package_data('site')
+	dst = fs.refdir('site')
 
-	if os.path.exists(dst):
-		print(f'reinstalling {dst} that already exists')
-		rm = shutil.rmtree if os.path.isdir(dst) else os.remove
-		rm(dst)
+	shutil.copytree(src, dst, dirs_exist_ok=True)
 
-	cp = shutil.copytree if os.path.isdir(src) else shutil.copyfile
-	cp(src, dst)
+	site_contents = os.path.join(dst, 'contents')
+	if os.path.isdir(site_contents):
+		os.remove(site_contents)
+	os.symlink(fs.refdir('contents'), site_contents)
 
-	if link_type == 'symbolic':
-		contents_path = 'contents'
-		index_path = 'index.js'
-		os.symlink(fs.refdir('contents'), os.path.join(dst, 'contents'))
-		os.symlink(os.path.join(fs.home(), 'index.js'), os.path.join(dst, 'index.js'))
-	elif link_type == 'relative':
-		contents_path = '../contents'
-		index_path = '../index.js'
+	const_code = f'const hostname="{config["host-name"]}";'
+	util.write_all_text(os.path.join(dst, 'constants.js'), const_code)
 
-	else:
-		raise RuntimeError('unknown path type')
-
-	index.main(site=dst, full=True)
-
-	with open(os.path.join(dst, 'constants.js'), 'w', encoding='utf-8') as f:
-		f.write(declare_js_string_constant('hostname', config['host-name']))
-		f.write(declare_js_string_constant('contentsPath', contents_path))
-		f.write(declare_js_string_constant('indexPath', index_path))
+	update_site()
 
 
-	print(f'installed site into {dst}')
-
-
-class index:
-	@staticmethod
-	def load():
-		try:
-			path = os.path.join(fs.refdir_untouch('site'), 'index.js')
-			with open(path, encoding='utf-8') as f:
-				raw = f.read()
-			return json.loads(re.sub(r'^.+?=', '', raw))
-
-		except:
-			return {}
-
-
-	@staticmethod
-	def value(i):
-		from .. import board, article
-
-		item = content.load(i)
-		media = [i for i, _ in article.ptn_media.findall(item['values']['body'])]
+def get_config(url=None):
+	if url is None:
 		return {
-			'title': item['values']['title'],
-			'board': board.get('id', item['boardId'])['page'],
-			'author': item.get('category', {'name':''})['name'],
-			'date': item['openingAt'],
-			'media': [''.join(x) for x in sorted(
-				filter(lambda x:x[0] in media,
-					(os.path.splitext(i) for i in fs.listdir(os.path.join('contents', i)))
-				),
-				key=lambda x:media.index(x[0])
-			)],
-			'expired': item.get('closingAt', None),
-			'body': build_body(item)
+			'listener-port': config['listener-port']
 		}
 
+	config_url = f'http://{find_root(url)}/config'
 
-	@staticmethod
-	def create_table(contents):
-		from concurrent.futures import ThreadPoolExecutor
-		with ThreadPoolExecutor() as e:
-			values = e.map(index.value, contents)
-		return {k:v for k, v in zip(contents, values)}
+	try:
+		res = requests.get(config_url)
+		return res.json()
+	except Exception as e:
+		print('Failed to find listener port')
+		print(e)
 
+class Handler(http.server.SimpleHTTPRequestHandler):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, directory=fs.refdir_untouch('site'), **kwargs)
 
-	@staticmethod
-	def main(site=None, full=False):
-		if not site:
-			site = fs.refdir_untouch('site')
+	def end_headers(self):
+		self.send_header('Accept-Ranges', 'bytes')
+		super().end_headers()
 
-		if not site:
-			print('site not installed. return')
-			return
-
-		if full:
-			table = index.create_table(content.get_ids())
+	def do_GET(self):
+		print(self.path)
+		if self.path == '/config':
+			self.send_response(200)
+			self.send_header("Content-type", "application/json")
+			self.end_headers()
+			self.wfile.write(json.dumps(get_config()).encode())
 		else:
-			prev = index.load()
-			contents = list(set(content.get_ids()).difference(prev.keys()))
-			table = prev | index.create_table(contents)
-
-		out = os.path.join(fs.home(), 'index.js')
-		with open(out, 'w', encoding='utf-8') as f:
-			print(f'const table={json.dumps(table, separators=(",", ":"), ensure_ascii=False)}', file=f)
-
-		print(f'saved {out}')
+			super().do_GET()
 
 
-def build_body(item):
-	from .. import article
+def serve(port, browse=False):
+	import socketserver, threading
 
-	i = item['contentId']
-	media_list = fs.listdir(f'contents/{i}')
+	print('Checking existing server...')
+	status, url = send_command('find')
+	if status:
+		print(f'Found running server. {url}')
+		if browse:
+			util.open_url(url)
+		return
 
-	def up(match):
-		m, t = match.groups()
-		try:
-			p = next(p for p in media_list if p.startswith(m))
-		except:
-			return ''
+	install()
 
-		if t == 'image':
-			return f'<img src=../contents/{i}/{p}></img>'
-		elif t == 'video':
-			return f'<video controls autoplay muted loop src=../contents/{i}/{p}></video>'
-		else:
-			return ''
+	url = f'http://{get_local_ip()}:{port}'
+	with socketserver.ThreadingTCPServer(('0.0.0.0', port), Handler) as httpd:
+		print(f'Serving at {url}')
 
-	return article.ptn_media.sub(up, item['values']['body'])
+		commandset = create_commandset(httpd)
+		listender_thread = threading.Thread(target=command_listener, args=(commandset,), daemon=True)
+		listender_thread.start()
+
+		server_thread = threading.Thread(target=httpd.serve_forever)
+		server_thread.start()
+
+		if browse:
+			util.open_url(url)
+
+		server_thread.join()
+
+def create_commandset(httpd):
+	def shutdown_command():
+		print("[Server] Shutting down...")
+		with socket.create_connection(('127.0.0.1', httpd.server_address[1])):
+			pass
+		httpd.shutdown()
+
+	def find_server():
+		_, port = httpd.server_address
+		host = get_local_ip()
+		return f'http://{host}:{port}'
+
+	return {
+		'shutdown': shutdown_command,
+		'find': find_server,
+	}
+
+def send_command(command, url=None):
+	host = get_local_ip() if url is None else find_ip(url)
+	if not host:
+		return False, 'Could not find the host address.'
+	config = get_config(url)
+	if not config:
+		return False, 'Could not find config.'
+	port = config.get('listener-port')
+	if port is None:
+		return False, 'Could not find the command listener port.'
+
+	try:
+		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+			client.connect((host, port))
+			client.sendall(command.encode())
+			result = json.loads(client.recv(1024).decode())
+			return result.get('status', False), result.get('value', '')
+	except Exception as e:
+		return False, f'Could not connect to {host}:{port}. Server may not be running.\n{e}'
 
 
+# move to util
+def execute_command(commandset, key):
+	f = commandset.get(key)
+	if not f:
+		return {'status': False, 'value': f'Unknown command "{key}"'}
+	try:
+		value = f() or ''
+		return {'status': True, 'value': value}
+	except Exception as e:
+		return {'status': False, 'value': e}
+
+def command_listener(commandset):
+	host, port = get_local_ip(), config['listener-port']
+	with socket.create_server((host, port)) as server_socket:
+		print(f"[Server] Listening for commands on port {port}...")
+		server_socket.listen(5)
+
+		while True:
+			try:
+				client_socket, _ = server_socket.accept()
+				with client_socket:
+					command = client_socket.recv(1024).decode().strip()
+					result = execute_command(commandset, command)
+					client_socket.sendall(json.dumps(result).encode())
+
+			except Exception as e:
+				print(e)
+
+_local_ip = None
 def get_local_ip():
-	import socket
+	global _local_ip
+	if _local_ip:
+		return _local_ip
+
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	try:
 		s.connect(('8.8.8.8', 80))
-		return s.getsockname()[0]
+		_local_ip = s.getsockname()[0]
+		return _local_ip
 	except:
 		return 'localhost'
 	finally:
 		s.close()
 
-def serve(port, browse=False):
-	import http.server, socketserver, socket, threading
-	import webbrowser
-	import tempfile
+def find_ip(url):
+	try:
+		return re.sub(r'.+://', '', url).split(':')[0]
+	except:
+		return None
 
-	webbrowser.register("termux-open '%s'", None)
-
-	with tempfile.TemporaryDirectory() as tmp:
-		site = os.path.join(tmp, 'site')
-		print(site)
-		install_to(site, 'symbolic')
-
-		class Handler(http.server.SimpleHTTPRequestHandler):
-			def __init__(self, *args, **kwargs):
-				super().__init__(*args, directory=site, **kwargs)
-
-			def end_headers(self):
-				self.send_header('Accept-Ranges', 'bytes')
-				super().end_headers()
-
-		url = f'http://{get_local_ip()}:{port}'
-		with socketserver.ThreadingTCPServer(('0.0.0.0', port), Handler) as httpd:
-			print(f'serving at {url}')
-
-			server_thread = threading.Thread(target=httpd.serve_forever)
-			server_thread.daemon = True
-			server_thread.start()
-
-			try:
-				if browse:
-					webbrowser.open(url)
-				server_thread.join()
-			except  KeyboardInterrupt:
-				pass
+def find_root(url):
+	try:
+		return re.sub(r'.+://', '', url).split('/')[0]
+	except:
+		return None
