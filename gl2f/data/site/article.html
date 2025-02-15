@@ -56,13 +56,17 @@ nav{
 
 </header>
 
-<main><div style="max-width:800px;margin:auto;">
-  <span id='body'/>
-</div></main>
+<main>
+  <div id=notificationContainer class="notificationContainer"></div>
+  <div style="max-width:800px;margin:auto;">
+    <span id='body'/>
+  </div>
+</main>
 
 <script>
 const contentId = location.search.split('?')[1];
 const content = table[contentId];
+const notifier = new Notification();
 
 function* createNavItems(hostname) {
   const home = document.createElement('a');

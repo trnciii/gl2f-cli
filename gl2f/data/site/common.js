@@ -1,6 +1,8 @@
-function tileMedia(mediaList, width, columns, showList)
+function tileMedia(mediaList, width, columns, showList, notifier)
 {
   const itemWidth = width/columns;
+  const maxRetries = 10;
+  const retryDelay = 500;
 
   const element = document.createElement('center');
 
@@ -34,6 +36,21 @@ function tileMedia(mediaList, width, columns, showList)
       img.title = i.displayName;
       img.loading = 'lazy';
 
+      let retries = 0;
+      img.addEventListener('error', ()=>{
+        if(retries < maxRetries){
+          retries++;
+          console.warn(`Retrying ${src} (${retries}/${maxRetries})`);
+          setTimeout(() => {
+            img.src = src + `?retry=${retries}`;
+          }, retryDelay);
+        }
+        else{
+          console.error(`Failed to load image ${src} after ${maxRetries} retries`);
+          notifier.error(`Failed to load image. See the log for more info.`);
+        }
+      });
+
       a.appendChild(img);
       return a;
     }
@@ -61,6 +78,23 @@ function tileMedia(mediaList, width, columns, showList)
       });
       observer.observe(video);
 
+      let retries = 0;
+      video.addEventListener('error', () =>{
+        if(retries < maxRetries){
+          retries++;
+          console.warn(`Retrying ${src} (${retries}/${maxRetries})`);
+          setTimeout(() => {
+            video.src = src + `?retry=${retries}`;
+            video.load();
+          }, retryDelay);
+        }
+        else{
+          console.error(`Failed to load video ${src} after ${maxRetries} retries.`);
+          notifier.error(`Failed to load video. See the log for more info.`);
+        }
+      });
+
+
       a.appendChild(video);
       return a;
     }
@@ -83,6 +117,22 @@ function tileMedia(mediaList, width, columns, showList)
         });
       });
       observer.observe(video);
+
+      let retries = 0;
+      video.addEventListener('error', () =>{
+        if(retries < maxRetries){
+          retries++;
+          console.warn(`Retrying ${src} (${retries}/${maxRetries})`);
+          setTimeout(() => {
+            video.src = src + `?retry=${retries}`;
+            video.load();
+          }, retryDelay);
+        }
+        else{
+          console.error(`Failed to load video ${src} after ${maxRetries} retries.`);
+          notifier.error(`Failed to load video. See the log for more info.`);
+        }
+      });
 
       return video;
     }
@@ -121,17 +171,20 @@ class Notification {
 
   info(message)
   {
+    console.log(message);
     this.show(message, 'info');
   }
 
   warn(message)
   {
+    console.warn(message);
     this.show(message, 'warning');
   }
 
   error(message)
   {
-    this.show(message, 'error');
+    console.error(message);
+    this.show(message, 'error', 5000);
   }
 
   show(message, type='info', duration=3000) {

@@ -54,10 +54,14 @@ nav{
   </div>
 </header>
 
-<main id=main></main>
+<main>
+  <div id=notificationContainer class="notificationContainer"></div>
+  <div id=tiles>
+</main>
 
 <script>
 const contentId = location.search.split("?")[1];
+const notifier = new Notification();
 
 function updateTiles(){
   const mediaList = table[contentId]['media'].map(e => {
@@ -66,8 +70,8 @@ function updateTiles(){
       displayName:e,
     }
   });
-  main.replaceChildren();
-  main.appendChild(tileMedia(mediaList, window.innerWidth-100, cols.value, toggleButton.checked));
+  tiles.replaceChildren();
+  tiles.appendChild(tileMedia(mediaList, window.innerWidth-100, cols.value, toggleButton.checked, notifier));
   setupModaal();
 }
 

@@ -312,7 +312,7 @@ function updateMediaTile() {
 	}));
 	media.replaceChildren();
 	media.appendChild(document.createElement('hr'));
-	media.appendChild(tileMedia(mediaList, window.innerWidth-100, 4, false));
+	media.appendChild(tileMedia(mediaList, window.innerWidth-100, 4, false, notifier));
 	setupModaal();
 }
 
