@@ -13,6 +13,7 @@ body {
 header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 2px 8px 4px 8px;
   background: linear-gradient(to right, #F486BA, #FFCE5D);
   font-size: 18px;
@@ -22,6 +23,23 @@ header {
 header a{
   color: #0066b2;
   text-decoration: none;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: center;
+  gap: 4px;
+}
+
+.navItem {
+  padding: 4px;
+  border: solid;
+  border-color: white;
+  border-width: 2px;
+  border-radius: 12px;
+  color: black;
 }
 
 main {
@@ -54,10 +72,8 @@ h1{
 }
 
 .toggleButton {
-  border-radius: 4px;
-  padding: 2px 5px;
-  color: #000;
-  background: #a5a5a5;
+  color: #f1f1f1;
+  background: #4e4e4e8a;
 }
 
 .toggleInput:checked + .toggleButton {

@@ -161,3 +161,15 @@ function createFcArticleUrl(board, contentId)
 {
   return `https://girls2-fc.jp/page/${board}/${contentId}`;
 }
+
+async function updateHostName(updator, fallback)
+{
+  return fetch(window.location.href).then(res =>{
+    const hostName = res.headers.get('X-Server-Name');
+    console.log(`updateHostName set ${hostName}`);
+    updator(hostName);
+  }).catch(_ => {
+    console.log('updateHostName set default');
+    fallback();
+  });
+}

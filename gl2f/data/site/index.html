@@ -3,7 +3,6 @@
 <title>gl2f local files</title>
 
 <script src="index.js"></script>
-<script src="constants.js"></script>
 <script src="common.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/js/modaal.min.js"></script>
@@ -36,18 +35,14 @@ tr:nth-child(odd) td{
 <body>
 
 <header style="justify-content: left;">
-	<span id='columns'></span>
+	<nav id='links'></nav>
+
+	<span id='columns' style="margin-left: 8px;"></span>
 	<div style='margin-left:8px;'>
 		<select id=filter_board></select>
 		<select id=filter_author></select>
 	</div>
 
-	<div style='margin-left: 8px; margin-right: 8px;'>
-    <input type="checkbox" class="toggleInput" id="toggleAlbumButton" onchange="updateAlbumVisibility()">
-    <label class="toggleButton" for="toggleAlbumButton">Album</label>
-	</div>
-
-	<div id='hostname' style="display: flex; justify-content: right; margin-top: 2px; margin-left: auto;"></div>
 </header>
 
 <main>
@@ -278,6 +273,11 @@ function query(table, state)
 		.sort(([_, l], [__, r]) => toSortKey(l) < toSortKey(r)? -state.sort.order : state.sort.order));
 }
 
+const isAlbumVisible = () => {
+	const toggleAlbumButton = document.getElementById("toggleAlbumButton");
+	return toggleAlbumButton && toggleAlbumButton.checked;
+}
+
 function updateTableData()
 {
 	const cols = Object.entries(columnDefs);
@@ -295,7 +295,7 @@ function updateTableData()
 		tbody.appendChild(tr);
 	});
 
-	if (toggleAlbumButton.checked)
+	if (isAlbumVisible())
 	{
 		updateMediaTile();
 	}
@@ -318,10 +318,11 @@ function updateMediaTile() {
 
 function updateAlbumVisibility()
 {
+	const v = isAlbumVisible();
 	updateMediaTile();
-	tableContainer.style.maxHeight = toggleAlbumButton.checked? '30vh' : '';
-	tableContainer.style.overflow = toggleAlbumButton.checked? 'auto': '';
-	media.style.display = toDisplay(toggleAlbumButton.checked);
+	tableContainer.style.maxHeight = v? '30vh' : '';
+	tableContainer.style.overflow = v? 'auto': '';
+	media.style.display = toDisplay(v);
 }
 
 const updateLabel = () => Object.entries(columnDefs).forEach(([k, v]) =>
@@ -376,11 +377,27 @@ function initFilter(id)
 	});
 }
 
-document.title = `${hostname}/gl2f`;
 
-document.getElementById('hostname').innerHTML = `
-<div style="font-size:10;">hosted on&nbsp;</div>
-<div style="font-weight: bold; font-size:14;">${hostname}</div>`;
+function* createNavItems(hostname){
+	const home = document.createElement('a');
+	home.href = 'index.html';
+	home.className = 'navItem';
+	home.textContent = hostname || 'Home';
+	yield home;
+
+	const album = document.createElement('div');
+	album.innerHTML = `<input type="checkbox" class="toggleInput" id="toggleAlbumButton" onchange="updateAlbumVisibility()">
+	<label class="NavItem toggleButton" for="toggleAlbumButton">Album</label>`;
+	yield album;
+};
+
+updateHostName(hostname => {
+	document.title = `${hostname}/gl2f`;
+	createNavItems(hostname).forEach(e => links.appendChild(e));
+}, ()=>{
+	document.title = `local/gl2f`;
+	createNavItems(null).forEach(e => links.appendChild(e));
+});
 
 Object.keys(columnDefs).forEach(k => {
 	const label = document.createElement('label');

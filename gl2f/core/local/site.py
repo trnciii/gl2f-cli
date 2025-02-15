@@ -28,9 +28,6 @@ def install():
 		os.remove(site_contents)
 	os.symlink(fs.refdir('contents'), site_contents)
 
-	const_code = f'const hostname="{config["host-name"]}";'
-	util.write_all_text(os.path.join(dst, 'constants.js'), const_code)
-
 	update_site()
 
 
@@ -55,6 +52,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 	def end_headers(self):
 		self.send_header('Accept-Ranges', 'bytes')
+		self.send_header('X-Server-Name', config['host-name'])
 		super().end_headers()
 
 	def do_GET(self):

@@ -6,23 +6,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/css/modaal.min.css">
 
-<script src="constants.js"></script>
 <script src="index.js"></script>
 <script src="common.js"></script>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
-.header-links {
-  display: flex;
-  flex:1;
-  flex-wrap: wrap;
-  margin: 0 0 4 0;
-  align-content: flex-start;
-  gap:4px;
-}
-
-.header-title {
+nav{
+  flex: 1;
 }
 
 .header-controls {
@@ -46,7 +37,7 @@
 <body>
 
 <header class="blog-header">
-  <nav id=links class="header-links"></nav>
+  <nav id=links></nav>
 
   <div class="header-title">
     <div id=title></div>
@@ -56,7 +47,7 @@
   <div class=header-controls>
     <div>
       <input type="checkbox" class="toggleInput" id="toggleButton" onchange="updateTiles()">
-      <label class="toggleButton" for="toggleButton" title='on/off file list'>List</label>
+      <label class="toggleButton" for="toggleButton" title='Toggle file list' style="padding: 2px 6px; border-radius: 8px;">List</label>
 
       <input type="range" id="cols" min="1" max="7" step="1" title='adjust number of colmuns' oninput="updateTiles()">
     </div>
@@ -85,14 +76,30 @@ function calcColumns(n, width, height)
   return Math.min(Math.ceil(Math.sqrt(n * width/height)), n);
 }
 
-document.getElementById('links').innerHTML = `
-<a href=index.html title=${hostname}>Home</a>
-<a href=article.html?${contentId}>Article</a>`;
-
 const content = table[contentId];
 const media_table = content['media'];
 
-document.title = `${hostname}/Album - ${content['title']}`;
+function* createNavItems(hostname){
+  const home = document.createElement('a');
+  home.href = 'index.html';
+  home.className = 'NavItem';
+  home.textContent = hostname || 'Home';
+  yield home;
+
+  const article = document.createElement('a');
+  article.href = `article.html?${contentId}`;
+  article.className = 'NavItem';
+  article.textContent = 'Article';
+  yield article;
+}
+
+updateHostName(hostname => {
+  document.title = `${hostname}/Album - ${content['title']}`;
+  createNavItems(hostname).forEach(e => links.appendChild(e));
+}, ()=>{
+  document.title = `local/Album - ${content['title']}`;
+  createNavItems(null).forEach(e => links.appendChild(e));
+});
 
 document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
 document.getElementById('meta').innerHTML = `

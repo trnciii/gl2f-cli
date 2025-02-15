@@ -4,7 +4,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <script src="common.js"></script>
-<script src="constants.js"></script>
 <script src="index.js"></script>
 
 <link rel="stylesheet" href="style.css">
@@ -17,14 +16,8 @@ img, video {
   max-height: calc(100vh - 150px);
 }
 
-.header-links {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0 0 4 0;
-  align-content: flex-start;
-  flex:1;
-  width: 100%;
-  gap:4px;
+nav{
+  flex: 1;
 }
 
 .header-title {
@@ -51,7 +44,7 @@ img, video {
 <body>
 
 <header class="blog-header">
-  <nav id=links class="header-links"></nav>
+  <nav id=links></nav>
 
   <div class="header-title">
     <div id=title></div>
@@ -69,13 +62,29 @@ img, video {
 
 <script>
 const contentId = location.search.split('?')[1];
-const content = table[contentId]
+const content = table[contentId];
 
-document.title = `${hostname}/${content['title']}`;
+function* createNavItems(hostname) {
+  const home = document.createElement('a');
+  home.href = 'index.html';
+  home.className = 'NavItem';
+  home.textContent = hostname || 'Home';
+  yield home;
 
-document.getElementById('links').innerHTML = `
-<a href=index.html title=${hostname}>Home</a>
-<a href=album.html?${contentId}>Album</a>`;
+  const album = document.createElement('a');
+  album.href = `album.html?${contentId}`;
+  album.className = 'NavItem';
+  album.textContent = 'Album';
+  yield album;
+}
+
+updateHostName(hostname =>{
+  document.title = `${hostname}/${content['title']}`;
+  createNavItems(hostname).forEach(e => links.appendChild(e));
+}, () =>{
+  document.title = `local/${content['title']}`;
+  createNavItems().forEach(e => links.appendChild(e));
+});
 
 title.innerHTML = `<h1>${content['title']}</h1>`;
 meta.innerHTML = `
