@@ -12,7 +12,7 @@ function tileMedia(mediaList, width, columns, showList)
     list.className = 'tile';
     list.style.marginTop = '20px';
     list.style.marginBottom = '20px';
-    list.innerHTML = `<div style="padding:20px; background: pink;text-align:left;">${mediaList.map(i=>`<div class=list-item>${i}</div>`).join('')}</div>`
+    list.innerHTML = `<div style="padding:20px; background: pink;text-align:left;">${mediaList.map(i=>`<div class=list-item>${i.path}</div>`).join('')}</div>`
 
     element.appendChild(list);
     element.appendChild(document.createElement('br'));
@@ -20,7 +20,7 @@ function tileMedia(mediaList, width, columns, showList)
 
   mediaList.map(i =>
   {
-    const src = `contents/${i}`;
+    const src = `contents/${i.path}`;
     const ext = src.slice(src.lastIndexOf('.'));
     if([".jpeg", ".png"].indexOf(ext) > -1){
       const a = document.createElement('a');
@@ -31,7 +31,7 @@ function tileMedia(mediaList, width, columns, showList)
       const img = document.createElement("img");
       img.src = src;
       img.width = itemWidth;
-      img.title = i;
+      img.title = i.displayName;
       img.loading = 'lazy';
 
       a.appendChild(img);
@@ -48,7 +48,7 @@ function tileMedia(mediaList, width, columns, showList)
       video.muted = true;
       video.loop = true;
       video.width = itemWidth;
-      video.title = i;
+      video.title = i.displayName;
 
       const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry =>{
@@ -71,7 +71,7 @@ function tileMedia(mediaList, width, columns, showList)
       video.muted = true;
       video.loop = true;
       video.width = itemWidth;
-      video.title = i;
+      video.title = i.displayName;
 
       const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry =>{

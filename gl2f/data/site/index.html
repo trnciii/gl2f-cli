@@ -289,7 +289,13 @@ function updateTableData()
 
 function updateMediaTile() {
 	const items = query(table, queryState);
-	const mediaList = Object.entries(items).flatMap(([k, v])=>v['media'].map(m => `${k}/${m}`));
+	const mediaList = Object.entries(items).flatMap(([k, v])=>v['media'].map(m => {
+		const prefix = v['author']? v['author'] : v['board'];
+		return {
+			path: `${k}/${m}`,
+			displayName: `[${prefix}] ${v['title']}`,
+		}
+	}));
 	media.replaceChildren();
 	media.appendChild(document.createElement('hr'));
 	media.appendChild(tileMedia(mediaList, window.innerWidth-100, 4, false));
@@ -389,7 +395,6 @@ initTHead();
 
 initFilter('board');
 initFilter('author');
-
 updateLabel();
 updateTableData();
 updateAlbumVisibility();
@@ -397,12 +402,6 @@ updateAlbumVisibility();
 tileContextMenu.addEventListener('contextmenu', event => {
 	event.preventDefault();
 });
-
-initFilter('board');
-initFilter('author');
-updateLabel();
-updateTableData();
-updateAlbumVisibility();
 </script>
 
 </body>
