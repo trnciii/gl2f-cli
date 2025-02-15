@@ -1,8 +1,47 @@
+function addRetry(target, updator, onError){
+  const maxRetries = 10;
+  const retryDelay = 500;
+  let retries = 0;
+  target.addEventListener('error', () => {
+    if(retries < maxRetries){
+      retries++;
+      console.warn(`Retrying ${target._src} (${retries}/${maxRetries})`);
+      setTimeout(() => {
+        updator(retries);
+      }, retryDelay);
+    }
+    else{
+      console.error(`Failed to load media ${target._src} after ${maxRetries} retries.`);
+      onError();
+    }
+  });
+}
+
+function createVideoTile(src, displayName, width, notifier, observer){
+  const video = document.createElement('video');
+  video.controls = true;
+  video.autoplay = true;
+  video.muted = true;
+  video.loop = true;
+  video.width = width;
+  video.title = displayName;
+  video._src = src;
+
+  addRetry(video,
+    retries => {
+      video.src = `${src}?retry=${retries}`;
+      video.load();
+    },
+    ()=>notifier.error(`Failed to load video. See the log for more info.`));
+
+  observer.observe(video);
+
+  return video;
+}
+
 function tileMedia(mediaList, width, columns, showList, notifier)
 {
   const itemWidth = width/columns;
-  const maxRetries = 10;
-  const retryDelay = 500;
 
   const element = document.createElement('center');
 
@@ -20,6 +59,32 @@ function tileMedia(mediaList, width, columns, showList, notifier)
     element.appendChild(document.createElement('br'));
   }
 
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if(!entry.isIntersecting)
+      {
+        return;
+      }
+
+      if(entry.target.tagName == 'IMG')
+      {
+        const img = entry.target;
+        img.src = img._src;
+        obs.unobserve(img);
+      }
+      else if (entry.target.tagName == 'VIDEO')
+      {
+        const video = entry.target;
+        video.src = video._src;
+        video.load();
+        obs.unobserve(video);
+      }
+      else {
+        console.warn(`[Observer] Unknown target ${entry.target.tagName}`);
+      }
+    });
+  });
+
   mediaList.map(i =>
   {
     const src = `contents/${i.path}`;
@@ -31,24 +96,22 @@ function tileMedia(mediaList, width, columns, showList, notifier)
       a.href = src;
 
       const img = document.createElement("img");
-      img.src = src;
-      img.width = itemWidth;
+      img.style.width = `${itemWidth}px`;
+      img.style.height = `${itemWidth}px`;
+      img.style.objectFit = 'cover';
+      img.style.backgroundColor = '#a5a5a5';
+      img.style.boxShadow = 'inset 0 0 2px 1px white';
       img.title = i.displayName;
       img.loading = 'lazy';
+      img._src = src;
 
-      let retries = 0;
-      img.addEventListener('error', ()=>{
-        if(retries < maxRetries){
-          retries++;
-          console.warn(`Retrying ${src} (${retries}/${maxRetries})`);
-          setTimeout(() => {
-            img.src = src + `?retry=${retries}`;
-          }, retryDelay);
-        }
-        else{
-          console.error(`Failed to load image ${src} after ${maxRetries} retries`);
-          notifier.error(`Failed to load image. See the log for more info.`);
-        }
+      observer.observe(img);
+      addRetry(img,
+        retries => img.src = `${src}?retry=${retries}`,
+        ()=>notifier.error(`Failed to load media. See the log for more info.`));
+
+      img.addEventListener('load', ()=>{
+        img.style.height = 'auto';
       });
 
       a.appendChild(img);
@@ -58,83 +121,11 @@ function tileMedia(mediaList, width, columns, showList, notifier)
       const a = document.createElement('a');
       a.className += 'tiledIframe';
       a.href = src;
-
-      const video = document.createElement('video');
-      video.controls = true;
-      video.autoplay = true;
-      video.muted = true;
-      video.loop = true;
-      video.width = itemWidth;
-      video.title = i.displayName;
-
-      const observer = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry =>{
-          if(entry.isIntersecting){
-            video.src = src;
-            video.load();
-            obs.unobserve(video);
-          }
-        });
-      });
-      observer.observe(video);
-
-      let retries = 0;
-      video.addEventListener('error', () =>{
-        if(retries < maxRetries){
-          retries++;
-          console.warn(`Retrying ${src} (${retries}/${maxRetries})`);
-          setTimeout(() => {
-            video.src = src + `?retry=${retries}`;
-            video.load();
-          }, retryDelay);
-        }
-        else{
-          console.error(`Failed to load video ${src} after ${maxRetries} retries.`);
-          notifier.error(`Failed to load video. See the log for more info.`);
-        }
-      });
-
-
-      a.appendChild(video);
+      a.appendChild(createVideoTile(src, i.displayName, itemWidth, notifier, observer));
       return a;
     }
     else if([".mov"].indexOf(ext) > -1){
-      const video = document.createElement('video');
-      video.controls = true;
-      video.autoplay = true;
-      video.muted = true;
-      video.loop = true;
-      video.width = itemWidth;
-      video.title = i.displayName;
-
-      const observer = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry =>{
-          if(entry.isIntersecting){
-            video.src = src;
-            video.load();
-            obs.unobserve(video);
-          }
-        });
-      });
-      observer.observe(video);
-
-      let retries = 0;
-      video.addEventListener('error', () =>{
-        if(retries < maxRetries){
-          retries++;
-          console.warn(`Retrying ${src} (${retries}/${maxRetries})`);
-          setTimeout(() => {
-            video.src = src + `?retry=${retries}`;
-            video.load();
-          }, retryDelay);
-        }
-        else{
-          console.error(`Failed to load video ${src} after ${maxRetries} retries.`);
-          notifier.error(`Failed to load video. See the log for more info.`);
-        }
-      });
-
-      return video;
+      return createVideoTile(src, i.displayName, itemWidth, notifier, observer);
     }
     else{
       alert(`Unknown media file: ${src}`);
