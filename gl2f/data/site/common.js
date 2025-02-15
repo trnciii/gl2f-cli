@@ -156,3 +156,8 @@ class Notification {
     }, duration);
   }
 }
+
+function createFcArticleUrl(board, contentId)
+{
+  return `https://girls2-fc.jp/page/${board}/${contentId}`;
+}

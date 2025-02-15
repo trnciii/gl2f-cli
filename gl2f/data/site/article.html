@@ -3,6 +3,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+<script src="common.js"></script>
 <script src="constants.js"></script>
 <script src="index.js"></script>
 
@@ -80,7 +81,7 @@ title.innerHTML = `<h1>${content['title']}</h1>`;
 meta.innerHTML = `
 ${content['author']}&nbsp;
 ${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
-<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link" /></a>`;
+<a href=${createFcArticleUrl(content['board'], contentId)} target=_blank><i class="fa fa-external-link" /></a>`;
   body.innerHTML = content['body'];
 </script>
 

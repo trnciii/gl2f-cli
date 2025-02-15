@@ -129,15 +129,20 @@ media.addEventListener('contextmenu', event =>{
 	if(event.target.tagName === 'IMG')
 	{
 	  const img = event.target;
+  	const ar = event.target.src.split('/');
+		const id = ar[ar.length - 2];
+
 	  const items =  [];
 
 	  items.push(createContextMenuButton('View article',
 	  	() => {
-		  	const ar = event.target.src.split('/');
-				const id = ar[ar.length - 2];
 		  	window.open(createArticleUrl(id), '_blank');
 		  }, true));
-
+	  items.push(createContextMenuButton('View article in FC',
+	  	() => {
+	  		const board = table[id]['board'];
+	  		window.open(createFcArticleUrl(board, id));
+	  	}, true));
 		items.push(createContextMenuButton("Open image in new tab",
 			() => {
 				window.open(img.src, '_blank');
@@ -160,7 +165,6 @@ media.addEventListener('contextmenu', event =>{
 				.catch(_ => notifier.error('Failed to copy the image.'));
 			},
 			canCopyImage(img)));
-
 		items.push(createContextMenuButton("Copy image address",
 			() =>{
 				navigator.clipboard.writeText(img.src)
@@ -175,14 +179,24 @@ media.addEventListener('contextmenu', event =>{
 	if (event.target.tagName === 'VIDEO')
 	{
 	  const video = event.target;
+  	const ar = event.target.src.split('/');
+		const id = ar[ar.length - 2];
+
 	  const items = [];
 
 	  items.push(createContextMenuButton("View article",
 	  	() => {
-		  	const ar = event.target.src.split('/');
-				const id = ar[ar.length - 2];
 		  	window.open(createArticleUrl(id), '_blank');
 		  }, true));
+	  items.push(createContextMenuButton('View article in FC',
+	  	() => {
+	  		const board = table[id]['board'];
+	  		window.open(createFcArticleUrl(board, id));
+	  	}, true));
+		items.push(createContextMenuButton("Open video in new tab",
+			() => {
+				window.open(video.src, '_blank');
+			}, true));
 
 	  items.push(document.createElement('hr'));
 
