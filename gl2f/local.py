@@ -80,14 +80,18 @@ def add_args(parser):
 		help='Also open in the browser')
 	p.set_defaults(handler=lambda args:site.serve(args.port, args.open))
 
-	p = sub.add_parser('shutdown', description='Shutdown the web viewer')
-	p.add_argument('url', nargs='?', default=None)
-	p.set_defaults(handler=lambda a:site.send_command('shutdown', a.url))
-
 	p = sub.add_parser('send-command')
 	p.add_argument('command')
 	p.add_argument('url', nargs='?', default=None)
 	p.set_defaults(handler=lambda a:send_command(a.command, a.url))
+
+	p = sub.add_parser('shutdown', description='Shutdown the web viewer')
+	p.add_argument('url', nargs='?', default=None)
+	p.set_defaults(handler=lambda a:site.send_command('shutdown', a.url))
+
+	p = sub.add_parser('status')
+	p.add_argument('url', nargs='?', default=None)
+	p.set_defaults(handler=lambda a:send_command('status', a.url))
 
 	return sub
 
