@@ -55,166 +55,16 @@ tr:nth-child(odd) td{
 		</table>
 	</div>
 
-	<div id='media' style="display:none"></div>
+	<div id='media' style="display:none">
+		<hr>
+		<center id=center></center>
+	</div>
 </main>
 
 <div id="tileContextMenu" class="context-menu"></div>
 
 <script type="text/javascript">
-
 const notifier = new Notification();
-
-function createArticleUrl(id)
-{
-	return `article.html?${id}`;
-}
-
-function createAlbumUrl(id)
-{
-	return `album.html?${id}`;
-}
-
-function canCopyImage(target)
-{
-	return target.tagName === 'IMG' && navigator.clipboard && navigator.clipboard.write;
-}
-
-function canCopyText()
-{
-	return navigator.clipboard && navigator.clipboard.writeText;
-}
-
-function initCustomContextMenu(event, items)
-{
-	event.preventDefault();
-
-	tileContextMenu.replaceChildren();
-	items.forEach(i => tileContextMenu.appendChild(i));
-
-  const menuWidth = tileContextMenu.offsetWidth;
-  const menuHeight = tileContextMenu.offsetHeight;
-  let posX = event.clientX;
-  let posY = event.clientY;
-  if (posX + menuWidth > window.innerWidth) {
-    posX -= menuWidth;
-  }
-  if (posY + menuHeight > window.innerHeight) {
-    posY -= menuHeight;
-  }
-
-	tileContextMenu.style.top = `${posY}px`;
-	tileContextMenu.style.left = `${posX}px`;
-	tileContextMenu.style.display = 'block';
-}
-
-function createContextMenuButton(title, command, canExecute)
-{
-	const button = document.createElement('button');
-	button.appendChild(document.createTextNode(title));
-	button.onclick = command;
-	button.style.whiteSpace = 'nowrap';
-	if (!canExecute)
-	{
-		button.disabled = true;
-	}
-	return button;
-}
-
-media.addEventListener('contextmenu', event =>{
-	if(event.target.tagName === 'IMG')
-	{
-	  const img = event.target;
-  	const ar = event.target.src.split('/');
-		const id = ar[ar.length - 2];
-
-	  const items =  [];
-
-	  items.push(createContextMenuButton('View article',
-	  	() => {
-		  	window.open(createArticleUrl(id), '_blank');
-		  }, true));
-	  items.push(createContextMenuButton('View article in FC',
-	  	() => {
-	  		const board = table[id]['board'];
-	  		window.open(createFcArticleUrl(board, id));
-	  	}, true));
-		items.push(createContextMenuButton("Open image in new tab",
-			() => {
-				window.open(img.src, '_blank');
-			}, true));
-
-		items.push(document.createElement('hr'));
-
-		items.push(createContextMenuButton('Copy image',
-			async () => {
-				const canvas = document.createElement('canvas');
-				canvas.width = img.naturalWidth;
-				canvas.height = img.naturalHeight;
-
-				const ctx = canvas.getContext('2d');
-				ctx.drawImage(img, 0, 0);
-
-				new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
-				.then(blob => navigator.clipboard.write([new ClipboardItem({[blob.type]: blob})])
-					.then(_ => notifier.info('Image copied.')))
-				.catch(_ => notifier.error('Failed to copy the image.'));
-			},
-			canCopyImage(img)));
-		items.push(createContextMenuButton("Copy image address",
-			() =>{
-				navigator.clipboard.writeText(img.src)
-				.then(_ => notifier.info('Image path copied.'))
-				.catch(_ => notifier.error('Failed to copy the image path.'));
-			},
-			canCopyText()));
-
-		initCustomContextMenu(event, items);
-	}
-
-	if (event.target.tagName === 'VIDEO')
-	{
-	  const video = event.target;
-  	const ar = event.target.src.split('/');
-		const id = ar[ar.length - 2];
-
-	  const items = [];
-
-	  items.push(createContextMenuButton("View article",
-	  	() => {
-		  	window.open(createArticleUrl(id), '_blank');
-		  }, true));
-	  items.push(createContextMenuButton('View article in FC',
-	  	() => {
-	  		const board = table[id]['board'];
-	  		window.open(createFcArticleUrl(board, id));
-	  	}, true));
-		items.push(createContextMenuButton("Open video in new tab",
-			() => {
-				window.open(video.src, '_blank');
-			}, true));
-
-	  items.push(document.createElement('hr'));
-
-	  items.push(createContextMenuButton("Open video in new tab",
-	  	() =>{
-		  	window.open(video.src, '_blank');
-		  }, true));
-
-	  items.push(createContextMenuButton("Copy video address",
-	  	() => {
-		  	navigator.clipboard.writeText(video.src)
-		  	.then(_ => notifier.info('Video path copied.'))
-		  	.catch(_ => notifier.error('Failed to copy the video path.'))
-		  },
-		  canCopyText()));
-
-		initCustomContextMenu(event, items);
-	}
-});
-
-document.addEventListener('click', () => {
-  tileContextMenu.style.display = 'none';
-});
 
 const columnDefs = {
 	ID:{
@@ -244,8 +94,8 @@ const columnDefs = {
 	Title:{
 		key:'title',
 		data:(k, v)=>['girls2radio', 'lucky2radio', 'wallpaper', 'commercialmovie', 'gtube'].includes(v['board'])?
-			`<a href=${createAlbumUrl(k)}>${v['title']}</a>`
-			: `<a href=${createArticleUrl(k)}>${v['title']}</a>&nbsp;/&nbsp;<a href=album.html?${k}>Album</a>`,
+			`<a href=album.html?${k}>${v['title']}</a>`
+			: `<a href=article.html?${k}>${v['title']}</a>&nbsp;/&nbsp;<a href=album.html?${k}>Album</a>`,
 		default: true,
 	},
 };
@@ -261,8 +111,16 @@ const queryState = {
 	}
 };
 
-var visibility = Object.fromEntries(Object.entries(columnDefs).map(([k, v]) => [k, v.default]));
-const toDisplay = b => b? '' : 'none';
+const tileHandlers = Object.entries(table).flatMap(([k, v])=>v['media'].map(m => {
+	const prefix = v['author']? v['author'] : v['board'];
+	return {
+		contentId: k,
+		path: `${k}/${m}`,
+		displayName: `[${prefix}] ${v['title']}`,
+	}
+}))
+.map(i => [i.path, table[i.contentId], createTile(i, (window.innerWidth-100)/4, notifier)]);
+
 
 function query(table, state)
 {
@@ -273,9 +131,25 @@ function query(table, state)
 		.sort(([_, l], [__, r]) => toSortKey(l) < toSortKey(r)? -state.sort.order : state.sort.order));
 }
 
-const isAlbumVisible = () => {
-	const toggleAlbumButton = document.getElementById("toggleAlbumButton");
-	return toggleAlbumButton && toggleAlbumButton.checked;
+function updateMediaTile() {
+	tileHandlers.forEach(([_, v, u]) =>{
+		const visible = (queryState.filter.board == '*' || queryState.filter.board == v.board)
+			&& (queryState.filter.author == '*' || queryState.filter.author == v.author);
+		u.updateVisibility(visible);
+	});
+
+	center.replaceChildren();
+	tileHandlers.sort(([lp, lv, _], [rp, rv, __])=>{
+		const l = String(lv[queryState.sort.key]).toLowerCase();
+		const r = String(rv[queryState.sort.key]).toLowerCase();
+		return l == r? lp > rp : l > r? queryState.sort.order : -queryState.sort.order;
+	})
+	.forEach(([_, __, u]) => {
+	 const div = document.createElement('div');
+    div.className = 'tile';
+    div.appendChild(u.tile);
+    center.appendChild(div)
+	});
 }
 
 function updateTableData()
@@ -287,7 +161,9 @@ function updateTableData()
 		const tr = document.createElement('tr');
 		cols.forEach(([ck, cv])=>{
 			const td = document.createElement('td');
-			td.style.display = toDisplay(visibility[ck]);
+			const checked = document.getElementById(`col_${ck}`).checked;
+			td.style.display = toDisplay(checked);
+			td.setAttribute('data-column', ck);
 			td.innerHTML = cv.data(...data);
 
 			tr.appendChild(td);
@@ -295,45 +171,95 @@ function updateTableData()
 		tbody.appendChild(tr);
 	});
 
-	if (isAlbumVisible())
-	{
-		updateMediaTile();
-	}
+	const toggleAlbumButton = document.getElementById("toggleAlbumButton");
+	updateMediaTile();
 };
 
-function updateMediaTile() {
-	const items = query(table, queryState);
-	const mediaList = Object.entries(items).flatMap(([k, v])=>v['media'].map(m => {
-		const prefix = v['author']? v['author'] : v['board'];
-		return {
-			path: `${k}/${m}`,
-			displayName: `[${prefix}] ${v['title']}`,
-		}
-	}));
-	media.replaceChildren();
-	media.appendChild(document.createElement('hr'));
-	media.appendChild(tileMedia(mediaList, window.innerWidth-100, 4, false, notifier));
-	setupModaal();
+function initFilter(id)
+{
+	const e = document.getElementById(`filter_${id}`);
+	e.innerHTML = [
+		`<option value=*>${id} / all</option>`,
+		...Array.from(new Set(Object.values(table).map(v => v[id])))
+			.sort().map(b=>`<option value='${b}'>${b}</option>`)
+	].join('');
+
+	e.addEventListener('change', () => {
+		queryState.filter[id] = e.value;
+		updateTableData();
+	});
 }
 
-function updateAlbumVisibility()
-{
-	const v = isAlbumVisible();
-	updateMediaTile();
-	tableContainer.style.maxHeight = v? '30vh' : '';
-	tableContainer.style.overflow = v? 'auto': '';
-	media.style.display = toDisplay(v);
+{ // header links
+	const home = document.createElement('a');
+	home.href = 'index.html';
+	home.className = 'navItem';
+
+	const checkbox = document.createElement('input');
+	checkbox.type = 'checkbox';
+	checkbox.id = 'toggleAlbumButton';
+	checkbox.className = 'toggleInput';
+	checkbox.checked = false;
+	checkbox.onchange = ()=> {
+		tableContainer.style.maxHeight = checkbox.checked? '30vh' : '';
+		tableContainer.style.overflow = checkbox.checked? 'auto': '';
+		media.style.display = toDisplay(checkbox.checked);
+	};
+	checkbox.onchange();
+
+	const label = document.createElement('label');
+	label.classList.add('Navitem', 'toggleButton');
+	label.htmlFor = 'toggleAlbumButton';
+	label.textContent = 'Album';
+
+	const album = document.createElement('div');
+	album.appendChild(checkbox);
+	album.appendChild(label);
+
+	updateHostName(hostname => {
+		document.title = `${hostname}/gl2f`;
+		home.textContent = hostname;
+		links.appendChild(home);
+		links.appendChild(album);
+	}, ()=>{
+		document.title = `local/gl2f`;
+		home.textContent = 'Home';
+		links.appendChild(home);
+		links.appendChild(album);
+	});
 }
 
-const updateLabel = () => Object.entries(columnDefs).forEach(([k, v]) =>
-{
-	const arrow = v.key != queryState.sort.key? '↑↓' : queryState.sort.order == 1? '↑':'↓';
-	document.getElementById(`th_${v.key}`).innerHTML = `${k}&thinsp;${arrow}`;
-});
+{ // header controls
+	Object.keys(columnDefs).forEach(k => {
+		const label = document.createElement('label');
+		label.className = 'buttonlike';
 
+		const checkbox = document.createElement('input');
+		checkbox.id = `col_${k}`;
+		checkbox.className = 'buttonlike';
+		checkbox.type = 'checkbox';
+		checkbox.checked = columnDefs[k].default;
+		checkbox.addEventListener('change', ()=>{
+			document.querySelectorAll(`[data-column="${k}"]`).forEach(cell =>{
+				cell.style.display = toDisplay(checkbox.checked);
+			});
+		});
 
-function initTHead()
-{
+		label.appendChild(checkbox);
+		label.appendChild(document.createTextNode(k));
+		columns.appendChild(label);
+	});
+
+	initFilter('board');
+	initFilter('author');
+}
+{ // table
+	const updateLabels = () => Object.entries(columnDefs).forEach(([k, v]) =>
+	{
+		const arrow = v.key != queryState.sort.key? '↑↓' : queryState.sort.order == 1? '↑':'↓';
+		document.getElementById(`th_${v.key}`).innerHTML = `${k}&thinsp;${arrow}`;
+	});
+
 	const row = document.createElement('tr');
 	Object.entries(columnDefs).forEach(([k, v]) => {
 		const th = document.createElement('th');
@@ -350,7 +276,7 @@ function initTHead()
 				queryState.sort.key = v.key;
 				queryState.sort.order = 1;
 			}
-			updateLabel();
+			updateLabels();
 			updateTableData();
 		});
 		th.appendChild(e);
@@ -359,80 +285,131 @@ function initTHead()
 	});
 
 	thead.appendChild(row);
+
+	updateLabels();
+	updateTableData();
 }
-
-function initFilter(id)
-{
-	const e = document.getElementById(`filter_${id}`);
-	e.innerHTML = [
-		`<option value=*>${id} / all</option>`,
-		...Array.from(new Set(Object.values(table).map(v => v[id])))
-			.sort().map(b=>`<option value='${b}'>${b}</option>`)
-	].join('');
-
-	e.addEventListener('change', () => {
-		queryState.filter[id] = e.value;
-
-		updateTableData();
-	});
+{ // images
+	updateMediaTile();
+	setupModaal();
 }
+{ // contextmenu
+	function initCustomContextMenu(event, items)
+	{
+		event.preventDefault();
 
+		tileContextMenu.replaceChildren();
+		items.forEach(i => tileContextMenu.appendChild(i));
 
-function* createNavItems(hostname){
-	const home = document.createElement('a');
-	home.href = 'index.html';
-	home.className = 'navItem';
-	home.textContent = hostname || 'Home';
-	yield home;
+	  const menuWidth = tileContextMenu.offsetWidth;
+	  const menuHeight = tileContextMenu.offsetHeight;
+	  let posX = event.clientX;
+	  let posY = event.clientY;
+	  if (posX + menuWidth > window.innerWidth) {
+	    posX -= menuWidth;
+	  }
+	  if (posY + menuHeight > window.innerHeight) {
+	    posY -= menuHeight;
+	  }
 
-	const album = document.createElement('div');
-	album.innerHTML = `<input type="checkbox" class="toggleInput" id="toggleAlbumButton" onchange="updateAlbumVisibility()">
-	<label class="NavItem toggleButton" for="toggleAlbumButton">Album</label>`;
-	yield album;
-};
+		tileContextMenu.style.top = `${posY}px`;
+		tileContextMenu.style.left = `${posX}px`;
+		tileContextMenu.style.display = 'block';
+	}
 
-updateHostName(hostname => {
-	document.title = `${hostname}/gl2f`;
-	createNavItems(hostname).forEach(e => links.appendChild(e));
-}, ()=>{
-	document.title = `local/gl2f`;
-	createNavItems(null).forEach(e => links.appendChild(e));
-});
+	function createContextMenuButton(title, command, canExecute)
+	{
+		const button = document.createElement('button');
+		button.appendChild(document.createTextNode(title));
+		button.onclick = command;
+		button.style.whiteSpace = 'nowrap';
+		if (!canExecute)
+		{
+			button.disabled = true;
+		}
+		return button;
+	}
 
-Object.keys(columnDefs).forEach(k => {
-	const label = document.createElement('label');
-	label.className = 'buttonlike';
+	const canCopyText = navigator.clipboard && navigator.clipboard.writeText;
 
-	const checkbox = document.createElement('input');
-	checkbox.id = `col_${k}`;
-	checkbox.className = 'buttonlike';
-	checkbox.type = 'checkbox';
-	checkbox.checked = columnDefs[k].default;
-	checkbox.addEventListener('change', ()=>{
-		visibility[k] = checkbox.checked;
-		document.querySelectorAll(`[data-column="${k}"]`).forEach(cell =>{
-			cell.style.display = toDisplay(visibility[k]);
-		});
+	function createCommonItems(target)
+	{
+  	const ar = target.src.split('/');
+		const id = ar[ar.length - 2];
+	  return [
+	  	createContextMenuButton('View article',
+				() => {
+					window.open(`article.html?${id}`, '_blank');
+				}, true),
+			createContextMenuButton('View album',
+				() => {
+					window.open(`album.html?${id}`, '_blank');
+				}, true),
+			createContextMenuButton('Open in FC',
+				() => {
+					const board = table[id]['board'];
+					window.open(createFcArticleUrl(board, id));
+				}, true),
+			createContextMenuButton("Open media in new tab",
+				() => {
+					window.open(target.src, '_blank');
+				}, true),
+	  ];
+	}
 
-		updateTableData();
+	media.addEventListener('contextmenu', event =>{
+		if(event.target.tagName === 'IMG')
+		{
+		  const img = event.target;
+
+		  const items =  createCommonItems(img);
+			items.push(document.createElement('hr'));
+
+			items.push(createContextMenuButton('Copy image',
+				async () => {
+					const canvas = document.createElement('canvas');
+					canvas.width = img.naturalWidth;
+					canvas.height = img.naturalHeight;
+
+					const ctx = canvas.getContext('2d');
+					ctx.drawImage(img, 0, 0);
+
+					new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+					.then(blob => navigator.clipboard.write([new ClipboardItem({[blob.type]: blob})])
+						.then(_ => notifier.info('Image copied.')))
+					.catch(_ => notifier.error('Failed to copy the image.'));
+				},
+				img.tagName === 'IMG' && navigator.clipboard && navigator.clipboard.write));
+			items.push(createContextMenuButton("Copy image address",
+				() =>{
+					navigator.clipboard.writeText(img.src)
+					.then(_ => notifier.info('Image path copied.'))
+					.catch(_ => notifier.error('Failed to copy the image path.'));
+				},
+				canCopyText));
+
+			initCustomContextMenu(event, items);
+		}
+
+		if (event.target.tagName === 'VIDEO')
+		{
+			const items = createCommonItems(event.target);
+			items.push(document.createElement('hr'));
+
+			items.push(createContextMenuButton("Copy video address",
+				() => {
+					navigator.clipboard.writeText(event.target.src)
+					.then(_ => notifier.info('Video path copied.'))
+					.catch(_ => notifier.error('Failed to copy the video path.'))
+				},
+				canCopyText));
+
+			initCustomContextMenu(event, items);
+		}
 	});
 
-	label.appendChild(checkbox);
-	label.appendChild(document.createTextNode(k));
-	columns.appendChild(label);
-});
-
-initTHead();
-
-initFilter('board');
-initFilter('author');
-updateLabel();
-updateTableData();
-updateAlbumVisibility();
-
-tileContextMenu.addEventListener('contextmenu', event => {
-	event.preventDefault();
-});
+	document.addEventListener('click', ()=>tileContextMenu.style.display = 'none');
+}
 </script>
 
 </body>

@@ -1,3 +1,5 @@
+const toDisplay = b => b? '' : 'none';
+
 function addRetry(target, updator, onError){
   const maxRetries = 10;
   const retryDelay = 500;
@@ -17,15 +19,41 @@ function addRetry(target, updator, onError){
   });
 }
 
-function createVideoTile(src, displayName, width, notifier, observer){
+const observer = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if(!entry.isIntersecting)
+    {
+      return;
+    }
+
+    if(entry.target.tagName == 'IMG')
+    {
+      const img = entry.target;
+      img.src = img._src;
+      obs.unobserve(img);
+    }
+    else if (entry.target.tagName == 'VIDEO')
+    {
+      const video = entry.target;
+      video.src = video._src;
+      video.load();
+      obs.unobserve(video);
+    }
+    else {
+      console.warn(`[Observer] Unknown target ${entry.target.tagName}`);
+    }
+  });
+});
+
+function createVideoTile(src, displayName, width, notifier){
   const video = document.createElement('video');
   video.controls = true;
   video.autoplay = true;
   video.muted = true;
   video.loop = true;
-  video.width = width;
   video.title = displayName;
   video._src = src;
+  video.style.width = width;
 
   addRetry(video,
     retries => {
@@ -36,120 +64,82 @@ function createVideoTile(src, displayName, width, notifier, observer){
 
   observer.observe(video);
 
-  return video;
+  updator = {
+    tile: video,
+    updateWidth: width => video.style.width = `${width}px`,
+    updateVisibility: visibility => video.style.display = toDisplay(visibility),
+  };
+
+  return [video, updator];
 }
 
-function tileMedia(mediaList, width, columns, showList, notifier)
+function createTile(i, initialWidth, notifier)
 {
-  const itemWidth = width/columns;
+  const src = `contents/${i.path}`;
+  const ext = src.slice(src.lastIndexOf('.'));
 
-  const element = document.createElement('center');
+  if([".mp4"].indexOf(ext) > -1){
+    const a = document.createElement('a');
+    a.className += 'modaalIframe';
+    a.href = src;
+    const [video, updator] = createVideoTile(src, i.displayName, initialWidth, notifier);
+    a.appendChild(video);
 
-  if(showList)
-  {
-    const min = 250;
-
-    const list = document.createElement('div');
-    list.className = 'tile';
-    list.style.marginTop = '20px';
-    list.style.marginBottom = '20px';
-    list.innerHTML = `<div style="padding:20px; background: pink;text-align:left;">${mediaList.map(i=>`<div class=list-item>${i.path}</div>`).join('')}</div>`
-
-    element.appendChild(list);
-    element.appendChild(document.createElement('br'));
+    updator.tile = a;
+    return updator;
   }
+  else if([".mov"].indexOf(ext) > -1){
+    const [video, updator] = createVideoTile(src, i.displayName, initialWidth, notifier);
+    updator.tile = video;
+    return updator;
+  }
+  else{
+    const a = document.createElement('a');
+    a.className += "modaalImage";
+    a.setAttribute("data-group", "gallery");
+    a.href = src;
 
-  const observer = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if(!entry.isIntersecting)
-      {
-        return;
-      }
+    const img = document.createElement("img");
+    img.style.width = `${initialWidth}px`;
+    img.style.height = `${initialWidth}px`;
+    img.style.objectFit = 'contain';
+    img.style.backgroundColor = '#a5a5a5';
+    img.style.boxShadow = 'inset 0 0 2px 1px white';
+    img.title = i.displayName;
+    img.loading = 'lazy';
+    img._src = src;
 
-      if(entry.target.tagName == 'IMG')
-      {
-        const img = entry.target;
-        img.src = img._src;
-        obs.unobserve(img);
-      }
-      else if (entry.target.tagName == 'VIDEO')
-      {
-        const video = entry.target;
-        video.src = video._src;
-        video.load();
-        obs.unobserve(video);
-      }
-      else {
-        console.warn(`[Observer] Unknown target ${entry.target.tagName}`);
-      }
+    observer.observe(img);
+    addRetry(img,
+      retries => img.src = `${src}?retry=${retries}`,
+      ()=>notifier.error(`Failed to load media. See the log for more info.`));
+
+    img.addEventListener('load', ()=>{
+      img.style.height = 'auto';
     });
-  });
 
-  mediaList.map(i =>
-  {
-    const src = `contents/${i.path}`;
-    const ext = src.slice(src.lastIndexOf('.'));
-    if([".jpeg", ".png"].indexOf(ext) > -1){
-      const a = document.createElement('a');
-      a.className += "tiledImage";
-      a.setAttribute("data-group", "gallery");
-      a.href = src;
+    a.appendChild(img);
 
-      const img = document.createElement("img");
-      img.style.width = `${itemWidth}px`;
-      img.style.height = `${itemWidth}px`;
-      img.style.objectFit = 'cover';
-      img.style.backgroundColor = '#a5a5a5';
-      img.style.boxShadow = 'inset 0 0 2px 1px white';
-      img.title = i.displayName;
-      img.loading = 'lazy';
-      img._src = src;
+    return {
+      tile: a,
+      updateWidth: width => img.style.width = `${width}px`,
+      updateVisibility: visibility => img.style.display = toDisplay(visibility),
+    };
+  }
+}
 
-      observer.observe(img);
-      addRetry(img,
-        retries => img.src = `${src}?retry=${retries}`,
-        ()=>notifier.error(`Failed to load media. See the log for more info.`));
-
-      img.addEventListener('load', ()=>{
-        img.style.height = 'auto';
-      });
-
-      a.appendChild(img);
-      return a;
-    }
-    else if([".mp4"].indexOf(ext) > -1){
-      const a = document.createElement('a');
-      a.className += 'tiledIframe';
-      a.href = src;
-      a.appendChild(createVideoTile(src, i.displayName, itemWidth, notifier, observer));
-      return a;
-    }
-    else if([".mov"].indexOf(ext) > -1){
-      return createVideoTile(src, i.displayName, itemWidth, notifier, observer);
-    }
-    else{
-      alert(`Unknown media file: ${src}`);
-      return document.createElement('div');
-    }
-  }).forEach(t =>
-  {
-    const i = document.createElement('div');
-    i.className = 'tile';
-
-    i.appendChild(t);
-    element.appendChild(i);
-  });
-
-  return element;
+function tileMedia(mediaList, initialWidth, notifier)
+{
+  return Object.fromEntries(mediaList.map(i => [i.path, createTile(i, initialWidth, notifier)]))
 }
 
 function setupModaal()
 {
-  $('.tiledImage').modaal({
+  $('.modaalImage').modaal({
     type: 'image',
     hide_close: true,
   })
-  $('.tiledIframe').modaal({
+  $('.modaalIframe').modaal({
     type: 'iframe',
     hide_close: true,
   });

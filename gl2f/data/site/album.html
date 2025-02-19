@@ -46,8 +46,8 @@ nav{
 
   <div class=header-controls>
     <div>
-      <input type="checkbox" class="toggleInput" id="toggleButton" onchange="updateTiles()">
-      <label class="toggleButton" for="toggleButton" title='Toggle file list' style="padding: 2px 6px; border-radius: 8px;">List</label>
+      <input type="checkbox" class="toggleInput" id="listButton" onchange="toggleList()">
+      <label class="toggleButton" for="listButton" title='Toggle file list' style="padding: 2px 6px; border-radius: 8px;">List</label>
 
       <input type="range" id="cols" min="1" max="7" step="1" title='adjust number of colmuns' oninput="updateTiles()">
     </div>
@@ -56,32 +56,57 @@ nav{
 
 <main>
   <div id=notificationContainer class="notificationContainer"></div>
-  <div id=tiles>
+  <center id=tiles>
+    <div id=list class=tile style="margin-top:20px;margin-bottom:20px; padding:20px;background:pink;text-align:left;"></div>
+    <br>
+  </center>
 </main>
 
 <script>
+function toggleList(){
+  list.style.display = toDisplay(listButton.checked);
+}
+
 const contentId = location.search.split("?")[1];
 const notifier = new Notification();
 
-function updateTiles(){
-  const mediaList = table[contentId]['media'].map(e => {
-    return {
-      path: `${contentId}/${e}`,
-      displayName:e,
-    }
-  });
-  tiles.replaceChildren();
-  tiles.appendChild(tileMedia(mediaList, window.innerWidth-100, cols.value, toggleButton.checked, notifier));
-  setupModaal();
-}
-
-function calcColumns(n, width, height)
-{
-  return Math.min(Math.ceil(Math.sqrt(n * width/height)), n);
-}
-
 const content = table[contentId];
-const media_table = content['media'];
+const mediaList = content['media'].map(e => {
+  return {
+    path: `${contentId}/${e}`,
+    displayName:e,
+  }
+});
+const tileHandlers = mediaList.map(i => createTile(i, (window.innerWidth-100)/cols.value, notifier));
+
+{
+  list.style.display = toDisplay(listButton.checked);
+  mediaList.forEach(i => {
+    const div = document.createElement('div');
+    div.className = "list-item";
+    div.textContent = i.path.split('/')[1];
+    list.appendChild(div);
+  });
+  {
+    const n = content['media'].length;
+    cols.value = Math.min(Math.ceil(Math.sqrt(n * window.innerWidth / window.innerHeight)), n);
+  }
+
+  tileHandlers.forEach(u => {
+    const div = document.createElement('div');
+    div.className = 'tile';
+    div.appendChild(u.tile);
+    tiles.appendChild(div)
+  });
+  setupModaal();
+  updateTiles();
+}
+
+function updateTiles(){
+  const itemWidth = (window.innerWidth - 100)/cols.value;
+  console.log(itemWidth);
+  tileHandlers.forEach(u => u.updateWidth(itemWidth));
+}
 
 function* createNavItems(hostname){
   const home = document.createElement('a');
@@ -110,9 +135,6 @@ document.getElementById('meta').innerHTML = `
 ${content['author']}&nbsp;
 ${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
 <a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link" /></a>`;
-
-cols.value = calcColumns(content['media'].length, window.innerWidth, window.innerHeight);
-updateTiles();
 
 </script>
 
