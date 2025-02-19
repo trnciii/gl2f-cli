@@ -91,11 +91,8 @@ updateHostName(hostname =>{
 });
 
 title.innerHTML = `<h1>${content['title']}</h1>`;
-meta.innerHTML = `
-${content['author']}&nbsp;
-${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
-<a href=${createFcArticleUrl(content['board'], contentId)} target=_blank><i class="fa fa-external-link" /></a>`;
-  body.innerHTML = content['body'];
+meta.innerHTML = createMetadata(content.author, content.date, content.board, contentId);
+body.innerHTML = content['body'];
 </script>
 
 </body>

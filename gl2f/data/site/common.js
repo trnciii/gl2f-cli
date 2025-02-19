@@ -207,3 +207,10 @@ async function updateHostName(updator, fallback)
     fallback();
   });
 }
+
+function createMetadata(author, date, board, contentId)
+{
+  return `${content['author']}&nbsp;
+${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
+<a href=${createFcArticleUrl(content['board'], contentId)} target=_blank><i class="fa fa-external-link" />`
+}

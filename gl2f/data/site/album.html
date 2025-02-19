@@ -131,11 +131,7 @@ updateHostName(hostname => {
 });
 
 document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
-document.getElementById('meta').innerHTML = `
-${content['author']}&nbsp;
-${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
-<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link" /></a>`;
-
+document.getElementById('meta').innerHTML = createMetadata(content.author, content.data, content.board, contentId);
 </script>
 
 </body>
