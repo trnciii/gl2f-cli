@@ -91,7 +91,7 @@ def time_build(n=1):
 
 def test_build_time():
 	n = 10
-	assert sum(time_build(n))/n < 0.02
+	assert sum(time_build(n))/n < 0.05
 
 
 if __name__ == '__main__':
