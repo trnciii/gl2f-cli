@@ -2,28 +2,26 @@
 <meta charset="utf-8">
 <title>gl2f local files</title>
 
-<script src="constants.js"></script>
 <script src="index.js"></script>
+<script src="common.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/js/modaal.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/css/modaal.min.css">
 
 <link rel="stylesheet" href="style.css">
 
 <style>
 
-table{
-	margin:0;
-	border-collapse:collapse;
-}
-
 th{
-	padding-top:8px;
-	padding-bottom:8px;
+	padding:8px 8px;
 	position: sticky;
 	top:0;
 	background: lightcoral;
 }
 
 td{
-	padding: 4px 4px;
+	padding: 4px 8px;
 	background: lavenderblush;
 }
 
@@ -32,140 +30,386 @@ tr:nth-child(odd) td{
 }
 
 </style>
-
 </head>
-
 
 <body>
 
 <header style="justify-content: left;">
-	<span id='columns'></span>
+	<nav id='links'></nav>
+
+	<span id='columns' style="margin-left: 8px;"></span>
 	<div style='margin-left:8px;'>
-		<select id=filter_board onchange="draw()"></select>
-		<select id=filter_author onchange="draw()"></select>
+		<select id=filter_board></select>
+		<select id=filter_author></select>
 	</div>
-	<div id='hostname' style="display: flex; justify-content: right; margin-top: 2px; margin-left: auto;"></div>
+
 </header>
 
 <main>
-	<table>
-		<thead id='thead'></thead>
-		<tbody id='tbody'></tbody>
-	</table>
+	<div id=notificationContainer class="notificationContainer"></div>
+
+	<div id=tableContainer style="display: inline-block;">
+		<table style="margin: 0; border-collapse: collapse;">
+			<thead id='thead'></thead>
+			<tbody id='tbody'></tbody>
+		</table>
+	</div>
+
+	<div id='media' style="display:none">
+		<hr>
+		<center id=center></center>
+	</div>
 </main>
 
+<div id="tileContextMenu" class="context-menu"></div>
+
 <script type="text/javascript">
-const f = {
+const notifier = new Notification();
+
+const columnDefs = {
 	ID:{
-		data:(k, v)=>`<a href='./contents/${k}'>${k}</a>`
+		data:(k, v)=>`<a href='./contents/${k}'>${k}</a>`,
+		default: false,
 	},
 	Date:{
 		key:'date',
 		data:(k, v)=>`${new Date(v['date']).toLocaleDateString('ja-JP')}`,
+		default: true,
 	},
 	Expired:{
 		key:'expired',
-		data:(k, v)=> v['expired']? new Date(v['expired']).toLocaleDateString('ja-JP') : ""
+		data:(k, v)=> v['expired']? new Date(v['expired']).toLocaleDateString('ja-JP') : "",
+		default: false,
 	},
-	Page:{
+	Board:{
 		key:'board',
 		data:(k, v)=>`<a href='https://girls2-fc.jp/page/${v['board']}/${k}' target='_blank'>${v['board']}</a>`,
+		default: true,
 	},
 	Author:{
 		key:'author',
 		data:(k, v)=>`<center style="white-space: nowrap">${v['author']}`,
+		default: true,
 	},
 	Title:{
 		key:'title',
 		data:(k, v)=>['girls2radio', 'lucky2radio', 'wallpaper', 'commercialmovie', 'gtube'].includes(v['board'])?
 			`<a href=album.html?${k}>${v['title']}</a>`
 			: `<a href=article.html?${k}>${v['title']}</a>&nbsp;/&nbsp;<a href=album.html?${k}>Album</a>`,
+		default: true,
 	},
 };
 
-const keys = Object.keys(f);
-
-var sort_state = {
-	key:'date',
-	order:-1
+const queryState = {
+	sort: {
+		key: 'date',
+		order: -1,
+	},
+	filter: {
+		board: '*',
+		author: '*',
+	}
 };
 
+const tileHandlers = Object.entries(table).flatMap(([k, v])=>v['media'].map(m => {
+	const prefix = v['author']? v['author'] : v['board'];
+	return {
+		contentId: k,
+		path: `${k}/${m}`,
+		displayName: `[${prefix}] ${v['title']}`,
+	}
+}))
+.map(i => [i.path, table[i.contentId], createTile(i, (window.innerWidth-100)/4, notifier)]);
 
-function filter(table, key){
-	const b = document.getElementById(`filter_${key}`).value;
-	if(b == 'all') return table;
-	else return Object.fromEntries(Object.entries(table).filter(([k, v])=>v[key]==b));
+
+function query(table, state)
+{
+	const toSortKey = v => String(v[state.sort.key]).toLowerCase();
+	return Object.fromEntries(Object.entries(table)
+		.filter(([_, v]) => state.filter.board == '*' || state.filter.board == v['board'])
+		.filter(([_, v]) => state.filter.author == '*' || state.filter.author == v['author'])
+		.sort(([_, l], [__, r]) => toSortKey(l) < toSortKey(r)? -state.sort.order : state.sort.order));
 }
 
-function sort(table, key, order){
-	const lower = (s)=>String(s).toLowerCase();
-	const entries = Object.entries(table)
-		.sort(([kl, vl], [kr, vr])=>lower(vl[key])<lower(vr[key])?-order:order);
-	return Object.fromEntries(entries);
-}
-
-
-function draw(){
-	const columns = keys.filter(k=>document.getElementById(`col_${k}`).checked);
-	document.getElementById('thead')
-	.innerHTML = `<tr>${
-		columns.map(c=>`<th><div class="buttonlike" id=thead_${c}>${c}&thinsp;${f[c].key==sort_state.key?(sort_state.order==1?'↑':'↓')+'&ensp;':'↑↓'}</div></th>`).join('')
-	}</tr>`;
-	columns.forEach((c)=>{
-		document.getElementById(`thead_${c}`).onclick = ()=>{
-			if (sort_state.key == f[c].key)
-				sort_state.order *= -1;
-			else{
-				sort_state.key = f[c].key;
-				sort_state.order = 1;
-			}
-			draw();
-		};
+function updateMediaTile() {
+	tileHandlers.forEach(([_, v, u]) =>{
+		const visible = (queryState.filter.board == '*' || queryState.filter.board == v.board)
+			&& (queryState.filter.author == '*' || queryState.filter.author == v.author);
+		u.updateVisibility(visible);
 	});
 
-	document.getElementById('tbody').innerHTML = Object.entries(
-		sort(filter(filter(table, 'board'), 'author'), sort_state.key, sort_state.order)
-	).map(([k, v])=>'<tr>'
-		+ columns.map((c)=>`<td>${f[c].data(k, v)}</td>`).join('')
-		+ '</tr>'
-	).join('');
+	center.replaceChildren();
+	tileHandlers.sort(([lp, lv, _], [rp, rv, __])=>{
+		const l = String(lv[queryState.sort.key]).toLowerCase();
+		const r = String(rv[queryState.sort.key]).toLowerCase();
+		return l == r? lp > rp : l > r? queryState.sort.order : -queryState.sort.order;
+	})
+	.forEach(([_, __, u]) => {
+	 const div = document.createElement('div');
+    div.className = 'tile';
+    div.appendChild(u.tile);
+    center.appendChild(div)
+	});
+}
+
+function updateTableData()
+{
+	const cols = Object.entries(columnDefs);
+	const items = query(table, queryState);
+	tbody.replaceChildren();
+	Object.entries(items).forEach(data =>{
+		const tr = document.createElement('tr');
+		cols.forEach(([ck, cv])=>{
+			const td = document.createElement('td');
+			const checked = document.getElementById(`col_${ck}`).checked;
+			td.style.display = toDisplay(checked);
+			td.setAttribute('data-column', ck);
+			td.innerHTML = cv.data(...data);
+
+			tr.appendChild(td);
+		});
+		tbody.appendChild(tr);
+	});
+
+	const toggleAlbumButton = document.getElementById("toggleAlbumButton");
+	updateMediaTile();
 };
 
+function initFilter(id)
+{
+	const e = document.getElementById(`filter_${id}`);
+	e.innerHTML = [
+		`<option value=*>${id} / all</option>`,
+		...Array.from(new Set(Object.values(table).map(v => v[id])))
+			.sort().map(b=>`<option value='${b}'>${b}</option>`)
+	].join('');
 
-var element = document.createElement('script');
+	e.addEventListener('change', () => {
+		queryState.filter[id] = e.value;
+		updateTableData();
+	});
+}
 
+{ // header links
+	const home = document.createElement('a');
+	home.href = 'index.html';
+	home.className = 'navItem';
 
-document.title = `${hostname}/gl2f`;
+	const checkbox = document.createElement('input');
+	checkbox.type = 'checkbox';
+	checkbox.id = 'toggleAlbumButton';
+	checkbox.className = 'toggleInput';
+	checkbox.checked = false;
+	checkbox.onchange = ()=> {
+		tableContainer.style.maxHeight = checkbox.checked? '30vh' : '';
+		tableContainer.style.overflow = checkbox.checked? 'auto': '';
+		media.style.display = toDisplay(checkbox.checked);
+	};
+	checkbox.onchange();
 
-document.getElementById('hostname').innerHTML = `
-<div style="font-size:10;">hosted on&nbsp;</div>
-<div style="font-weight: bold; font-size:14;">${hostname}</div>`;
+	const label = document.createElement('label');
+	label.classList.add('Navitem', 'toggleButton');
+	label.htmlFor = 'toggleAlbumButton';
+	label.textContent = 'Album';
 
-document.getElementById('columns').innerHTML = keys.map(
-	k=>`<label class=buttonlike><input id=col_${k} class=buttonlike type='checkbox' checked>${k}</label>`
-).join('');
+	const album = document.createElement('div');
+	album.appendChild(checkbox);
+	album.appendChild(label);
 
-document.getElementById('col_ID').checked = false;
-document.getElementById('col_Expired').checked = false;
+	updateHostName(hostname => {
+		document.title = `${hostname}/gl2f`;
+		home.textContent = hostname;
+		links.appendChild(home);
+		links.appendChild(album);
+	}, ()=>{
+		document.title = `local/gl2f`;
+		home.textContent = 'Home';
+		links.appendChild(home);
+		links.appendChild(album);
+	});
+}
 
-keys.map(k=>document.getElementById(`col_${k}`))
-.forEach(b=>b.addEventListener('change', draw));
+{ // header controls
+	Object.keys(columnDefs).forEach(k => {
+		const label = document.createElement('label');
+		label.className = 'buttonlike';
 
+		const checkbox = document.createElement('input');
+		checkbox.id = `col_${k}`;
+		checkbox.className = 'buttonlike';
+		checkbox.type = 'checkbox';
+		checkbox.checked = columnDefs[k].default;
+		checkbox.addEventListener('change', ()=>{
+			document.querySelectorAll(`[data-column="${k}"]`).forEach(cell =>{
+				cell.style.display = toDisplay(checkbox.checked);
+			});
+		});
 
-document.getElementById('filter_board').innerHTML = `<option value=all>page / all</option>
-${
-	[...new Set(Object.values(table).map(v=>v['board']))]
-	.sort().map(b=>`<option value=${b}>${b}</option>`).join('')
-}`;
+		label.appendChild(checkbox);
+		label.appendChild(document.createTextNode(k));
+		columns.appendChild(label);
+	});
 
-document.getElementById('filter_author').innerHTML = `<option value=all>author / all</option>
-${
-	[...new Set(Object.values(table).map(v=>v['author']))]
-	.sort().map(a=>`<option value=${a}>${a}</option>`).join('')
-}`;
+	initFilter('board');
+	initFilter('author');
+}
+{ // table
+	const updateLabels = () => Object.entries(columnDefs).forEach(([k, v]) =>
+	{
+		const arrow = v.key != queryState.sort.key? '↑↓' : queryState.sort.order == 1? '↑':'↓';
+		document.getElementById(`th_${v.key}`).innerHTML = `${k}&thinsp;${arrow}`;
+	});
 
-draw();
+	const row = document.createElement('tr');
+	Object.entries(columnDefs).forEach(([k, v]) => {
+		const th = document.createElement('th');
+		th.setAttribute('data-column', k);
+		th.style.display = toDisplay(v.default);
 
+		const e = document.createElement('div');
+		e.className = 'buttonlike';
+		e.id = `th_${v.key}`;
+		e.addEventListener('click', ()=>{
+			if (queryState.sort.key == v.key)
+				queryState.sort.order *= -1;
+			else{
+				queryState.sort.key = v.key;
+				queryState.sort.order = 1;
+			}
+			updateLabels();
+			updateTableData();
+		});
+		th.appendChild(e);
+
+		row.appendChild(th);
+	});
+
+	thead.appendChild(row);
+
+	updateLabels();
+	updateTableData();
+}
+{ // images
+	updateMediaTile();
+	setupModaal();
+}
+{ // contextmenu
+	function initCustomContextMenu(event, items)
+	{
+		event.preventDefault();
+
+		tileContextMenu.replaceChildren();
+		items.forEach(i => tileContextMenu.appendChild(i));
+
+	  const menuWidth = tileContextMenu.offsetWidth;
+	  const menuHeight = tileContextMenu.offsetHeight;
+	  let posX = event.clientX;
+	  let posY = event.clientY;
+	  if (posX + menuWidth > window.innerWidth) {
+	    posX -= menuWidth;
+	  }
+	  if (posY + menuHeight > window.innerHeight) {
+	    posY -= menuHeight;
+	  }
+
+		tileContextMenu.style.top = `${posY}px`;
+		tileContextMenu.style.left = `${posX}px`;
+		tileContextMenu.style.display = 'block';
+	}
+
+	function createContextMenuButton(title, command, canExecute)
+	{
+		const button = document.createElement('button');
+		button.appendChild(document.createTextNode(title));
+		button.onclick = command;
+		button.style.whiteSpace = 'nowrap';
+		if (!canExecute)
+		{
+			button.disabled = true;
+		}
+		return button;
+	}
+
+	const canCopyText = navigator.clipboard && navigator.clipboard.writeText;
+
+	function createCommonItems(target)
+	{
+  	const ar = target.src.split('/');
+		const id = ar[ar.length - 2];
+	  return [
+	  	createContextMenuButton('View article',
+				() => {
+					window.open(`article.html?${id}`, '_blank');
+				}, true),
+			createContextMenuButton('View album',
+				() => {
+					window.open(`album.html?${id}`, '_blank');
+				}, true),
+			createContextMenuButton('Open in FC',
+				() => {
+					const board = table[id]['board'];
+					window.open(createFcArticleUrl(board, id));
+				}, true),
+			createContextMenuButton("Open media in new tab",
+				() => {
+					window.open(target.src, '_blank');
+				}, true),
+	  ];
+	}
+
+	media.addEventListener('contextmenu', event =>{
+		if(event.target.tagName === 'IMG')
+		{
+		  const img = event.target;
+
+		  const items =  createCommonItems(img);
+			items.push(document.createElement('hr'));
+
+			items.push(createContextMenuButton('Copy image',
+				async () => {
+					const canvas = document.createElement('canvas');
+					canvas.width = img.naturalWidth;
+					canvas.height = img.naturalHeight;
+
+					const ctx = canvas.getContext('2d');
+					ctx.drawImage(img, 0, 0);
+
+					new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+					.then(blob => navigator.clipboard.write([new ClipboardItem({[blob.type]: blob})])
+						.then(_ => notifier.info('Image copied.')))
+					.catch(_ => notifier.error('Failed to copy the image.'));
+				},
+				img.tagName === 'IMG' && navigator.clipboard && navigator.clipboard.write));
+			items.push(createContextMenuButton("Copy image address",
+				() =>{
+					navigator.clipboard.writeText(img.src)
+					.then(_ => notifier.info('Image path copied.'))
+					.catch(_ => notifier.error('Failed to copy the image path.'));
+				},
+				canCopyText));
+
+			initCustomContextMenu(event, items);
+		}
+
+		if (event.target.tagName === 'VIDEO')
+		{
+			const items = createCommonItems(event.target);
+			items.push(document.createElement('hr'));
+
+			items.push(createContextMenuButton("Copy video address",
+				() => {
+					navigator.clipboard.writeText(event.target.src)
+					.then(_ => notifier.info('Video path copied.'))
+					.catch(_ => notifier.error('Failed to copy the video path.'))
+				},
+				canCopyText));
+
+			initCustomContextMenu(event, items);
+		}
+	});
+
+	document.addEventListener('click', ()=>tileContextMenu.style.display = 'none');
+}
 </script>
 
 </body>

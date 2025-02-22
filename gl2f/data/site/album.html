@@ -1,166 +1,137 @@
 <head>
 <meta charset="utf-8">
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/js/modaal.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/css/modaal.min.css">
 
-<script src="constants.js"></script>
 <script src="index.js"></script>
+<script src="common.js"></script>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
-
-.tile{
-  display: inline-block;
-  vertical-align: middle;
+nav{
+  flex: 1;
 }
 
-.list-item{
-  font-size: 16;
-  width:fit-content
-}
-
-.modaal-inner-wrapper {
-  height: 100%;
-  padding: 25px 25px;
-}
-
-.modaal-gallery-item img {
-  max-height: calc(100vh - 60px);
-}
-
-
-.header-controls{
+.header-controls {
   display: flex;
+  flex:1;
   justify-content: right;
   align-items: center;
+  padding-left: 8px;
 }
 
-#list-checkbox {
-  display: none; /* Hide the actual checkbox input */
-}
-
-.list-checkbox {
-  border-radius: 4px;
-  padding: 2px 5px; /* Adjust the padding values as needed */
-  color: #000; /* Default text color when not checked */
-  background: #a5a5a5;
-}
-
-#list-checkbox:checked + .list-checkbox {
-  color: white;
-  background: cadetblue; /* Change text color when checked */
-}
-
-
-@media screen and (max-width: 600px){
+@media screen and (max-width: 600px) {
   .blog-header{
     flex-direction: column;
     align-items: stretch;
   }
 }
-
 </style>
-
 </head>
 
 
 <body>
 
 <header class="blog-header">
-  <nav id=links class="header-links"></nav>
+  <nav id=links></nav>
 
   <div class="header-title">
     <div id=title></div>
-    <div id=meta class=title-meta></div>
+    <div id=meta class=title-meta style="font-size: 14;margin: 0;"></div>
   </div>
 
   <div class=header-controls>
     <div>
-      <input type="checkbox" id="list-checkbox" onchange="draw()">
-      <label class="list-checkbox" for="list-checkbox" title='on/off file list'>List</label>
+      <input type="checkbox" class="toggleInput" id="listButton" onchange="toggleList()">
+      <label class="toggleButton" for="listButton" title='Toggle file list' style="padding: 2px 6px; border-radius: 8px;">List</label>
 
-      <input type="range" id="cols" min="1" max="7" step="1" title='adjust number of colmuns' oninput="draw()">
+      <input type="range" id="cols" min="1" max="7" step="1" title='adjust number of colmuns' oninput="updateTiles()">
     </div>
   </div>
 </header>
 
 <main>
-  <center><span id='media'></span></center>
+  <div id=notificationContainer class="notificationContainer"></div>
+  <center id=tiles>
+    <div id=list class=tile style="margin-top:20px;margin-bottom:20px; padding:20px;background:pink;text-align:left;"></div>
+    <br>
+  </center>
 </main>
 
 <script>
+function toggleList(){
+  list.style.display = toDisplay(listButton.checked);
+}
+
 const contentId = location.search.split("?")[1];
-const dir = `contents/${contentId}`
-
-function list(size, media_table){
-  const min = 250;
-  const items = media_table.map(i=>`<div class=list-item>${i}</div>`).join('');
-  const br = size<min?'<br>':'';
-  return `
-<div class="tile" style="width:${Math.max(min, size)}; margin-top:20px; margin-bottom:20px;">
-  <div style="width:fit-content; padding:20px; background: pink;text-align:left;">
-    <a class=list-item href=./contents/${contentId}>Directory</a>
-    ${items}
-  </div>
-</div>${br}`;
-}
-
-function draw(){
-  const content = table[contentId];
-  const media_table = content['media'];
-  const size = (window.innerWidth-100)/cols.value;
-
-  media.innerHTML = (document.getElementById('list-checkbox').checked?list(size, media_table):'')
-    + media_table.map(function(e){
-      const src = `${dir}/${e}`;
-      const ext = src.slice(src.lastIndexOf('.'));
-
-      if([".jpeg", ".png"].indexOf(ext) > -1){
-        return `<a class="image tile" data-group="gallery" href=${src}><img src="${src}" width=${size}/></a>`;
-      }
-      else if([".mp4"].indexOf(ext) > -1){
-        return `<a class="iframe tile" href=${src}><video controls autoplay muted loop src="${src}" width=${size}/></a>`;
-      }
-      else if([".mov"].indexOf(ext) > -1){
-        return `<video controls autoplay muted loop src="${src}" class="tile" width=${size} />`;
-      }
-    }).join('');
-
-  $('.image').modaal({
-    type: 'image',
-    hide_close: true,
-  })
-  $('.iframe').modaal({
-    type: 'iframe',
-    hide_close: true,
-  });
-}
-
-document.getElementById('links').innerHTML = `
-<a href=index.html title=${hostname}>Home</a>
-<a href=article.html?${contentId}>Article</a>`;
-
+const notifier = new Notification();
 
 const content = table[contentId];
-const media_table = content['media'];
+const mediaList = content['media'].map(e => {
+  return {
+    path: `${contentId}/${e}`,
+    displayName:e,
+  }
+});
+const tileHandlers = mediaList.map(i => createTile(i, (window.innerWidth-100)/cols.value, notifier));
 
-document.title = `${hostname}/Album - ${content['title']}`;
+{
+  list.style.display = toDisplay(listButton.checked);
+  mediaList.forEach(i => {
+    const div = document.createElement('div');
+    div.className = "list-item";
+    div.textContent = i.path.split('/')[1];
+    list.appendChild(div);
+  });
+  {
+    const n = content['media'].length;
+    cols.value = Math.min(Math.ceil(Math.sqrt(n * window.innerWidth / window.innerHeight)), n);
+  }
+
+  tileHandlers.forEach(u => {
+    const div = document.createElement('div');
+    div.className = 'tile';
+    div.appendChild(u.tile);
+    tiles.appendChild(div)
+  });
+  setupModaal();
+  updateTiles();
+}
+
+function updateTiles(){
+  const itemWidth = (window.innerWidth - 100)/cols.value;
+  console.log(itemWidth);
+  tileHandlers.forEach(u => u.updateWidth(itemWidth));
+}
+
+function* createNavItems(hostname){
+  const home = document.createElement('a');
+  home.href = 'index.html';
+  home.className = 'NavItem';
+  home.textContent = hostname || 'Home';
+  yield home;
+
+  const article = document.createElement('a');
+  article.href = `article.html?${contentId}`;
+  article.className = 'NavItem';
+  article.textContent = 'Article';
+  yield article;
+}
+
+updateHostName(hostname => {
+  document.title = `${hostname}/Album - ${content['title']}`;
+  createNavItems(hostname).forEach(e => links.appendChild(e));
+}, ()=>{
+  document.title = `local/Album - ${content['title']}`;
+  createNavItems(null).forEach(e => links.appendChild(e));
+});
 
 document.getElementById('title').innerHTML = `<h1>${content['title']}</h1>`;
-document.getElementById('meta').innerHTML = `
-${content['author']}&nbsp;
-${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
-<a href=https://girls2-fc.jp/page/${content['board']}/${contentId} target=_blank><i class="fa fa-external-link" /></a>`;
-
-document.getElementById('cols').value = Math.min(
-  Math.ceil(Math.sqrt(media_table.length * window.innerWidth/window.innerHeight)),
-  media_table.length
-);
-
-draw();
+document.getElementById('meta').innerHTML = createMetadata(content.author, content.data, content.board, contentId);
 </script>
 
 </body>

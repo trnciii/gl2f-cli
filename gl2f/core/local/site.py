@@ -28,9 +28,6 @@ def install():
 		os.remove(site_contents)
 	os.symlink(fs.refdir('contents'), site_contents)
 
-	const_code = f'const hostname="{config["host-name"]}";'
-	util.write_all_text(os.path.join(dst, 'constants.js'), const_code)
-
 	update_site()
 
 
@@ -55,15 +52,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 	def end_headers(self):
 		self.send_header('Accept-Ranges', 'bytes')
+		self.send_header('X-Server-Name', config['host-name'])
 		super().end_headers()
 
 	def do_GET(self):
-		print(self.path)
-		if self.path == '/config':
+		if self.path == '/config': # always listen
 			self.send_response(200)
 			self.send_header("Content-type", "application/json")
 			self.end_headers()
 			self.wfile.write(json.dumps(get_config()).encode())
+		elif getattr(self.server, 'reject', False):
+			self.send_response(503)
+			self.end_headers()
+			self.wfile.write(b'Server is refusing connections.')
 		else:
 			super().do_GET()
 
@@ -83,6 +84,7 @@ def serve(port, browse=False):
 
 	url = f'http://{get_local_ip()}:{port}'
 	with socketserver.ThreadingTCPServer(('0.0.0.0', port), Handler) as httpd:
+		httpd.reject = False
 		print(f'Serving at {url}')
 
 		commandset = create_commandset(httpd)
@@ -104,14 +106,26 @@ def create_commandset(httpd):
 			pass
 		httpd.shutdown()
 
-	def find_server():
+	def reject():
+		httpd.reject = True
+
+	def resume():
+		httpd.reject = False
+
+	def status():
 		_, port = httpd.server_address
 		host = get_local_ip()
-		return f'http://{host}:{port}'
+		state = {
+			'address': f'http://{host}:{port}',
+			'reject': httpd.reject,
+		}
+		return json.dumps(state)
 
 	return {
+		'reject': reject,
+		'resume': resume,
 		'shutdown': shutdown_command,
-		'find': find_server,
+		'status': status,
 	}
 
 def send_command(command, url=None):
