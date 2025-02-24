@@ -214,3 +214,25 @@ function createMetadata(author, date, board, contentId)
 ${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
 <a href=${createFcArticleUrl(content['board'], contentId)} target=_blank><i class="fa fa-external-link" />`
 }
+
+function encodeParameter(state, defaultState)
+{
+  const params = new URLSearchParams();
+  Object.entries(state).forEach(([k, v]) =>{
+    if (v != defaultState[k]){
+      params.append(k, v);
+    }
+  });
+  return params.toString();
+}
+
+function decodeParameter(params, defaultState)
+{
+  const state = {...defaultState};
+  new URLSearchParams(params).forEach((v, k) => {
+    if(Object.prototype.hasOwnProperty.call(state, k)) {
+      state[k] = v;
+    }
+  });
+  return state;
+}

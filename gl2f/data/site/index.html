@@ -100,16 +100,47 @@ const columnDefs = {
 	},
 };
 
-const queryState = {
-	sort: {
-		key: 'date',
-		order: -1,
-	},
-	filter: {
+function defaultState()
+{
+	return {
 		board: '*',
 		author: '*',
-	}
-};
+		order: 'date.desc',
+		album: false,
+	};
+}
+
+function createState() {
+	const state = decodeParameter(window.location.search, defaultState());
+  return new Proxy(state, {
+		get(target, prop) {
+			if(prop === 'order')
+			{
+				const [col, dir] = target.order.split('.');
+				return [col, dir==='desc'?-1:1];
+			}
+			return target[prop];
+		},
+		set(target, prop, value) {
+			if(prop === 'order')
+			{
+				const [col, dir] = value;
+				target.order = `${col}.${dir<0?'desc':'asc'}`;
+			}
+			else if (target[prop] !== value) {
+			  target[prop] = value;
+			}
+
+		  const params = encodeParameter(state, defaultState());
+  		const url = params? `?${params}` : window.location.pathname;
+  		window.history.replaceState(null, '', url);
+
+			return true;
+		},
+  });
+}
+
+const queryState = createState();
 
 const tileHandlers = Object.entries(table).flatMap(([k, v])=>v['media'].map(m => {
 	const prefix = v['author']? v['author'] : v['board'];
@@ -121,28 +152,29 @@ const tileHandlers = Object.entries(table).flatMap(([k, v])=>v['media'].map(m =>
 }))
 .map(i => [i.path, table[i.contentId], createTile(i, (window.innerWidth-100)/4, notifier)]);
 
-
 function query(table, state)
 {
-	const toSortKey = v => String(v[state.sort.key]).toLowerCase();
-	return Object.fromEntries(Object.entries(table)
-		.filter(([_, v]) => state.filter.board == '*' || state.filter.board == v['board'])
-		.filter(([_, v]) => state.filter.author == '*' || state.filter.author == v['author'])
-		.sort(([_, l], [__, r]) => toSortKey(l) < toSortKey(r)? -state.sort.order : state.sort.order));
+	const [col, dir] = queryState.order;
+	const toSortKey = v => String(v[col]).toLowerCase();
+	return Object.entries(table)
+		.filter(([_, v]) => state.board == '*' || state.board == v['board'])
+		.filter(([_, v]) => state.author == '*' || state.author == v['author'])
+		.sort(([_, l], [__, r]) => toSortKey(l) < toSortKey(r)? -dir : dir);
 }
 
 function updateMediaTile() {
 	tileHandlers.forEach(([_, v, u]) =>{
-		const visible = (queryState.filter.board == '*' || queryState.filter.board == v.board)
-			&& (queryState.filter.author == '*' || queryState.filter.author == v.author);
+		const visible = (queryState.board == '*' || queryState.board == v.board)
+			&& (queryState.author == '*' || queryState.author == v.author);
 		u.updateVisibility(visible);
 	});
 
 	center.replaceChildren();
 	tileHandlers.sort(([lp, lv, _], [rp, rv, __])=>{
-		const l = String(lv[queryState.sort.key]).toLowerCase();
-		const r = String(rv[queryState.sort.key]).toLowerCase();
-		return l == r? lp > rp : l > r? queryState.sort.order : -queryState.sort.order;
+		const [col, dir] = queryState.order;
+		const l = String(lv[col]).toLowerCase();
+		const r = String(rv[col]).toLowerCase();
+		return l == r? lp > rp : l > r? dir : -dir;
 	})
 	.forEach(([_, __, u]) => {
 	 const div = document.createElement('div');
@@ -155,9 +187,8 @@ function updateMediaTile() {
 function updateTableData()
 {
 	const cols = Object.entries(columnDefs);
-	const items = query(table, queryState);
 	tbody.replaceChildren();
-	Object.entries(items).forEach(data =>{
+	query(table, queryState).forEach(data =>{
 		const tr = document.createElement('tr');
 		cols.forEach(([ck, cv])=>{
 			const td = document.createElement('td');
@@ -175,20 +206,6 @@ function updateTableData()
 	updateMediaTile();
 };
 
-function initFilter(id)
-{
-	const e = document.getElementById(`filter_${id}`);
-	e.innerHTML = [
-		`<option value=*>${id} / all</option>`,
-		...Array.from(new Set(Object.values(table).map(v => v[id])))
-			.sort().map(b=>`<option value='${b}'>${b}</option>`)
-	].join('');
-
-	e.addEventListener('change', () => {
-		queryState.filter[id] = e.value;
-		updateTableData();
-	});
-}
 
 { // header links
 	const home = document.createElement('a');
@@ -199,11 +216,12 @@ function initFilter(id)
 	checkbox.type = 'checkbox';
 	checkbox.id = 'toggleAlbumButton';
 	checkbox.className = 'toggleInput';
-	checkbox.checked = false;
+	checkbox.checked = queryState.album;
 	checkbox.onchange = ()=> {
 		tableContainer.style.maxHeight = checkbox.checked? '30vh' : '';
 		tableContainer.style.overflow = checkbox.checked? 'auto': '';
 		media.style.display = toDisplay(checkbox.checked);
+		queryState.album = checkbox.checked;
 	};
 	checkbox.onchange();
 
@@ -250,13 +268,34 @@ function initFilter(id)
 		columns.appendChild(label);
 	});
 
-	initFilter('board');
-	initFilter('author');
+	const filters = ['board', 'author'];
+	filters.forEach(id => {
+		const e = document.getElementById(`filter_${id}`);
+		e.innerHTML = [
+			`<option value=*>${id} / all</option>`,
+			...Array.from(new Set(Object.values(table).map(v => v[id])))
+				.sort().map(b=>`<option value='${b}'>${b}</option>`)
+		].join('');
+		e.value = queryState[id];
+
+		e.addEventListener('change', () => {
+			queryState[id] = e.value;
+			if(query(table, queryState).length == 0){
+				filters.filter(b => b != id).forEach(b => {
+					const e = document.getElementById(`filter_${b}`);
+					e.value = '*';
+					queryState[b] = '*';
+				});
+			}
+			updateTableData();
+		});
+	});
 }
 { // table
 	const updateLabels = () => Object.entries(columnDefs).forEach(([k, v]) =>
 	{
-		const arrow = v.key != queryState.sort.key? '↑↓' : queryState.sort.order == 1? '↑':'↓';
+		const [col, dir] = queryState.order;
+		const arrow = v.key != col? '↑↓' : dir == 1? '↑':'↓';
 		document.getElementById(`th_${v.key}`).innerHTML = `${k}&thinsp;${arrow}`;
 	});
 
@@ -270,11 +309,12 @@ function initFilter(id)
 		e.className = 'buttonlike';
 		e.id = `th_${v.key}`;
 		e.addEventListener('click', ()=>{
-			if (queryState.sort.key == v.key)
-				queryState.sort.order *= -1;
-			else{
-				queryState.sort.key = v.key;
-				queryState.sort.order = 1;
+			const [col, dir] = queryState.order;
+			if (col == v.key) {
+				queryState.order = [col, -dir];
+			}
+			else {
+				queryState.order = [v.key, 1];
 			}
 			updateLabels();
 			updateTableData();
@@ -288,9 +328,6 @@ function initFilter(id)
 
 	updateLabels();
 	updateTableData();
-}
-{ // images
-	updateMediaTile();
 	setupModaal();
 }
 { // contextmenu
