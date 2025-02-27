@@ -16,16 +16,8 @@ img, video {
   max-height: calc(100vh - 150px);
 }
 
-nav{
-  flex: 1;
-}
-
 .header-title {
   width: 820px;
-}
-
-.header-controls {
-  flex:1;
 }
 
 @media screen and (max-width: 960px) {
@@ -44,55 +36,49 @@ nav{
 <body>
 
 <header class="blog-header">
-  <nav id=links></nav>
+  <nav style="flex: 1;">
+    <a id=homeButton href='index.html' class=NavItem>Home</a>
+    <a id=albumButton class="NavItem">Album</a>
+  </nav>
 
   <div class="header-title">
-    <div id=title></div>
+    <h1 id=title></h1>
     <div id=meta class=title-meta style="font-size: 14;margin: 0;"></div>
   </div>
 
-  <div class="header-controls">
-  </div>
+  <div class="header-controls" style="flex: 1;"></div>
 
 </header>
 
 <main>
   <div id=notificationContainer class="notificationContainer"></div>
-  <div style="max-width:800px;margin:auto;">
-    <span id='body'/>
+  <div id=body style="max-width:800px; margin:20px auto;">
   </div>
 </main>
 
 <script>
-const contentId = location.search.split('?')[1];
-const content = table[contentId];
-const notifier = new Notification();
+const app = {};
+{
+  app.main = (contentId, content) => {
+    const notifier = new Notification();
 
-function* createNavItems(hostname) {
-  const home = document.createElement('a');
-  home.href = 'index.html';
-  home.className = 'NavItem';
-  home.textContent = hostname || 'Home';
-  yield home;
+    albumButton.href = `album.html?${contentId}`;
+    updateHostName(hostname =>{
+      document.title = `${hostname}/${content.title}`;
+      homeButton.textContent = hostname;
+    }, () =>{
+      document.title = `local/${content.title}`;
+    });
 
-  const album = document.createElement('a');
-  album.href = `album.html?${contentId}`;
-  album.className = 'NavItem';
-  album.textContent = 'Album';
-  yield album;
+    title.innerHTML = content.title;
+    meta.appendChild(createMetadata(content.author, content.date, content.board, contentId));
+    body.innerHTML = content.body;
+  }
 }
-
-updateHostName(hostname =>{
-  document.title = `${hostname}/${content['title']}`;
-  createNavItems(hostname).forEach(e => links.appendChild(e));
-}, () =>{
-  document.title = `local/${content['title']}`;
-  createNavItems().forEach(e => links.appendChild(e));
-});
-
-title.innerHTML = `<h1>${content['title']}</h1>`;
-meta.innerHTML = createMetadata(content.author, content.date, content.board, contentId);
-body.innerHTML = content['body'];
+</script>
+<script type="text/javascript">
+  const contentId = location.search.split('?')[1];
+  app.main(contentId, _table[contentId]);
 </script>
 
 </body>

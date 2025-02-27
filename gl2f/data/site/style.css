@@ -14,7 +14,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2px 8px 4px 8px;
+  padding: 4px 8px;
   background: linear-gradient(to right, #F486BA, #FFCE5D);
   font-size: 18px;
   margin-bottom: 2px;
@@ -81,13 +81,14 @@ h1{
   background: cadetblue;
 }
 
-.context-menu {
+.float, .context-menu {
   position: absolute;
-  background: #fff;
+  background: white;
   border: 1px solid #ccc;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 4px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 2px;
   z-index: 1000;
+
   display: none;
 }
 
