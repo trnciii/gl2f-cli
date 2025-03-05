@@ -1,5 +1,7 @@
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>local/gl2f</title>
 
 <script src="common.js"></script>
@@ -17,6 +19,7 @@ th{
 	position: sticky;
 	top:0;
 	background: lightcoral;
+	font-size: 1em;
 }
 
 td{
@@ -38,7 +41,7 @@ tr:nth-child(odd) td{
 <body>
 
 <header style="justify-content: left;">
-	<nav id='links'>
+	<nav>
 		<a href="index.html" class="navItem" id=homeButton>Home</a>
 		<div>
 			<input type="checkbox" class="toggleInput" id="toggleAlbumButton">
@@ -73,7 +76,7 @@ tr:nth-child(odd) td{
 		</table>
 	</div>
 
-	<div id='media' style="display:none">
+	<div id='media' style="display:none;">
 		<hr>
 		<center id=center></center>
 	</div>
@@ -181,7 +184,7 @@ const app = {};
 		 const div = document.createElement('div');
 	    div.className = 'tile';
 	    div.appendChild(u.tile);
-	    center.appendChild(div)
+	    center.appendChild(div);
 		});
 	}
 
@@ -231,7 +234,9 @@ const app = {};
 				displayName: `[${prefix}] ${v['title']}`,
 			}
 		}))
-		.map(i => [i.path, table[i.contentId], createTile(i, (window.innerWidth-100)/4, notifier)]);
+		.map(i => {
+			return [i.path, table[i.contentId], createTile(i, (tableContainer.clientWidth-16)*0.25, notifier)];
+		});
 
 		{ // header
 			updateHostName(hostname => {

@@ -231,7 +231,19 @@ function createMetadata(author, date, board, contentId) {
   const div = document.createElement('div');
   div.appendChild(document.createTextNode(`${author} ${new Date(date).toLocaleDateString('ja-JP')} `));
   div.appendChild(a);
+  div.style.fontSize = "0.8em";
+  div.style.margin = '0';
   return div;
+}
+
+function createTitle(title, author, date, board, contentId) {
+  const h = document.createElement('h1');
+  h.appendChild(document.createTextNode(title));
+
+  const container = document.createElement('div');
+  container.appendChild(h);
+  container.appendChild(createMetadata(author, date, board, contentId));
+  return container;
 }
 
 function encodeParameter(state, defaultState)

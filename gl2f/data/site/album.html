@@ -1,5 +1,6 @@
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/modaal@0.4.4/dist/js/modaal.min.js"></script>
@@ -23,34 +24,24 @@ nav{
   align-items: center;
   padding-left: 8px;
 }
-
-@media screen and (max-width: 600px) {
-  .blog-header{
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
 </style>
 </head>
 
 
 <body>
 
-<header class="blog-header">
+<header>
   <nav>
     <a id=homeButton href='index.html' class=navItem>Home</a>
     <a id=albumButton class="navItem">Article</a>
   </nav>
 
-  <div class="header-title">
-    <h1 id=title></h1>
-    <div id=meta class=title-meta style="font-size: 14;margin: 0;"></div>
-  </div>
+  <div id=headerTitle class="header-title"></div>
 
   <div class=header-controls>
     <div>
       <input type="checkbox" class="toggleInput" id="listButton" onchange="toggleList()">
-      <label class="toggleButton navItem" for="listButton" title='Toggle file list' style="padding: 2px 6px; border-radius: 8px;">List</label>
+      <label class="toggleButton navItem" for="listButton" title='Toggle file list'>List</label>
 
       <input id="cols" type="range" min="1" step="1" title='adjust number of colmuns'>
     </div>
@@ -59,6 +50,9 @@ nav{
 
 <main>
   <div id=notificationContainer class="notificationContainer"></div>
+
+  <div id=innerTitle class=inner-title></div>
+
   <center id=tiles>
     <div id=list class=tile style="display: none; margin: 20px auto; padding:20px; background:pink; text-align:left;"></div>
     <br>
@@ -90,15 +84,16 @@ const app = {};
       document.title = `local/Album - ${content['title']}`;
     });
 
-    title.innerHTML = content['title'];
-    meta.appendChild(createMetadata(content.author, content.date, content.board, contentId));
+    headerTitle.appendChild(createTitle(content.title, content.author, content.date, content.board, contentId));
+    innerTitle.appendChild(createTitle(content.title, content.author, content.date, content.board, contentId));
+    innerTitle.appendChild(document.createElement('hr'));
 
     {
       const n = content.media.length;
       cols.max = Math.min(n, 7);
       cols.value = Math.min(Math.ceil(Math.sqrt(n * window.innerWidth / window.innerHeight)), n);
       cols.oninput = () => {
-        const w = (window.innerWidth - 100)/cols.value;
+        const w = tiles.offsetWidth / cols.value;
         tileHandlers.forEach(u => u.updateWidth(w));
       };
     }

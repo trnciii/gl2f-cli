@@ -16,7 +16,6 @@ header {
   align-items: center;
   padding: 4px 8px;
   background: linear-gradient(to right, #F486BA, #FFCE5D);
-  font-size: 18px;
   margin-bottom: 2px;
 }
 
@@ -63,7 +62,7 @@ p{
 
 h1{
   margin: 0;
-  font-size:20;
+  font-size: 1.5em;
 }
 
 
@@ -139,7 +138,7 @@ h1{
 }
 
 
-/*album*/
+/*gallery*/
 .tile{
   display: inline-block;
   vertical-align: middle;
@@ -152,4 +151,21 @@ h1{
 
 .modaal-gallery-item img {
   max-height: calc(100vh - 60px);
+}
+
+/*album and article*/
+.header-title{}
+
+.inner-title{
+  display: none;
+}
+
+@media only screen and (max-width:768px){
+  .header-title{
+    display: none;
+  }
+
+  .inner-title{
+    display: block;
+  }
 }

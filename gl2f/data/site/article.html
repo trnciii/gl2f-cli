@@ -1,5 +1,6 @@
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -35,16 +36,13 @@ img, video {
 
 <body>
 
-<header class="blog-header">
+<header>
   <nav style="flex: 1;">
     <a id=homeButton href='index.html' class=NavItem>Home</a>
     <a id=albumButton class="NavItem">Album</a>
   </nav>
 
-  <div class="header-title">
-    <h1 id=title></h1>
-    <div id=meta class=title-meta style="font-size: 14;margin: 0;"></div>
-  </div>
+  <div id=headerTitle class="header-title"></div>
 
   <div class="header-controls" style="flex: 1;"></div>
 
@@ -52,7 +50,10 @@ img, video {
 
 <main>
   <div id=notificationContainer class="notificationContainer"></div>
-  <div id=body style="max-width:800px; margin:20px auto;">
+
+  <div id=innerTitle class=inner-title></div>
+
+  <div id=body style="max-width:800px; margin: auto;">
   </div>
 </main>
 
@@ -70,8 +71,10 @@ const app = {};
       document.title = `local/${content.title}`;
     });
 
-    title.innerHTML = content.title;
-    meta.appendChild(createMetadata(content.author, content.date, content.board, contentId));
+    headerTitle.appendChild(createTitle(content.title, content.author, content.date, content.board, contentId));
+    innerTitle.appendChild(createTitle(content.title, content.author, content.date, content.board, contentId));
+    innerTitle.appendChild(document.createElement('hr'));
+
     body.innerHTML = content.body;
   }
 }
