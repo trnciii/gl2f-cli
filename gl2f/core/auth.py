@@ -44,12 +44,13 @@ first_unauthorized = True
 def verify(au):
 	import requests
 	res = requests.get(
-		'https://api.fensi.plus/v1/auth/token/verify',
+		'https://yomo-api.girls2-fc.jp/web/v1/auth/token/verify',
 		cookies={},
 		headers={
+	    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
 	    'origin': 'https://girls2-fc.jp',
 	    'x-authorization': au,
-	    'x-from': 'https://girls2-fc.jp/page/blogs',
+	    'x-from': 'https://girls2-fc.jp/',
 	    'x-root-origin': 'https://girls2-fc.jp',
 		}).json()
 	if res['success']:
@@ -79,6 +80,7 @@ def login(email, password):
 			'sec-ch-ua': '"Chromium";v="116", "Not)A;Brand";v="24", "Google Chrome";v="116"',
 			'sec-ch-ua-mobile': '?0',
 			'sec-ch-ua-platform': '"Windows"',
+	    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
 			'x-from': 'https://girls2-fc.jp/',
 			'x-platform-id': 'web',
 			'x-root-origin': 'https://girls2-fc.jp',
