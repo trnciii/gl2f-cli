@@ -44,7 +44,7 @@ first_unauthorized = True
 def verify(au):
 	import requests
 	res = requests.get(
-		'https://api.fensi.plus/v1/auth/token/verify',
+		'https://yomo-api.girls2-fc.jp/web/v1/auth/token/verify',
 		cookies={},
 		headers={
 	    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
