@@ -202,23 +202,6 @@ function createFcArticleUrl(board, contentId)
   return `https://girls2-fc.jp/page/${board}/${contentId}`;
 }
 
-async function updateHostName(updator, fallback){
-  if(window.location.protocol === 'file:')
-  {
-    fallback();
-    return Promise.resolve();
-  }
-
-  return fetch(window.location.href).then(res =>{
-    const hostName = res.headers.get('X-Server-Name');
-    console.log(`updateHostName set ${hostName}`);
-    updator(hostName);
-  }).catch(_ => {
-    console.log('updateHostName set default');
-    fallback();
-  });
-}
-
 function createMetadata(author, date, board, contentId) {
   const i = document.createElement('i');
   i.classList = ['fa fa-external-link'];
@@ -293,4 +276,17 @@ function initCustomContextMenu(items, x, y) {
   tileContextMenu.style.top = `${posY}px`;
   tileContextMenu.style.left = `${posX}px`;
   tileContextMenu.style.display = 'block';
+}
+
+function isLocalFile() {
+  return  window.location.protocol === 'file:';
+}
+
+function isHttp() {
+  const protocol = window.location.protocol;
+  return protocol === 'http:' || protocol === 'https:';
+}
+
+function isNarrow() {
+  return window.innerWidth <= 960;
 }

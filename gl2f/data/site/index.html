@@ -57,8 +57,7 @@ tr:nth-child(odd) td{
 	<div>
 		<div id=columnDropdown style="position: relative; display: inline-block;">
 			<button id="columnDropdownButton" class="dropdown-item">
-				Columns
-				<i class="fa fa-caret-down" aria-hidden="true"></i>
+				Cols&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
 			</button>
 			<div id="columnDropdownContent" class="float" style="right: 0; border-radius: 5px;"></div>
 		</div>
@@ -91,7 +90,7 @@ const app = {};
 		expired: {
 			displayName: '<i class="fa fa-chain-broken" aria-hidden="true"></i>',
 			data: (k, v)=>v.expired? '<i class="fa fa-chain-broken" aria-hidden="true"></i>': '',
-			default: true,
+			default: window.innerWidth < 400? false: true,
 		},
 		id: {
 			displayName: 'Id',
@@ -111,12 +110,12 @@ const app = {};
 		board: {
 			displayName: 'Board',
 			data:(k, v)=>`<a href='https://girls2-fc.jp/page/${v.board}/${k}' target='_blank' style="text-decoration:none;">${v.board}&nbsp;<i class="fa fa-external-link"></i></a>`,
-			default: true,
+			default: window.innerWidth < 800? false : true,
 		},
 		author: {
 			displayName: 'Author',
 			data:(k, v)=>`<center style="white-space: nowrap">${v['author']}`,
-			default: true,
+			default: window.innerWidth < 600? false : true,
 		},
 		title: {
 			displayName: 'Title',
@@ -239,10 +238,15 @@ const app = {};
 		});
 
 		{ // header
-			updateHostName(hostname => {
-				document.title = `${hostname}/gl2f`;
-				homeButton.textContent = hostname;
-			}, _=>{});
+			if(isHttp()) {
+				fetch(window.location.href).then(res => {
+					const hostname = res.headers.get('X-Server-Name');
+					document.title = `${hostname}/gl2f`;
+					homeButton.textContent = hostname;
+				}).catch(_ =>{
+					console.log('Failed to host name');
+				});
+			}
 
 			toggleAlbumButton.onchange = ()=> {
 				tableContainer.style.maxHeight = toggleAlbumButton.checked? '30vh' : '';
@@ -256,6 +260,7 @@ const app = {};
 			const filters = ['board', 'author'];
 			filters.forEach(id => {
 				const e = document.getElementById(`filter_${id}`);
+				e.style.width = '8em';
 				e.innerHTML = [
 					`<option value=*>${id} / all</option>`,
 					...Array.from(new Set(Object.values(table).map(v => v[id])))

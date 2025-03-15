@@ -17,18 +17,14 @@ img, video {
   max-height: calc(100vh - 150px);
 }
 
-.header-title {
-  width: 820px;
+header {
+  padding-right: 28px; /* scroll bar 20px + default 8px */
 }
 
 @media screen and (max-width: 960px) {
   .blog-header {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .header-title{
-    width: 100%;
   }
 }
 </style>
@@ -42,7 +38,7 @@ img, video {
     <a id=albumButton class="NavItem">Album</a>
   </nav>
 
-  <div id=headerTitle class="header-title"></div>
+  <div id=headerTitle class="header-title" style="width:800px;"></div>
 
   <div class="header-controls" style="flex: 1;"></div>
 
@@ -64,12 +60,16 @@ const app = {};
     const notifier = new Notification();
 
     albumButton.href = `album.html?${contentId}`;
-    updateHostName(hostname =>{
-      document.title = `${hostname}/${content.title}`;
-      homeButton.textContent = hostname;
-    }, () =>{
-      document.title = `local/${content.title}`;
-    });
+    if(isHttp()) {
+      fetch(window.location.href).then(res => {
+        const hostname = res.headers.get('X-Server-Name');
+        document.title = `${hostname}/${content.title}`;
+        homeButton.textContent = hostname;
+      }).catch(_ =>{
+        document.title = `local/${content.title}`;
+        console.log('Failed to host name. Setting to default.');
+      });
+    }
 
     headerTitle.appendChild(createTitle(content.title, content.author, content.date, content.board, contentId));
     innerTitle.appendChild(createTitle(content.title, content.author, content.date, content.board, contentId));
