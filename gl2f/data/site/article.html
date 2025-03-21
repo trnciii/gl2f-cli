@@ -35,7 +35,7 @@ header {
 <header>
   <nav style="flex: 1;">
     <a id=homeButton href='index.html' class=NavItem>Home</a>
-    <a id=albumButton class="NavItem">Album</a>
+    <a id=photosButton class="NavItem">Photos</a>
   </nav>
 
   <div id=headerTitle class="header-title" style="width:800px;"></div>
@@ -59,7 +59,7 @@ const app = {};
   app.main = (contentId, content) => {
     const notifier = new Notification();
 
-    albumButton.href = `album.html?${contentId}`;
+    photosButton.href = `photos.html?${contentId}`;
     if(isHttp()) {
       fetch(window.location.href).then(res => {
         const hostname = res.headers.get('X-Server-Name');

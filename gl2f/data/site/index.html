@@ -44,8 +44,8 @@ tr:nth-child(odd) td{
 	<nav>
 		<a href="index.html" class="navItem" id=homeButton>Home</a>
 		<div>
-			<input type="checkbox" class="toggleInput" id="toggleAlbumButton">
-			<label class="NavItem toggleButton" for="toggleAlbumButton">Album</label>
+			<input type="checkbox" class="toggleInput" id="togglePhotosButton">
+			<label class="NavItem toggleButton" for="togglePhotosButton">Photos</label>
 		</div>
 	</nav>
 
@@ -120,8 +120,8 @@ const app = {};
 		title: {
 			displayName: 'Title',
 			data:(k, v)=>['girls2radio', 'lucky2radio', 'wallpaper', 'commercialmovie', 'gtube'].includes(v['board'])?
-				`<a href=album.html?${k}>${v.title}</a>`
-				: `<a href=article.html?${k}>${v.title}</a>&nbsp;/&nbsp;<a href=album.html?${k}>Album</a>`,
+				`<a href=photos.html?${k}>${v.title}</a>`
+				: `<a href=article.html?${k}>${v.title}</a>&nbsp;/&nbsp;<a href=photos.html?${k}>Photos</a>`,
 			default: true,
 		},
 	};
@@ -131,7 +131,7 @@ const app = {};
 			board: '*',
 			author: '*',
 			order: 'date.desc',
-			album: false,
+			photos: false,
 		};
 	}
 
@@ -248,14 +248,14 @@ const app = {};
 				});
 			}
 
-			toggleAlbumButton.onchange = ()=> {
-				tableContainer.style.maxHeight = toggleAlbumButton.checked? '30vh' : '';
-				tableContainer.style.overflow = toggleAlbumButton.checked? 'auto': '';
-				media.style.display = toDisplay(toggleAlbumButton.checked);
-				queryState.album = toggleAlbumButton.checked;
+			togglePhotosButton.onchange = ()=> {
+				tableContainer.style.maxHeight = togglePhotosButton.checked? '30vh' : '';
+				tableContainer.style.overflow = togglePhotosButton.checked? 'auto': '';
+				media.style.display = toDisplay(togglePhotosButton.checked);
+				queryState.photos = togglePhotosButton.checked;
 			};
-			toggleAlbumButton.checked = queryState.album;
-			toggleAlbumButton.onchange();
+			togglePhotosButton.checked = queryState.photos;
+			togglePhotosButton.onchange();
 
 			const filters = ['board', 'author'];
 			filters.forEach(id => {
@@ -356,9 +356,9 @@ const app = {};
 						() => {
 							window.open(`article.html?${id}`, '_blank');
 						}, true),
-					createContextMenuButton('View album',
+					createContextMenuButton('View photos',
 						() => {
-							window.open(`album.html?${id}`, '_blank');
+							window.open(`photos.html?${id}`, '_blank');
 						}, true),
 					createContextMenuButton('Open in FC',
 						() => {

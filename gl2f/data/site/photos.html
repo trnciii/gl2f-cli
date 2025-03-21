@@ -33,7 +33,7 @@ nav{
 <header>
   <nav>
     <a id=homeButton href='index.html' class=navItem>Home</a>
-    <a id=albumButton class="navItem">Article</a>
+    <a id=articleButton class="navItem">Article</a>
   </nav>
 
   <div id=headerTitle class="header-title"></div>
@@ -92,14 +92,14 @@ const app = {};
     };
 
 
-    albumButton.href = `article.html?${contentId}`;
+    articleButton.href = `article.html?${contentId}`;
     if(isHttp()) {
       fetch(window.location.href).then(res => {
         const hostname = res.headers.get('X-Server-Name');
-        document.title = `${hostname}/Album - ${content.title}`;
+        document.title = `${hostname}/Photos - ${content.title}`;
         homeButton.textContent = hostname;
       }).catch(_ =>{
-        document.title = `local/Album - ${content.title}`;
+        document.title = `local/Photos - ${content.title}`;
         console.log('Failed to host name. Setting to default.');
       });
     }
