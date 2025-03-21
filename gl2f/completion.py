@@ -1,4 +1,4 @@
-from .core import local, board, pretty
+from .core import local, board, pretty, util
 from . import command_builder
 
 def add_no_desc(words):
@@ -44,8 +44,7 @@ def make_case(key, process):
 
 
 def generate():
-	with open(local.fs.package_data('completion.bash')) as f:
-		source = f.read()
+	source = util.read_all_text(local.fs.package_data('completion.bash'))
 
 	boards = board.tree()
 	parser, commands = command_builder.build(command_builder.builtin + command_builder.get_addon_registrars())

@@ -135,8 +135,9 @@ def dl_medium(boardId, contentId, mediaId, head=False, request_as_stream=False, 
 		ok = False
 
 	response = requests.get(
-		f'https://api.fensi.plus/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
+		f'https://yomo-api.girls2-fc.jp/web/v1/sites/girls2-fc/boards/{boardId}/contents/{contentId}/medias/{mediaId}',
 		headers={
+	    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
 			'origin': 'https://girls2-fc.jp',
 			'x-authorization': xauth if xauth else auth.update(auth.load()),
 			'x-from': 'https://girls2-fc.jp',
