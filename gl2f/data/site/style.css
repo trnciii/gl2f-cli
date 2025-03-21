@@ -14,9 +14,8 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2px 8px 4px 8px;
+  padding: 4px 8px;
   background: linear-gradient(to right, #F486BA, #FFCE5D);
-  font-size: 18px;
   margin-bottom: 2px;
 }
 
@@ -31,6 +30,7 @@ nav {
   align-content: flex-start;
   align-items: center;
   gap: 4px;
+  padding-right: 4px;
 }
 
 .navItem {
@@ -63,7 +63,7 @@ p{
 
 h1{
   margin: 0;
-  font-size:20;
+  font-size: 1.5em;
 }
 
 
@@ -81,13 +81,14 @@ h1{
   background: cadetblue;
 }
 
-.context-menu {
+.float, .context-menu {
   position: absolute;
-  background: #fff;
+  background: white;
   border: 1px solid #ccc;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 4px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 2px;
   z-index: 1000;
+
   display: none;
 }
 
@@ -138,7 +139,7 @@ h1{
 }
 
 
-/*album*/
+/*gallery*/
 .tile{
   display: inline-block;
   vertical-align: middle;
@@ -151,4 +152,25 @@ h1{
 
 .modaal-gallery-item img {
   max-height: calc(100vh - 60px);
+}
+
+/*album and article*/
+.header-title{}
+
+.inner-title{
+  display: none;
+}
+
+@media only screen and (max-width:768px){
+  main{
+    padding: 0 8px 30px 8px;
+  }
+
+  .header-title{
+    display: none;
+  }
+
+  .inner-title{
+    display: block;
+  }
 }

@@ -1,4 +1,10 @@
-const toDisplay = b => b? '' : 'none';
+function toDisplay(b){
+  return b? '' : 'none';
+}
+
+function toDate(date) {
+  return new Date(date).toLocaleDateString('ja-JP');
+}
 
 function addRetry(target, updator, onError){
   const maxRetries = 10;
@@ -196,23 +202,31 @@ function createFcArticleUrl(board, contentId)
   return `https://girls2-fc.jp/page/${board}/${contentId}`;
 }
 
-async function updateHostName(updator, fallback)
-{
-  return fetch(window.location.href).then(res =>{
-    const hostName = res.headers.get('X-Server-Name');
-    console.log(`updateHostName set ${hostName}`);
-    updator(hostName);
-  }).catch(_ => {
-    console.log('updateHostName set default');
-    fallback();
-  });
+function createMetadata(author, date, board, contentId) {
+  const i = document.createElement('i');
+  i.classList = ['fa fa-external-link'];
+
+  const a = document.createElement('a');
+  a.href = createFcArticleUrl(board, contentId);
+  a.target = '_blank';
+  a.appendChild(i);
+
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(`${author} ${new Date(date).toLocaleDateString('ja-JP')} `));
+  div.appendChild(a);
+  div.style.fontSize = "0.8em";
+  div.style.margin = '0';
+  return div;
 }
 
-function createMetadata(author, date, board, contentId)
-{
-  return `${content['author']}&nbsp;
-${new Date(content['date']).toLocaleDateString('ja-JP')}&nbsp;
-<a href=${createFcArticleUrl(content['board'], contentId)} target=_blank><i class="fa fa-external-link" />`
+function createTitle(title, author, date, board, contentId) {
+  const h = document.createElement('h1');
+  h.appendChild(document.createTextNode(title));
+
+  const container = document.createElement('div');
+  container.appendChild(h);
+  container.appendChild(createMetadata(author, date, board, contentId));
+  return container;
 }
 
 function encodeParameter(state, defaultState)
@@ -235,4 +249,44 @@ function decodeParameter(params, defaultState)
     }
   });
   return state;
+}
+
+function createContextMenuButton(title, command, canExecute) {
+  const button = document.createElement('button');
+  button.appendChild(document.createTextNode(title));
+  button.onclick = command;
+  button.style.whiteSpace = 'nowrap';
+  if (!canExecute)
+  {
+    button.disabled = true;
+  }
+  return button;
+}
+
+function initCustomContextMenu(items, x, y) {
+  tileContextMenu.replaceChildren();
+  items.forEach(i => tileContextMenu.appendChild(i));
+
+  const menuWidth = tileContextMenu.offsetWidth;
+  const menuHeight = tileContextMenu.offsetHeight;
+
+  const posX = x + menuWidth < window.innerWidth? x:x - menuWidth;
+  const posY = y + menuHeight < window.innerHeight? y : y - menuHeight;
+
+  tileContextMenu.style.top = `${posY}px`;
+  tileContextMenu.style.left = `${posX}px`;
+  tileContextMenu.style.display = 'block';
+}
+
+function isLocalFile() {
+  return  window.location.protocol === 'file:';
+}
+
+function isHttp() {
+  const protocol = window.location.protocol;
+  return protocol === 'http:' || protocol === 'https:';
+}
+
+function isNarrow() {
+  return window.innerWidth <= 960;
 }

@@ -11,7 +11,7 @@ def update_site(full=False):
 
 	index.main(full=full)
 
-	table_code = f'const table={util.read_all_text(index.get_path())}'
+	table_code = f'const _table={util.read_all_text(index.get_path())};'
 	util.write_all_text(os.path.join(site, 'index.js'), table_code)
 
 
