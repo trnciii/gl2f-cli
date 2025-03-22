@@ -1,9 +1,9 @@
 import os, json, re
 from . import fs
+from .. import util
 
 def load(i):
-	with open(os.path.join(fs.refdir('contents'), i, f'{i}.json'), encoding='utf-8') as f:
-		return json.load(f)
+	return util.read_json(os.path.join(fs.refdir('contents'), i, f'{i}.json'))
 
 def get_ids():
 	root = fs.refdir_untouch('contents')

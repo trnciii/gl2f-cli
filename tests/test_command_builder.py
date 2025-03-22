@@ -50,8 +50,8 @@ def test_builtin_command_tree():
 	assert {'login', 'remove', 'set-token', 'update'} == tree['gl2f.auth'].choices.keys()
 	assert {'create', 'path', 'view', 'edit'} == tree['gl2f.config'].choices.keys()
 	assert {
-		'clear-cache', 'dir', 'export', 'import', 'index',
-		'install', 'ls', 'open', 'stat', 'serve'
+		'clear-cache', 'dir', 'export', 'import', 'index', 'install', 'ls', 'open',
+		'send-command', 'serve', 'shutdown', 'stat', 'status',
 	} == tree['gl2f.local'].choices.keys()
 	assert {
 		'add-definition', 'remove-definition',

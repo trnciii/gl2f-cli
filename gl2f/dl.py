@@ -48,8 +48,7 @@ def save(item, args):
 	else:
 		out = local.fs.refdir(os.path.join('contents', contentId))
 
-	with open(os.path.join(out, f'{contentId}.json'), 'w', encoding='utf-8') as f:
-		f.write(json.dumps(item, indent=2, ensure_ascii=False))
+	util.write_json(os.path.join(out, f'{contentId}.json'), item)
 
 	local.meta.dump_entry(contentId, local.meta.create(
 		important = 'closingAt' in item
@@ -99,7 +98,7 @@ def save(item, args):
 
 
 def subcommand(args):
-	from .core.local import fs, site
+	from .core.local import fs, site, index
 
 	if args.board.startswith('https'):
 		items = [lister.fetch_content(args.board, dump=args.dump)]
@@ -113,8 +112,8 @@ def subcommand(args):
 	for i in items:
 		save(i, args)
 
-	if fs.refdir_untouch('site'):
-		site.index.main(full=args.force)
+	site.update_site(args.force)
+
 
 def add_to():
 	return 'gl2f', 'dl'

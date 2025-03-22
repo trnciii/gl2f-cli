@@ -1,10 +1,8 @@
 from .core import lister, pretty, util
 
 def open_url(i):
-	import webbrowser
 	from .core import board
-	webbrowser.register("termux-open '%s'", None)
-	webbrowser.open(board.content_url(i), new=0, autoraise=True)
+	util.open_url(board.content_url(i), new=0, autoraise=True)
 
 
 def subcommand(args):

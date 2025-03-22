@@ -14,7 +14,7 @@ def check_response(response):
 
 def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=False, xauth=None):
 	response = requests.get(
-		f'https://api.fensi.plus/v1/sites/girls2-fc/texts/{boardId}/contents',
+		f'https://yomo-api.girls2-fc.jp/web/v1/sites/girls2-fc/texts/{boardId}/contents',
 		params={
 			'size': str(size),
 			'page': str(page),
@@ -23,6 +23,7 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=Fa
 		},
 		cookies={},
 		headers={
+	    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
 			'origin': 'https://girls2-fc.jp',
 			'x-from': 'https://girls2-fc.jp',
 			'x-authorization': xauth if xauth else auth.update(auth.load()),
@@ -49,8 +50,9 @@ def fetch_content(url, dump=False, xauth=None):
 	boardId = board.get('page', board.map_board_alias(page))['id']
 
 	response = requests.get(
-		f'https://api.fensi.plus/v1/sites/girls2-fc/texts/{boardId}/contents/{contentId}',
+		f'https://yomo-api.girls2-fc.jp/web/v1/sites/girls2-fc/texts/{boardId}/contents/{contentId}',
 		headers={
+	    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
 			'origin': 'https://girls2-fc.jp',
 			'x-from': 'https://girls2-fc.jp',
 			'x-authorization': xauth if xauth else auth.update(auth.load()),
@@ -158,8 +160,8 @@ def list_contents(args):
 		return sorted(filter(in24h, ret), key=lambda i:i['openingAt'], reverse=True), 1
 
 	elif os.path.isfile(args.board):
-		with open(args.board, encoding='utf-8') as f:
-			return json.load(f)['list'], 1
+		return util.read_json(args.board)['list'], 1
+
 	if b := board.get('key', args.board):
 		ret = fetch(b['id'], args.number, args.page, args.order, dump=args.dump)
 		return ret['list'], ret['totalCount']
