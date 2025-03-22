@@ -36,8 +36,9 @@ def fetch(boardId, size, page, order='reservedAt:desc', categoryId=None, dump=Fa
 
 	if dump:
 		name = board.get('id', boardId)['page']
-		if categoryId:
-			name += f'-{member.from_id(categoryId)[0]}'
+		for d in filter(lambda d: d['categoryId'] == categoryId, member.default()):
+			name += f'-{d["id"]}'
+			break
 		util.dump(dump, name, data)
 
 	return data
@@ -82,13 +83,6 @@ def list_multiple_boards(boardId, args):
 	return sum((r['list'] for r in results), [])
 
 
-def get_IDs(domain, m, g):
-	data = member.get()[m]
-	group_list = data['group']
-	group = g if g in group_list else group_list[0]
-	return board.get('key', f'{domain}/{group}')['id'], data['categoryId'][domain]
-
-
 def add_args(parser):
 	parser.add_argument('board', type=str,
 		help='board and group or member name')
@@ -112,36 +106,34 @@ def add_args(parser):
 def in24h(i):
 	return (datetime.now() - util.to_datetime(i['openingAt'])).total_seconds() < 24*3600
 
+def get_IDs(page, group):
+	parent, sub = page.split('/')
+	for d in filter(lambda d:d['id'] == sub, member.default()):
+		boardId = board.get('key', f'{parent}/{d["group"]}')['id']
+		if d['boardId'] == boardId:
+			if not group:
+				return boardId, d['categoryId']
+			if d['group'] == group:
+				return boardId, d['categoryId']
+	return board.get('key', page)['id'], None
+
 def list_contents(args):
 	if args.board.startswith('blogs/'):
 		sub = args.board.split('/')[1]
-		if member.is_group(sub):
-			boardId = board.get('key', args.board)['id']
-			ret = fetch(boardId, args.number, args.page, args.order, dump=args.dump)
-			return ret['list'], ret['totalCount']
-
-		elif member.is_member(sub):
-			boardId, categoryId = get_IDs('blogs', sub, args.group)
-			ret = fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)
-			return ret['list'], ret['totalCount']
-
-		elif sub == 'today':
+		if sub == 'today':
 			return list(filter(in24h, list_multiple_boards(
 				[board.get('key', f'blogs/{g}')['id'] for g in ['girls2', 'lucky2']],
 				args
 			))), 1
 
-	elif args.board.startswith('radio/'):
-		sub = args.board.split('/')[1]
-		if member.is_group(sub):
-			boardId = board.get('key', args.board)['id']
-			ret = fetch(boardId, args.number, args.page, args.order, dump=args.dump)
-			return ret['list'], ret['totalCount']
+		boardId, categoryId = get_IDs(args.board, args.group)
+		ret = fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)
+		return ret['list'], ret['totalCount']
 
-		elif member.is_member(sub):
-			boardId, categoryId = get_IDs('radio', sub, args.group)
-			ret = fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)
-			return ret['list'], ret['totalCount']
+	elif args.board.startswith('radio/'):
+		boardId, categoryId = get_IDs(args.board, args.group)
+		ret = fetch(boardId, args.number, args.page, args.order, categoryId=categoryId, dump=args.dump)
+		return ret['list'], ret['totalCount']
 
 	elif args.board.startswith('news/'):
 		sub = args.board.split('/')[1]
